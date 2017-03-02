@@ -1,0 +1,23 @@
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+	$(".link").click(function() {
+		var params = "";
+		if (link_parameters != undefined) {
+			params = link_parameters;
+		}
+		
+		var page = $(this).attr("page");
+		if (page != undefined) {
+			$("body").animate({
+				"opacity": "0",
+				"top": "10px"
+			},400, function () {
+				location.href = page+params;
+			});
+		}
+	});
+});
+
+</script>

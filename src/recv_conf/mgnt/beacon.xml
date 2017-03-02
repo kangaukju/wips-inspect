@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <default>
+        <desc>beacon</desc>
+        <channel>11</channel>
+        <count>10</count>
+        <sleep>10000</sleep>
+    </default>
+    
+    <airconf>
+        <type>0</type>
+        <subtype>8</subtype>
+        <ds tods="0" fromds="0" />
+		<!--
+		<addr count="3">
+			<da>ff:ff:ff:ff:ff:ff</da>
+			<sa>00:26:66:C5:10:F4</sa>
+			<bssid>01:26:66:C5:10:F4</bssid>
+		</addr>
+		-->
+        <taglist>
+            <tag id="0"  len="7" data="UNETV20" />
+        </taglist>
+    </airconf>
+
+</list>

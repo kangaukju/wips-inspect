@@ -1,0 +1,373 @@
+package osdep.inspect.wips.air;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.StringTokenizer;
+import java.util.concurrent.TimeUnit;
+
+public class Tools {
+	static final String AIRTOOL_HOME = "/home/kinow/git/aircrack-ng";
+
+	static final HashMap<String, String> map = new HashMap<>();
+
+	synchronized static private void setCacheLinuxPath(String toolname, String fullpath) {
+		map.put(toolname, fullpath);
+	}
+
+	synchronized static private String getCacheLinuxPath(String toolname) {
+		return map.get(toolname);
+	}
+
+	static private String searchInside(String dir, String filename) {
+		File basedir;
+
+		basedir = new File(dir);
+		if (basedir.isDirectory()) {
+			// System.out.println("basedir is
+			// directory:"+basedir.getAbsolutePath());
+			File[] subdir = basedir.listFiles();
+			for (File subfile : subdir) {
+				if (subfile.isFile()) {
+					// System.out.println("file: "+subfile.getName());
+					if (filename.equals(subfile.getName())) {
+						return subfile.getAbsolutePath();
+					}
+				} else if (subfile.isDirectory() && !Files.isSymbolicLink(subfile.toPath())) {
+					String find = searchInside(subfile.getAbsolutePath(), filename);
+					if (find != null) {
+						return find;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	static public String getLinuxPath(String tool) {
+		String path;
+		final String[] bases = new String[] { 
+				".", 
+				AIRTOOL_HOME+"/src",
+				AIRTOOL_HOME+"/scripts",
+				"/sbin", 
+				"/usr/sbin", 
+				"/usr/local/sbin", 
+				"/bin", 
+				"/usr/bin",
+				"/usr/local/bin", 
+				"/tmp",
+		};
+
+		path = Tools.getCacheLinuxPath(tool);
+		if (path != null) {
+//			System.out.println("cache match");
+			return path;
+		}
+
+		for (String dir : bases) {
+			path = searchInside(dir, tool);
+			if (path != null) {
+				Tools.setCacheLinuxPath(tool, path);
+				return path;
+			}
+		}
+		return null;
+	}
+
+	static public void runWipsInspect() {
+		String cmd = getLinuxPath("wips-inspect");
+		System.out.println(cmd);
+	}
+	
+	static boolean isMonitorDevice(String ifname) {
+		return ifname.endsWith("mon");
+	}
+	
+	static public List<WifiDevice> changeMonitorAll(boolean monitor) {
+		List<WifiDevice> changed = new ArrayList<>();
+		List<WifiDevice> devices = getWifiInterface();
+		WifiDevice device;
+		
+		if (devices == null || devices.size() == 0) {
+			return null;
+		}
+		
+		for (WifiDevice d : devices) {
+			if (d.isMonitor()) {
+				if (!monitor) {					
+					device = changeMonitor(d.getIfname(), false);
+					if (device != null) {
+						System.out.println("<changeMonitorAll("+monitor+")> <monitor=false> "+device);
+						changed.add(device);
+					}
+				}
+			} else {
+				if (monitor) {
+					device = changeMonitor(d.getIfname(), true);
+					if (device != null) {
+						System.out.println("<changeMonitorAll("+monitor+")> <monitor=true> "+device);
+						changed.add(device);
+					}
+				}
+			}
+		}
+		return changed;
+	}
+	
+	static public void stopAircurrent(Process procecss) {
+		if (procecss != null) {
+			if (procecss.isAlive()) {
+				procecss.destroy();
+			}
+			procecss = null;
+		}
+		
+		final String tool = getLinuxPath("killall");
+		String[] cmd = {
+				tool, "-9", "aircurrent"
+		};
+		
+		try {
+			String cmds = "";
+			for (String s : cmd) {
+				cmds += s + " ";
+			}
+			System.out.println("<stopAircurrent> "+cmds);
+			new ProcessBuilder(cmd).start();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+		}
+		System.out.println("<stopAircurrent> done.");
+	}
+	
+
+	static public int [] CHANNEL_2GHZ = {
+			36,40,44,48,52,56,60,64,100,104,108,112,116,120,124,128,132,136,140,149,153,157,161,165,
+	};
+	static public String[] getChannel2GHz() {
+		
+	}
+	
+	static public String[] get
+	
+	static public Process startAircurrent(final String ifname, int channel, int refreshTime) throws Exception {
+		return startAircurrent(ifname, channel, refreshTime, 0, 0);
+	}
+	
+	static public Process startAircurrent(final String ifname, int channel, int refreshTime, 
+			int aplifeTime, int stalifeTime) throws Exception {
+		final String tool = getLinuxPath("aircurrent");
+		Process process = null;
+		String[] cmd = {
+				tool,
+				"-i", ifname,
+				"-c", String.valueOf(channel),
+				"-t", String.valueOf(refreshTime),
+				"-a", String.valueOf(aplifeTime),
+				"-s", String.valueOf(stalifeTime)
+		};
+		
+		if (ifname == null || "".equals(ifname)) {
+			new Exception("Unknown interface");
+		}
+		
+		try {
+			String cmds = "";
+			for (String s : cmd) {
+				cmds += s + " ";
+			}
+			System.out.println("<startAircurrent> "+cmds);
+			process = new ProcessBuilder(cmd).start();
+		} catch (Exception e) {
+			e.printStackTrace();
+			process = null;
+		} finally {
+		}
+		System.out.println("<startAircurrent> done.");
+		return process;
+	}
+	
+	static public WifiDevice changeMonitor(final String ifname, boolean monitor) {
+		final String tool = getLinuxPath("airmon-ng");
+		WifiDevice device = null;
+		Process process = null;
+		String[] cmd = {
+				tool,
+				monitor ? "start" : "stop", 
+				ifname
+		};
+		
+		device = getWifiInterface(ifname);
+		if (device == null) {
+			return null;
+		}
+		
+		try {
+			{
+				String cmds = "";
+				for (String s : cmd) {
+					cmds += s + " ";
+				}
+				System.out.println("<changeMonitor> "+cmds);
+			}
+			process = new ProcessBuilder(cmd).start();
+			process.getErrorStream().close();
+//			process.getInputStream().close();
+			process.getOutputStream().close();
+			if (!process.waitFor(10, TimeUnit.SECONDS)) {
+				return null;
+			}
+			
+			List<WifiDevice> devices = getWifiInterface();
+			if (devices == null || devices.size() == 0) {
+				return null;
+			}
+			for (WifiDevice d : devices) {
+				if (d.getPhy().equals(device.getPhy())) {
+					return d;
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if (process != null && process.isAlive()) {
+				process.destroy();
+			}
+		}
+		return null;
+	}
+
+	static public WifiDevice getWifiInterface(final String ifname) {
+		WifiDevice device = null;
+		List<WifiDevice> devices = getWifiInterface();
+		
+		for (WifiDevice d : devices) {
+			if (ifname.equals(d.getIfname())) {
+				device = d;
+			}
+		}
+		return device;
+	}
+	
+	static public List<WifiDevice> getWifiInterface() {
+		String tool = getLinuxPath("airmon-ng");
+		BufferedReader out = null;
+		Process process = null;
+		String line;
+		StringTokenizer st;
+		List<WifiDevice> devices = new ArrayList<>();
+		WifiDevice device;
+		String phy;
+		String chipset;
+		
+		if (tool == null) {
+			return devices;
+		}
+		
+		try {			
+			process = new ProcessBuilder(tool).start();
+			process.getOutputStream().close();
+			process.getErrorStream().close();
+			out = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			while ((line = out.readLine()) != null) {
+				if ("".equals(line) || "\n".equals(line) || "\r".equals(line)) {
+					continue;
+				}
+				st = new StringTokenizer(line, "\t ");
+				
+				if (st.countTokens() < 2) {
+					continue;
+				}
+				phy = st.nextToken();
+				if ("PHY".equals(phy)) {
+					continue; // header
+				}
+				
+				device = new WifiDevice();
+				device.setPhy(phy);
+				device.setIfname(st.nextToken());
+				if (st.hasMoreTokens()) {
+					device.setDriver(st.nextToken());
+				}
+				chipset = "";
+				while (st.hasMoreTokens()) {
+					chipset += st.nextToken();
+				}
+				device.setChipset(chipset);
+				
+				if (isMonitorDevice(device.getIfname())) {
+					device.setMonitor(true);
+				} else {
+					device.setMonitor(false);
+				}
+				devices.add(device);
+			}			
+		} catch (Exception e) {
+			System.err.println("unable run command '"+tool+"'");
+			e.printStackTrace();
+		} finally {
+			if (out != null) try { out.close(); } catch (Exception e) {}
+			if (process != null && process.isAlive()) {
+				process.destroy();
+			}
+		}
+		return devices;
+	}
+	
+	/*
+	static public String[] getIfnames() {
+		String[] cmd = new String[] { 
+				"/home/kinow/git/aircrack-ng/src/monitor_mode.sh", "names" 
+		};
+		StringBuffer sb = new StringBuffer();
+		String[] results = null;
+		String line;
+
+		try {
+			Process process = new ProcessBuilder(cmd).start();
+			BufferedReader out = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+			while ((line = out.readLine()) != null) {
+				sb.append(line);
+			}
+
+			if ("".equals(sb.toString())) {
+				return null;
+			}
+
+			results = sb.toString().split(" ");
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return results;
+	}
+	*/
+
+	public static void main(String[] args) throws Exception {
+		/*
+		List<WifiDevice> devices;
+		devices = changeMonitorAll(true);
+		for(WifiDevice d: devices) {
+			System.out.println(d);
+		}
+		
+		System.out.println("=======================");		
+		
+		devices = getWifiInterface();
+		for(WifiDevice d: devices) {
+			System.out.println(d);
+		}
+		*/
+		Process process = startAircurrent("wlp2s0mon", 1, 10, 0, 0);
+		System.out.println(process.isAlive());
+	}
+
+}

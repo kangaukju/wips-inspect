@@ -1,0 +1,21 @@
+package air.wips.inspect.analyzer.factors;
+
+public class NotInspectionRecordException extends Exception {
+	private String inspectionName;
+	
+	NotInspectionRecordException(final String inspectionName) {
+		this.inspectionName = inspectionName;
+	}
+
+	@Override
+	public String getMessage() {
+		return String.format("[%s] no data for inspection", inspectionName);
+	}
+
+	@Override
+	public void printStackTrace() {
+		// TODO Auto-generated method stub
+		super.printStackTrace();
+	}
+	
+}

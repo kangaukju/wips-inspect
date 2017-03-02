@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+   <airconf>
+		<desc>T wifi zone</desc>
+        <type>0</type>
+        <subtype>8</subtype>
+        <taglist>
+            <tag id="0"  len="11" data="T wifi zone" />
+        </taglist>
+    </airconf>
+
+</list>

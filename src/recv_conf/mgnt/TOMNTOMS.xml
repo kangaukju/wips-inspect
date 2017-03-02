@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+		<desc>TOMNTOMS</desc>
+        <type>0</type>
+        <subtype>8</subtype>
+        <ds tods="0" fromds="0" />
+        <taglist>
+            <tag id="0"  len="8" data="TOMNTOMS" />
+        </taglist>
+    </airconf>
+
+</list>

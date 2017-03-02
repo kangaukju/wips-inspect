@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+	<default>
+		<disable>1</disable>
+		<desc>ps-poll</desc>
+		<channel>1</channel>
+		<count>4</count>
+		<sleep>10000</sleep>
+	</default>
+
+    <airconf>
+        <type>1</type>
+        <subtype>10</subtype>
+        <ds tods="0" fromds="0" />
+        <addr count="2">
+               <da>00:11:22:33:44:51</da>
+               <sa>00:11:22:33:44:52</sa>
+        </addr>
+    </airconf>
+</list>

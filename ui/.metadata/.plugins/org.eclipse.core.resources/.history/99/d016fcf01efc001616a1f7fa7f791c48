@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Wips-Inspect</title>
+	<%@include file="/M/header.jsp"%>
+</head>
+
+<body>
+	<div id="content"></div>
+		
+	<script type="text/javascript">
+	
+	$(function() {
+		function linking() {
+			$(".link").click(function(e) {				
+				e.preventDefault();				
+				var page = $(this).attr("page");				
+				if (page != undefined) {
+					$("#content").load(page);
+				}
+			});
+		}
+		$("#content").load("/M/home.jsp", function() {
+			linking();
+		});
+	});
+	</script>	
+</body>
+</html>

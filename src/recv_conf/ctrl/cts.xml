@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+		<disable>0</disable>
+		<desc>cts</desc>
+		<channel>1</channel>
+		<count>20</count>
+		<sleep>10000</sleep>
+
+        <type>1</type>
+        <subtype>12</subtype>
+		<duration>3</duration>
+        <ds tods="0" fromds="0" />
+        <addr count="1">
+            <bssid>00:11:22:33:44:41</bssid>
+        </addr>
+    </airconf>
+</list>

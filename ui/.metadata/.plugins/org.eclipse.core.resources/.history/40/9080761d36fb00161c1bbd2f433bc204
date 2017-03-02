@@ -1,0 +1,14 @@
+package air.wips.inspect.analyzer.factors;
+
+import java.util.List;
+
+import air.wips.inspect.result.AirCaptureResult;
+
+public interface Inspectable {
+	public double inspect(List<AirCaptureResult> captureResults, 
+			List<AirCaptureResult> shooterResults) throws NotInspectionDataException;
+
+	public String analyzeReport();
+	
+	public String inspectName();
+}

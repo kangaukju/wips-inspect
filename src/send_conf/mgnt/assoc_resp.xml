@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+	<default>
+		<desc>assoc-resp</desc>
+		<channel>1</channel>
+		<count>10</count>
+		<sleep>100000</sleep>
+	</default>
+
+	<airconf>
+        	<type>0</type>
+	        <subtype>1</subtype>
+	        <ds tods="0" fromds="0" />
+	        <addr count="3">
+	                   <da>00:11:22:33:44:22</da>
+	                   <sa>00:11:22:33:44:02</sa>
+            		<bssid>00:11:22:33:44:02</bssid>
+        	</addr>
+        <taglist>
+            <tag id="0" len="0" />
+            <tag id="1" len="8"   type="hex" data="82848b0c12961824" />
+            <tag id="50" len="4"  type="hex" data="0c121860" />
+        </taglist>
+
+	</airconf>
+</list>

@@ -1,0 +1,46 @@
+1487568651703	Delete elements
+1487570070701	Delete elements
+1487570555761	Delete element
+1487570558514	Rename resource '1487592113_arrow137.svg'
+1487570589402	Delete element
+1487570592192	Rename resource '1487592104_key22.svg'
+1487570613319	Delete element
+1487570615561	Rename resource '1487592088_arrow128.svg'
+1487570634396	Delete element
+1487570636820	Rename resource '1487592222_close15.svg'
+1487570643624	Rename resource 'arrow-down-01.svg'
+1487570648249	Rename resource 'arrow-up-01.svg'
+1487570655414	Rename resource 'remove-01.svg'
+1487594417152	Rename local variable 'delta'
+1487595389160	Rename local variable 'overTime'
+1487595396204	Rename local variable 'loss'
+1487595427122	Rename local variable 'overTime'
+1487595435617	Rename local variable 'overTimes'
+1487595441779	Rename local variable 'delays'
+1487597089315	Delete element
+1487634175208	Rename type 'InspectionMap'
+1487635867566	Delete element
+1487644464736	Move compilation unit
+1487644516257	Delete element
+1487650092285	Rename local variable 'newAirCaptureResultList'
+1487651029735	Rename field 'map'
+1487651313580	Rename field 'factors'
+1487917069719	Rename resource 'hello.html'
+1487990101954	Delete element
+1487990114765	Copy file
+1487991903886	Rename field 'standardTime'
+1487991922758	Rename field 'deltaDeauthTimeThreshold'
+1488000216532	Rename type 'TimeInspection'
+1488000573264	Rename field 'delay'
+1488000581665	Rename field 'busy'
+1488000591794	Rename field 'delayDeltaTime'
+1488000597418	Rename field 'busyDeltaTime'
+1488001055680	Rename type 'NotInspectionRecordException'
+1488001403717	Rename type 'DeltaTimeInspection'
+1488001423232	Copy compilation unit
+1488001439789	Rename type 'LossTimeInspection'
+1488007350245	Rename type 'FirstDiscoveryInspection'
+1488010734561	Rename resource 'wireshart_icon.png'
+1488012076497	Rename compilation unit 'Inspectable.java'
+1488012552584	Rename local variable 'f'
+1488012558578	Rename local variable 'inspect'

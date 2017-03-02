@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+        <desc>recv beacon</desc>
+        <type>0</type>
+        <subtype>8</subtype>
+        <ds tods="0" fromds="0" />
+        <taglist>
+            <tag id="0"  len="7" data="UNETV20" />
+        </taglist>
+    </airconf>
+
+</list>

@@ -1,0 +1,22 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+		<count>10000</count>
+        <desc>choisunsil</desc>
+        <type>0</type>
+        <subtype>8</subtype>
+        <ds tods="0" fromds="0" />
+        <protect>0</protect>
+        <duration>0</duration>
+		<ap>90:9f:33:c2:9a:f0</ap>
+        <taglist>
+            <tag id="0"  len="11" data="choisunsil4" />
+            <tag id="1"  len="8"  type="hex" data="82848b0c12961824" />
+            <tag id="50" len="4"  type="hex" data="3048606c" />
+<!--            <tag id="50" len="26" type="hex" data="ac792cffff000000000000000000000000000000000000000000" /> -->
+            <tag id="48" len="20" type="hex" data="0100000fac040100000fac040100000fac020000" />
+        </taglist>
+    </airconf>
+
+</list>

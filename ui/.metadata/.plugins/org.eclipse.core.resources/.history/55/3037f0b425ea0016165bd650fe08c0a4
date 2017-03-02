@@ -1,0 +1,243 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<style type="text/css">
+    .color_over_table tbody tr:hover td {
+		background: none repeat scroll 0 0 #FFCF8B;
+		color: #000000;
+		cursor: pointer;
+    }
+	.inspect_progress_label {
+		position: absolute;
+		left: 50%;
+		top: 4px;
+		font-weight: bold;
+		text-shadow: 1px 1px 0 #fff;
+	}
+	</style>
+</head>
+<body>
+	<fieldset class="main_fieldset">
+		<legend>Wi-Fi Driver</legend>
+		<div id="wifidev">
+			<table id="wifidev_table" class="table color_over_table">
+				<thead>
+					<tr>
+						<th>PHY</th>
+						<th>INTERFACE</th>
+						<th>DRIVER</th>
+						<th>CHIPSEET</th>
+						<th>MONITOR</th>
+					</tr>
+				</thead>
+				<tbody/>
+			</table>
+		</div>
+	</fieldset>
+	<fieldset class="tree main_fieldset">
+		<legend>All profile list</legend>
+		<div id="profile_tree">
+		</div>
+	</fieldset>	
+	<fieldset class="main_fieldset">
+		<legend>Inspect Process</legend>
+		<div>
+			timer <select id="inspect_timer" class="number_selectbox" style="width: 100px;">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="15">15</option>
+				<option value="20">20</option>
+				<option value="25">25</option>
+				<option value="30">30</option>
+			</select>
+			<a href="#" class="btn btn-inline btn-small btn-primary" id="inspect_run_button"><span>inspect</span></a>
+		</div>
+
+		<table id="all_config_table" class="table">		
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>name</th>
+					<th>capture xml</th>
+					<th>shooter xml</th>
+					<th>progress</th>
+					<th>result</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+
+		<div id="inspect_progressbar">
+			<div id="inspect_progress_label">Ready...</div>
+		</div>
+		<div id="inspect_chart">
+			
+		</div>
+	</fieldset>
+</body>
+<script type="text/javascript">
+
+function load_profile() {
+	jQuery.ajax({
+		url: "get_profile.jsp",
+		cache: false,
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert(result.cause);
+				return;
+			}
+			var id = 0;
+			var data = [];
+			$.each(result, function(i, profile){
+//				console.log(profile);
+				data.push({
+					id: "p_"+profile.id,
+					parent: '#',
+					text: profile.name,
+				});
+				$.each(profile.configList, function(k, config){
+//					console.log(config);
+					data.push({
+						id: "c_"+profile.id+"_"+config.id,
+						text: config.name,
+						parent: "p_"+profile.id,
+					});
+				});
+			});
+//			console.log(data);
+			$("#profile_tree").jstree("destroy")
+			.jstree({
+				plugins: ["themes","html_data","ui","crrm","search","types","hotkeys","contextmenu"],
+		   		themes: {'theme' : 'default', 'dots' : false, 'icons' : true},
+				search : {'case_insensitive' : true},
+				core: {
+					data: data,
+				},
+				/*
+		        'types': {
+		            'selectable': {
+		                'icon': 'http://elpidio.tools4software.com/images/icon-ok-small.png'
+		            },
+		            'default': {
+		                'icon': 'http://www.fabulatech.com/printer-for-remote-desktop-server-help/img/icons/warning-small.gif'
+		            }
+		        },
+		        */
+			})
+			.bind('loaded.jstree', function(event, data){
+	            //트리 로딩 롼료 이벤트
+			})
+			.bind('select_node.jstree', function(event, data){
+				//노드 선택 이벤트
+				var config_id = extract_config_id(data.selected[0]);
+				if (config_id != "") {
+					load_selected_config(config_id)
+				}
+			})
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+var wifidev_ifname_xlat = {
+		"tag":"option","value":"$\{ifname\}","html":"$\{ifname\}"};		
+var wifidev_list_xlat = {
+	tag: "tr",
+	children: [
+		{"tag":"td","html":"$\{phy\}"},
+		{"tag":"td","html":"$\{ifname\}"},
+		{"tag":"td","html":"$\{driver\}"},
+		{"tag":"td","html":"$\{chipset\}"},
+		{"tag":"td","html":"$\{monitor\}"},
+	]
+};
+function clear_wifidev() {
+	$("#wifidev_table > tbody").empty();
+}
+function load_wifidev() {
+	jQuery.ajax({
+		url: "wifidriver_json.jsp",
+		cache: false,
+		beforeSend: clear_wifidev,
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert(result.cause);
+				return;
+			}
+			$("#wifidev_table > tbody")
+			.html(json2html.transform(result, wifidev_list_xlat));
+		},
+		error: function(e) {
+			alert(e.responseText);  
+		}
+	});
+}
+
+function init_inspect_progressbar() {
+	var sp = $("#inspect_progressbar");
+	var spl = $("#inspect_progress_label");
+	sp.progressbar({
+		value: false,
+		change: function() {
+			spl.text(sp.progressbar("value") + "%");
+		},
+		complete: function() {
+			spl.text("Complete!");
+		}
+	});
+}
+	
+
+$(document).ready(function() {
+	$(".table").tablesorter();
+	$(".number_selectbox").chosen();
+	
+	load_wifidev();
+	load_profile();
+	init_inspect_progressbar();
+	
+	var ws;
+	$("#inspect_run_button").click(function() {
+		
+
+		start_inspect_progressbar($("#inspect_progressbar"), $("#inspect_timer"));
+		
+		/*
+		var profile_id = $('#profile_tree').jstree('get_selected');
+		if (_isnull(profile_id)) {
+			alert("please select the profile you want to inspect");
+			return;
+		}
+		
+		profile_id = extract_profile_id(profile_id[0]);
+		if (profile_id == "") {
+			alert("please select the profile you want to add to config");
+			return;
+		}
+		
+		if ("start" == $(this).val()) {
+			$(this).attr("disabled",true);
+			
+			ws = new WebSocket("ws://localhost:8080/wips-inspect/inspect");
+			ws.onopen = function(msg) {
+				var params = {
+					state: "start",
+					timer: $("#inspect_timer").val(),
+					profile_id: profile_id 
+				};
+				ws.send(JSON.stringify(params));
+				
+			}
+		}
+		*/
+	});
+});
+
+</script>
+</html>

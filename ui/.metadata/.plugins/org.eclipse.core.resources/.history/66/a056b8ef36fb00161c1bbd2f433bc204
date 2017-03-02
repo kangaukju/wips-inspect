@@ -1,0 +1,68 @@
+package air.wips.inspect.analyzer.factors;
+
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import air.wips.inspect.result.AirCaptureResult;
+
+public class FirstDetectionInspection extends InspectorAbstract {
+	
+	
+	/**
+
+__________|____|____|____|____|____|____|__________
+         0              t
+            f1
+                               f2
+
+	 */
+	
+	private double threshold;
+	private double firstDectectPercent;
+	
+	public FirstDetectionInspection(double threshold) {
+		this.threshold = threshold;
+	}
+
+	public double inspect(
+			List<AirCaptureResult> captureResults, 
+			List<AirCaptureResult> shooterResults) 
+					throws NotInspectionDataException 
+	{
+		if (shooterResults.size() == 0) {
+			throw new NotInspectionDataException(inspectName());
+		}
+		
+		double elapsedTime = Double.valueOf(shooterResults.get(0).getElapsed());
+		
+		firstDectectPercent = 0;
+		
+		/* perfect */
+		if (elapsedTime <= threshold) {
+			firstDectectPercent = 100;
+		}
+		
+		report = new Gson().toJson(this);
+		
+		return firstDectectPercent;
+	}
+
+	@Override
+	public String analyzeReport() {
+		return report;
+	}
+
+	@Override
+	public String inspectName() {
+		return this.getClass().getSimpleName();
+	}
+
+	public double getThreshold() {
+		return threshold;
+	}
+
+	public double getFirstDectectPercent() {
+		return firstDectectPercent;
+	}
+}

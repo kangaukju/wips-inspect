@@ -1,0 +1,45 @@
+package osdep.inspect.wips.air;
+
+public class WifiDevice {
+	private String phy;
+	private String ifname;
+	private String driver;
+	private String chipset;
+	private boolean monitor;
+	
+	public String getPhy() {
+		return phy;
+	}
+	public void setPhy(String phy) {
+		this.phy = phy;
+	}
+	public String getIfname() {
+		return ifname;
+	}
+	public void setIfname(String ifname) {
+		this.ifname = ifname;
+	}
+	public String getDriver() {
+		return driver;
+	}
+	public void setDriver(String driver) {
+		this.driver = driver;
+	}
+	public String getChipser() {
+		return chipset;
+	}
+	public void setChipser(String chipser) {
+		this.chipset = chipser;
+	}
+	public boolean isMonitor() {
+		return monitor;
+	}
+	public void setMonitor(boolean monitor) {
+		this.monitor = monitor;
+	}
+	@Override
+	public String toString() {
+		return "WifiDevice [phy=" + phy + ", ifname=" + ifname + ", driver=" + driver + ", chipser=" + chipset
+				+ ", monitor=" + monitor + "]";
+	}
+}

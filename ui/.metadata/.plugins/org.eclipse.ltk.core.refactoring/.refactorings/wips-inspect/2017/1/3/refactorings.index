@@ -1,0 +1,29 @@
+1484545917642	Rename field 'map'
+1484573944262	Rename type 'AirCurrent'
+1484624842288	Rename local variable 'nodes'
+1484627538829	Rename local variable 'ap'
+1484627543144	Rename local variable 'aplist'
+1484643435276	Delete element
+1484666011271	Rename type 'AirResultWebsocket'
+1484667646349	Delete element
+1484705493435	Rename type 'AirResultWebSocket'
+1484705629735	Rename compilation unit 'AirResultAccept.java'
+1484707577612	Delete element
+1484723542046	Delete element
+1484724000877	Delete element
+1484724012706	Rename type 'AircurrentParams'
+1484728812218	Rename method 'toFile'
+1484800777422	Delete element
+1484800801433	Rename type 'SQLConnection'
+1484871626659	Rename local variable 'list'
+1484879535955	Rename local variable 'tag'
+1484879999525	Rename type 'Profiles'
+1484893124721	Copy file
+1484896339111	Copy file
+1484896587275	Delete element
+1484897639269	Delete element
+1484990109154	Rename type 'AirCurrentReceiver'
+1484990578003	Delete element
+1484991651253	Copy compilation unit
+1484996365575	Rename type 'ShooterResult'
+1484998209448	Delete element

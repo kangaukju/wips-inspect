@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+		<desc>data</desc>
+		<disable>0</disable>
+		<channel>1</channel>
+		<count>10</count>
+		<sleep>10000</sleep>
+
+        <type>2</type>
+        <subtype>0</subtype>
+        <ds tods="0" fromds="1" />
+        <protect>1</protect>
+        <duration>0</duration>
+        <addr count="3">
+               <da>00:11:22:33:44:11</da>
+               <sa>00:11:22:33:44:01</sa>
+            <bssid>00:11:22:33:44:02</bssid>
+        </addr>
+		<data_size>60</data_size>
+    </airconf>
+</list>

@@ -1,0 +1,75 @@
+package air.wips.inspect.analyzer.factors;
+
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import air.wips.inspect.result.AirCaptureResult;
+
+public class DelayTimeInspection implements Inspectable {
+
+	/* 차단이 되는 최적의 deauth packet 송출 시간 간격  - time(msec) */
+	private int deltaDeauthMsecThreshold = 100;
+	
+	private double delayScore = 0;
+	private int delays[];
+	private int delayDeltaTimes[]; // 유실율 계산을 위한 송신된 패킷의 시간 간격
+	
+	public double inspect(
+			List<AirCaptureResult> captureResults, 
+			List<AirCaptureResult> shooterResults) 
+					throws NotInspectionDataException 
+	{	
+		if (captureResults.size() == 0) {
+			throw new NotInspectionDataException(inspectName());
+		}
+		
+		calcDelayTimes(captureResults);
+		
+		return delayScore;
+	}
+	
+	/**
+	 * @brief deauth 지연시간 계산 (유실율)
+	 * @param captureResults
+	 */
+	public double calcDelayTimes(List<AirCaptureResult> captureResults) {
+		int elapsedTime;
+		int prevTime = 0;
+		int deltaTime;
+		int delayTime;
+		int i = 0;
+		
+		delays = new int[captureResults.size()];
+		delayDeltaTimes = new int[captureResults.size()];
+		
+		for (AirCaptureResult r : captureResults) {
+			elapsedTime = Integer.valueOf(r.getElapsed()).intValue();
+			
+			// delta time = 패킷 수신 시간 - 이전 시간
+			delayDeltaTimes[i] = deltaTime = (elapsedTime - prevTime);
+			// 기준시간 간격과 지연시간 간격 차이
+			delayTime = deltaTime - deltaDeauthMsecThreshold;
+			// 지연이 발생하는 경우에만 계산에 포함
+			delays[i] = (delayTime > 0) ? delayTime : 0;
+			
+			delayScore += delays[i];
+			
+			prevTime = elapsedTime;
+			i++;
+		}
+		
+		return (delayScore / delays.length);
+	}
+	
+	@Override
+	public String analyzeReport() {
+		return new Gson().toJson(this);
+	}
+
+	@Override
+	public String inspectName() {
+		return "TimeInspection";
+	}
+
+}

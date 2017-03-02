@@ -1,0 +1,14 @@
+package air.wips.inspect.analyzer.factors;
+
+import java.util.List;
+
+import air.wips.inspect.result.AirCaptureResult;
+
+public abstract class InspectorAbstract {
+	abstract public double inspect(List<AirCaptureResult> captureResults, 
+			List<AirCaptureResult> shooterResults) throws NotInspectionDataException;
+
+	abstract public String getReport();
+	
+	abstract public String getName();
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <default>
+        <desc>probe-req</desc>
+        <channel>1</channel>
+        <count>10</count>
+        <sleep>10000</sleep>
+    </default>
+    
+    <airconf>
+        <type>0</type>
+        <subtype>4</subtype>
+        <ds tods="0" fromds="0" />
+        <addr count="3">
+                  <da>ff:ff:ff:ff:ff:ff</da>
+                  <sa>00:11:22:33:44:62</sa>
+            <bssid>ff:ff:ff:ff:ff:ff</bssid>
+        </addr>
+        <taglist>
+            <tag id="0" len="15" data="kinow_test_ssid" />
+            <tag id="1" len="8"  type="hex" data="82848b0c12961824" />
+            <tag id="50" len="4"  type="hex" data="3048606c" />
+        </taglist>
+    </airconf>
+
+</list>

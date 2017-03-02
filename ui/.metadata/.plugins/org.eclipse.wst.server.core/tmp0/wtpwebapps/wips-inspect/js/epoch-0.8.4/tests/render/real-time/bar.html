@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="../css/tests.css">
+        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+        <script src="../../../dist/js/epoch.js"></script>
+        <link rel="stylesheet" type="text/css" href="../../../dist/css/epoch.css">
+
+        <script>
+            var nextTime = (function() {
+				var m = 0;
+                return function() {
+					var t = parseInt(new Date().getTime());
+					//return t;
+					m = m + 0.01;
+					return m;
+                }
+            })();
+        </script>
+    </head>
+    <body>
+        <!-- Test 3 -->
+        <div id="test-3" class="test">
+            <h2>3. Single Seires Stream</h2>
+            <p>Correctly play / pause a single series stream of values from the plot <code>y = cos(x) + 1</code>.</p>
+            <div class="epoch"></div>
+            <p><button>Play</button></p>
+        </div>
+
+        <script>
+
+        $(function() {
+            var data = [{ label: 'A', values: [] }];
+            var playing = false;
+            var interval = null;
+            var chart = $('#test-3 .epoch').epoch({
+				speed: 100,
+				width: 700,
+				height: 100,
+				windowSize: 100,
+				pixelRatio: 1,
+				ticks: {
+					time: 10,
+				},
+				tickFormats: {
+					bottom: function(t) {
+						return t;
+					}
+				},
+                type: 'time.bar',
+                data: data
+            });
+
+            var pushPoint = function() {
+                var y = 1;
+                var time = nextTime();
+				if (time % 10 == 0) {
+					y *=2;
+				}
+                chart.push([{ time: time, y: y}]);
+            };
+
+            $('#test-3 button').on('click', function(e) {
+                if (playing) {
+                    $(e.target).text('Play');
+                    clearInterval(interval);
+                }
+                else {
+                    $(e.target).text('Pause');
+                    pushPoint();
+                    interval = setInterval(pushPoint, 100);
+                }
+                playing = !playing;
+            });
+        });
+        </script>
+
+    </body>
+</html>

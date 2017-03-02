@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Wips-Inspect</title>
+<%@include file="/M/header.jsp"%>
+<style type="text/css">
+.home_img {
+	width: 300px;
+	height: 300px;
+	cursor: pointer;
+}
+.home_contain {
+	width: 100%;
+	height: 100%;
+	vertical-align: middle;
+	text-align: center;
+}
+</style>
+</head>
+<body>
+<div>
+	<img src="">
+</div>
+</body>
+<script type="text/javascript">
+$(function() {
+	$(".menu").click(function(e) {
+		e.preventDefault();
+		$("#content").load(this.id+".jsp");
+	})
+});
+</script>
+</html>

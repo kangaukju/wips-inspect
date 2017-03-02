@@ -1,0 +1,26 @@
+<%@page import="air.wips.inspect.analyzer.factors.DelayTimeInspection"%>
+<%@page import="air.wips.inspect.analyzer.factors.BusyTimeInspection"%>
+<%@page import="air.wips.inspect.utils.StringUtil"%>
+<%@page import="air.wips.inspect.error.GoodBad"%>
+<%@page import="com.google.gson.Gson"%>
+<%@page import="air.wips.inspect.analyzer.factors.Inspectable"%>
+<%@page import="air.wips.inspect.analyzer.Inspector"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+
+	String configId = request.getParameter("config_id");
+
+	try {
+		if (StringUtil.isNull(configId)) {
+			throw new Exception("missing config_id");
+		}
+		
+		Inspector inspector = Inspector.getInstance();
+		inspector.inspect(configId, new Inspectable[] {
+				new BusyTimeInspection(),
+				new DelayTimeInspection(),
+		});
+	} catch (Exception e) {
+		e.printStackTrace();
+		response.getWriter().print(new Gson().toJson(new GoodBad().bad(e)));
+	}
+%>

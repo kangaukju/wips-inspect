@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <default>
+        <desc>action</desc>
+        <channel>1</channel>
+        <count>10</count>
+        <sleep>10000</sleep>
+    </default>
+    
+    <airconf>
+        <type>0</type>
+        <subtype>13</subtype>
+		<protect>1</protect>
+        <ds tods="0" fromds="0" />
+        <addr count="3">
+                  <da>00:11:22:33:44:81</da>
+                  <sa>00:11:22:33:44:82</sa>
+            <bssid>00:11:22:33:44:82</bssid>
+        </addr>
+		<data_size>60</data_size>
+    </airconf>
+
+</list>

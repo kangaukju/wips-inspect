@@ -1,0 +1,458 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Insert title here</title>
+	<link type="text/css"  href="//cdnjs.cloudflare.com/ajax/libs/c3/0.1.29/c3.css" rel="stylesheet">
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/wips-inspect/js/tablesorter-master/css/theme.default.css">
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.js"></script>
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/c3/0.1.29/c3.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script type="text/javascript" src="js/tablesorter-master/js/jquery.tablesorter.js"></script>
+	<script type="text/javascript" src="js/tablesorter-master/js/jquery.tablesorter.widgets.js"></script>
+	<script type="text/javascript" src="js/jquery.json2html.js"></script>
+	<script type="text/javascript" src="js/json2html.js"></script>
+	<script type="text/javascript" src="js/jquery.doubleSelect.min.js"></script>
+	
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	
+	<style type="text/css">
+		.start_button {
+			background-color: #4CAF50;
+			color: white;
+			cursor: pointer;
+		}
+		.stop_button {
+			background-color: #f44336;
+			color: white;
+			cursor: pointer;
+		}
+		.form-control {
+			display: block;
+			width: 100%;
+			font-size: 14px;		
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="head_tab">
+		<ul>			
+			<li><a href="#wifidev_tab">wifi driver</a></li>
+			<li><a href="#config_tab">config</a></li>
+		</ul>
+		<div id="wifidev_tab">
+			driver: 
+			<input type="button" value="load driver" onclick="load_wifidev();">
+			<select id="wifidev"></select>
+			refresh time: 
+			<select id="aircurrent_refresh">
+				<option value="1">1</option>
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="30">30</option>
+			</select>
+			<table id="wifidev_table" class="tablesorter">
+				<thead>
+					<tr>
+						<th>PHY</th>
+						<th>INTERFACE</th>
+						<th>DRIVER</th>
+						<th>CHIPSEET</th>
+						<th>MONITOR</th>
+					</tr>
+				</thead>
+				<tbody/>
+			</table>
+		</div>
+		<div id="config_tab">
+		</div>
+	</div>
+	<div id="tabs">
+		<ul>
+			<li><a href="#airprofiles_tab">profiles</a></li>
+			<li><a href="#aircurrent_tab">current</a></li>
+			<li><a href="#airshooter_tab">shooter</a></li>			
+			<li><a href="#user_test_tab">user test</a></li>
+		</ul>
+		<div id="aircurrent_tab">
+			channel:
+			<select id="aircurrent_channel">
+				<option value="1">1</option>
+			</select>			
+			<input type="button" id="aircurrent_btn" value="start" class="start_button">
+			<div id="aircurrent_tabs">
+				<ul>
+					<li><a href="#aircurrent_tab_aplist_tab">AP List</a></li>
+					<li><a href="#aircurrent_tab_stlist_tab">ST List</a></li>
+				</ul>
+				<div id="aircurrent_tab_aplist_tab">
+					<table id="aplist_table" class="tablesorter">
+						<thead>
+							<tr>
+								<th>BSSID</th>
+								<th>CH</th>
+								<th>SSID</th>
+								<th>PROTO</th>
+								<th>PWR(AVG)</th>
+								<th>AUTH</th>
+								<th>ENC</th>
+								<th>IP</th>
+								<th>BEGIN</th>
+								<th>LAST</th>
+							</tr>
+						</thead>
+						<tbody/>
+					</table>
+				</div>
+				<div id="aircurrent_tab_stlist_tab">
+					<table id="stlist_table" class="tablesorter">
+						<thead>
+							<tr>
+								<th>STA MAC</th>
+								<th>BSSID</th>
+								<th>CH</th>
+								<th>PWR(AVG)</th>
+								<th>RATE</th>
+								<th>PKTS</th>
+								<th>BYTES</th>
+								<th>BEGIN</th>
+								<th>LAST</th>
+							</tr>
+						</thead>
+						<tbody/>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div id="airprofiles_tab">
+			<div>
+				<table>
+					<tr>
+						<th></th>
+						<td></td>
+					</tr>
+				</table>
+				<fieldset>	
+					<legend>Shooter Config</legend>
+					<table>
+						<tr>
+							<th>Frame Type</th>
+							<td>
+								<select id="airshhoter_config_frame_type">
+								</select>
+							</td>
+						</tr>
+					</table>
+					<table id="airshhoter_config">
+						<tr>
+							<th>key</th>
+							<td><input type="text" id="airshhoter_config_key"></td>
+						</tr>
+						<tr>
+							<th>channel</th>
+							<td><input type="text" id="airshhoter_config_channel"></td>
+						</tr>
+						<tr>
+							<th>ds</th>
+							<td>
+							    <label for="adhoc">ADHOC</label>
+							    <input type="radio" name="ds" id="adhoc" class="ds-radio">
+							    <label for="fromds">fromDS</label>
+							    <input type="radio" name="ds" id="fromds" class="ds-radio">
+							    <label for="tods">toDS</label>
+							    <input type="radio" name="ds" id="tods" class="ds-radio">
+							    <label for="wds">WDS</label>
+							    <input type="radio" name="ds" id="wds" class="ds-radio">
+							</td>
+						</tr>
+						<tr>
+							<th>dwell</th>
+							<td><input type="text" id="airshhoter_config_dwell">milliseconds</td>
+						</tr>
+						<tr>
+							<th>dalay</th>
+							<td><input type="text" id="airshhoter_config_delay">milliseconds</td>
+						</tr>
+						<tr>
+							<th>ap address</th>
+							<td><input type="text" id="airshhoter_config_ap_address"></td>
+						</tr>
+						<tr>
+							<th>sta address</th>
+							<td><input type="text" id="airshhoter_config_sta_address"></td>
+						</tr>
+					</table>
+				</fieldset>
+				<fieldset>
+					<legend>Shooter Config</legend>
+				</fieldset>
+			</div>
+		</div>
+		<div id="airshooter_tab">
+			<div id="airshooter_progressbar"></div>
+			<div id="chart" style="width: 600px; height: 300px;"></div>
+		</div>
+		<div id="user_test_tab">
+			<p>
+			</p>
+		</div>
+	</div>	
+</body>
+
+<script type="text/javascript">
+
+$(function() {
+	{		
+		$("#head_tab").tabs();
+		$("#tabs").tabs();
+		$("#aircurrent_tabs").tabs();
+		$("#aplist_table").tablesorter();
+		$("#stlist_table").tablesorter();
+		$("#wifidev_table").tablesorter();
+	}
+	{
+		load_wifidev();
+	}
+	{
+		$("#airshooter_progressbar").progressbar({
+			value:10
+		});
+	}
+	{
+		$("input.ds-radio").checkboxradio();
+		console.log($("input.ds-radio"));
+	}
+	{
+		$("#airshhoter_config_frame_type").selectmenu();
+		/*
+		$("#airshhoter_config_type").select2({
+			  placeholder: "Select a type",
+			  allowClear: true
+		});
+		*/
+	}
+	{
+		build_frame_type_selectbox($("#airshhoter_config_frame_type"));
+	}
+});
+
+function build_frame_type_selectbox(target) {
+	target.empty();
+	var $group1 = $("<optgroup label='Management Frames'>");
+	target.append("<option value='0'>Association Request</option>");
+	target.append($group1);
+/*
+	
+	<option value='0'>Association Request</option>
+	<option value='1'>Association Response</option>
+	<option value='2'>Reassociation Request</option>
+	<option value='3'>Reassociation Response</option>
+	<option value='4'>Probe Request</option>
+	<option value='5'>Probe Response</option>
+	<option value='8'>Beacon</option>
+	<option value='9'>ATIM</option>
+	<option value='10'>Disassociation</option>
+	<option value='11'>Authentication</option>
+	<option value='12'>Deauthentication</option>
+	<option value='13'>Action</option>
+</optgroup>
+<optgroup label='Control Frames'>
+	<option value='24'>Block Ack Request</option>
+	<option value='25'>Block Ack</option>
+	<option value='26'>PS-Poll</option>
+	<option value='27'>RTS</option>
+	<option value='28'>CTS</option>
+	<option value='29'>ACK</option>
+	<option value='30'>CF End</option>
+	<option value='31'>CF End Ack</option>
+</optgroup>
+<optgroup label='Data Frames'>
+	<option value='32'>Data</option>
+	<option value='33'>Data Ack</option>
+	<option value='34'>Data Poll</option>
+	<option value='35'>Data Ack Poll</option>
+	<option value='36'>NULL</option>
+	<option value='37'>ACK</option>
+	<option value='38'>Poll</option>
+	<option value='39'>Ack Poll</option>
+	<option value='40'>Qos Data</option>
+	<option value='41'>Qos Data Ack</option>
+	<option value='42'>Qos Data Poll</option>
+	<option value='43'>Qos Data Ack Poll</option>
+	<option value='44'>Qos NULL</option>						
+	<option value='46'>Qos Poll</option>
+	<option value='47'>Qos Ack</option>
+</optgroup>
+*/
+}
+
+
+var data1 = ['data1', 1, 2, 3, 4, 5, 11, 12, 13, 14];
+
+
+var chart = c3.generate({
+	bindto : '#chart',
+	data : {
+		columns : [ data1, ],
+		axes: {
+			data1: 'y'
+		},
+		type: "bar",
+	},
+	bar: {
+		width: { ratio: 0.1 }
+	},
+	axis: {
+		y: {
+			show: true,
+			label: {
+				text: 'degres',
+				position: 'outer-middle'
+			}
+		}
+	},
+	zoom: {
+		enabled: false
+	}
+});
+
+var aircurrent_aplist_xlat = {
+	tag: "tr",
+	children: [
+   	{"tag":"td","html":"$\{bssid\}"},
+		{"tag":"td","html":"$\{channel\}"},
+		{"tag":"td","html":"$\{ssid\}"},
+		{"tag":"td","html":"$\{proto\}"},
+		{"tag":"td","html":"$\{power\}"},
+		{"tag":"td","html":"$\{auth\}"},
+		{"tag":"td","html":"$\{enc\}"},
+		{"tag":"td","html":"$\{ip\}"},
+		{"tag":"td","html":"$\{tinit\}"},
+		{"tag":"td","html":"$\{tlast\}"},
+	]
+};
+
+var aircurrent_stlist_xlat = {
+	tag: "tr",
+	children: [
+   	{"tag":"td","html":"$\{stamac\}"},
+		{"tag":"td","html":"$\{bssid\}"},
+		{"tag":"td","html":"$\{channel\}"},
+		{"tag":"td","html":"$\{power\}"},
+		{"tag":"td","html":"$\{rate\}"},
+		{"tag":"td","html":"$\{pktCount\}"},
+		{"tag":"td","html":"$\{dataBytes\}"},
+		{"tag":"td","html":"$\{tinit\}"},
+		{"tag":"td","html":"$\{tlast\}"},
+	]
+};
+
+var wifidev_ifname_xlat = {
+		"tag":"option","value":"$\{ifname\}","html":"$\{ifname\}"};
+		
+var wifidev_list_xlat = {
+	tag: "tr",
+	children: [
+   	{"tag":"td","html":"$\{phy\}"},
+		{"tag":"td","html":"$\{ifname\}"},
+		{"tag":"td","html":"$\{driver\}"},
+		{"tag":"td","html":"$\{chipset\}"},
+		{"tag":"td","html":"$\{monitor\}"},
+	]
+};
+
+var aircurrent_ws;
+$("#aircurrent_btn").click(function(){
+	
+	
+	if ("start" == $(this).val()) {
+		$("#aircurrent_btn").attr("class", "stop_button");		
+		$(this).val("stop");
+		
+		aircurrent_ws = new WebSocket("ws://localhost:8080/wips-inspect/aircurrent");
+		aircurrent_ws.onopen = function(msg) {
+			var params = {
+				state: "start",
+				ifname: $("#wifidev option:selected").val(),
+				channel: $("#aircurrent_channel option:selected").val(),
+				refreshTime: $("#aircurrent_refresh option:selected").val(),
+			};
+			aircurrent_ws.send(JSON.stringify(params));
+		}
+		var table;
+		var xlat;
+		aircurrent_ws.onmessage = function(msg){
+			if ("aplist" == msg.data) {
+				$("#aplist_table > tbody").empty();
+				table = $("#aplist_table > tbody");
+				xlat = aircurrent_aplist_xlat;
+			}
+			else if ("stlist" == msg.data) {
+				$("#stlist_table > tbody").empty();
+				table = $("#stlist_table > tbody");
+				xlat = aircurrent_stlist_xlat;
+			}
+			else if ("" != msg.data) {
+				table.html(json2html.transform(msg.data, xlat));
+			}
+		}
+		aircurrent_ws.onerror = function(msg) {
+			alert("wins-inspect not running.");
+		}
+	}
+	else {
+		$("#aircurrent_btn").attr("class", "start_button");		
+		$(this).val("start");
+		var params = {
+			state: "stop",
+		};
+		if (aircurrent_ws != undefined) {
+			aircurrent_ws.send(JSON.stringify(params));
+			aircurrent_ws.close();
+		}
+	}
+});
+
+function load_wifidev() {
+	jQuery.ajax({
+		url: "wifidriver_json.jsp",
+		cache: false,
+		beforeSend: clear_wifidev,
+		dataType: "json",
+		success: function(result) {
+			$("#wifidev")
+			.html(json2html.transform(result, wifidev_ifname_xlat));
+			$("#wifidev_table > tbody")
+			.html(json2html.transform(result, wifidev_list_xlat));
+		},
+		error: function(e) {
+			alert(e.responseText);  
+		}
+	});
+}
+
+function clear_wifidev() {
+	$("#wifidev")[0].options.length = 0;
+	$("#wifidev_table > tbody").empty();
+}
+
+/*
+var r = 0;
+
+setInterval(function () {
+	data1.push(r++);
+	chart.load({
+		columns: [
+			data1,
+		]
+	});
+}, 1000);
+*/
+</script>
+</html>

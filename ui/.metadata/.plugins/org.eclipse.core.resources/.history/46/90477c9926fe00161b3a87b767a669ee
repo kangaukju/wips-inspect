@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<%@include file="/M/header.jsp"%>
+<style type="text/css">
+#config_list_table tbody tr.selected td {
+    background: none repeat scroll 0 0 #FF9900;
+}
+.button_img {
+	cursor: pointer;
+	width: 30px;
+}
+.tr_img {
+	cursor: pointer;
+	width: 20px;
+}
+.hidden {
+	display: none;
+}
+</style>
+</head>
+<body>
+	<fieldset class="main_fieldset">
+		<legend>Config List</legend>
+		<div align="right">
+			<img class="link button_img" src="/img/M/plus.svg" page="add_config.jsp">
+			<img class="link button_img" src="/img/M/write.svg" page="modify_config.jsp" call="cur_config_id">
+		</div>
+		
+		<table id="config_list_table">
+			<thead>
+				<tr>
+					<th><img class="tr_img" src="/img/M/check.svg"></th>
+					<th>name</th>
+					<th>capture</th>
+					<th>shooter</th>
+					<th>updated</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</fieldset>
+</body>
+
+<script type="text/javascript">
+var config_list_table_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		class:"pointer",
+		children: [
+			{tag:"td", html:"<img class='config_check_img hidden tr_img' src='/img/M/check.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{captureAirConf.desc\}"},
+			{tag:"td", html:"$\{shooterAirConf.desc\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<img class='config_del_img tr_img' src='/img/M/cancel.svg'>"},
+		]
+};
+
+function load_config_list() {
+	jQuery.ajax({
+		url: "/get_config.jsp",
+		data: {detail: 'true'},
+		cache: false,
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert("load_config_list: "+result.cause);
+				return;
+			}
+			$("#config_list_table > tbody").html(
+				json2html.transform(result, config_list_table_xlat)
+			);
+			$("#config_list_table").tablesorter({
+				headers: {
+					0: {sorter: false},
+					5: {sorter: false},
+				}
+			}).trigger("update");
+			$("#config_list_table > tbody > tr").click(function(e) {
+				$("#config_list_table > tbody > tr").removeClass('selected');				
+				$(this).toggleClass('selected');
+				$(".config_check_img").addClass('hidden');
+				$("#img_"+$(this).attr("id")).toggleClass('hidden');
+			});
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+function cur_config_id() {
+	alert(1);
+}
+
+$(document).ready(function() {
+	load_config_list();
+});
+</script>
+<%@include file="/M/footer.jsp"%>
+</html>

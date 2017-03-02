@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+		<desc>choisunsil_ap_deauth</desc>
+        <type>0</type>
+        <subtype>12</subtype>
+        <ds tods="0" fromds="0" />
+		<addr count="3">
+			<da>ff:ff:ff:ff:ff:ff</da>
+			<sa>90:9f:33:c2:9a:f0</sa>
+			<bssid>90:9f:33:c2:9a:f0</bssid>
+		</addr>
+    </airconf>
+
+</list>

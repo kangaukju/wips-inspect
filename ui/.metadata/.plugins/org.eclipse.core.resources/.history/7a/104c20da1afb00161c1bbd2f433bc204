@@ -1,0 +1,5 @@
+package air.wips.inspect.analyzer.factors;
+
+public class FirstDiscoveryInspection {
+
+}

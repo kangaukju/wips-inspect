@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+	<default>
+		<desc>assoc-resp</desc>
+		<channel>1</channel>
+		<count>10</count>
+		<sleep>10000</sleep>
+	</default>
+
+	<airconf>
+        	<type>0</type>
+	        <subtype>3</subtype>
+	        <ds tods="0" fromds="0" />
+	        <addr count="3">
+	                      <da>00:11:22:33:44:21</da>
+	                      <sa>00:11:22:33:44:22</sa>
+            		<bssid>00:11:22:33:44:23</bssid>
+        	</addr>
+	</airconf>
+</list>

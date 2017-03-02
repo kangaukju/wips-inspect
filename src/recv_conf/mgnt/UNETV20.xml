@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+		<channel>1</channel>
+		<dwell>100</dwell>
+		<key>1</key>
+        <desc>UNETV20</desc>
+        <type>0</type>
+        <subtype>8</subtype>
+        <taglist>
+            <tag id="0"  len="7" data="UNETV20" />
+        </taglist>
+    </airconf>
+
+</list>

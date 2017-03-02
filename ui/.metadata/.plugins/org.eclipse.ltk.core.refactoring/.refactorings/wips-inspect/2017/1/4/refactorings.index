@@ -1,0 +1,42 @@
+1485066418800	Copy compilation unit
+1485158643125	Delete element
+1485158647663	Delete element
+1485158655858	Delete element
+1485158661295	Delete element
+1485159754234	Rename method 'stopAircurrent'
+1485159780838	Rename method 'stopAirshooter'
+1485306133694	Delete element
+1485317299289	Rename resource 'index.jsp'
+1485317304188	Copy file
+1485317321356	Delete element
+1485317325070	Copy file
+1485317339551	Rename resource 'index.html'
+1485317379277	Delete element
+1485317387269	Copy file
+1485317399301	Rename resource 'index.html'
+1485317467953	Copy file
+1485317476359	Rename resource 'index.html'
+1485317823017	Copy file
+1485318289193	Delete element
+1485319124403	Delete element
+1485319131422	Copy file
+1485319139112	Rename resource 'index.html'
+1485320177133	Rename resource 'index.jsp'
+1485320362516	Move 'index.jsp' to 'WebContent'
+1485320420516	Delete element
+1485333161276	Move '1.jsp' to 'WebContent'
+1485333165804	Copy file
+1485334658031	Rename resource 'menu.jsp'
+1485335989127	Rename resource '1.jsp'
+1485336160224	Rename resource 'index1.jsp'
+1485336170085	Delete element
+1485397599500	Rename resource 'inspect.jsp'
+1485408670557	Delete element
+1485411379795	Rename resource 'config_xml.jsp'
+1485411386784	Rename resource 'config_xmldata.jsp'
+1485411392926	Rename resource 'config_xml.jsp'
+1485444754118	Rename field 'filepath'
+1485473945065	Rename type 'Error'
+1485562652939	Rename resource 'config_json.jsp'
+1485562672419	Copy file
+1485562937601	Rename type 'Get'

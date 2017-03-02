@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>kinow-iphone</desc>
+    <type>0</type>
+    <subtype>12</subtype>
+    <ds fromds="0" tods="0"/>
+    <key>2</key>
+    <dwell>100</dwell>
+    <channel>1</channel>
+    <addr count="3">
+      <bssid>FF:FF:FF:FF:FF:FF</bssid>
+      <da>58:40:4E:71:7E:0C</da>
+      <sa>FF:FF:FF:FF:FF:FF</sa>
+    </addr>
+  </airconf>
+</list>

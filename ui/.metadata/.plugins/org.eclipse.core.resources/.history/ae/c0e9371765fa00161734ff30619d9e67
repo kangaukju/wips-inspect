@@ -1,0 +1,432 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">	
+	<style type="text/css">
+	<%--
+	.tree {
+		float: left;
+		width: 30%;
+	}
+	.selected_config {
+		float: left;
+		width: 60%;
+	}
+	.all_config {
+		width: 90%;
+	}
+	--%>
+	<%--
+    #all_config_table tbody tr:hover td {
+        background: none repeat scroll 0 0 #FFCF8B;
+        color: #000000;
+    }
+    --%>
+	#all_config_table tbody tr.selected td {
+		background: none repeat scroll 0 0 #FFCF8B;
+		color: #000000;
+	}    
+	#selected_config_table tbody tr:hover td {
+		background: none repeat scroll 0 0 #FFCF8B;
+		color: #000000;
+	}
+	
+	.pointer {
+		cursor: pointer;
+	}
+	.new_profile {
+		width: 100%;
+		margin-bottom: 10px;
+	}
+	.ui-widget, .ui-widget .ui-widget {                
+		font-size: 12px !important;
+	}
+	</style>
+</head>
+<body>
+	<fieldset class="tree main_fieldset">
+		<legend>All Profile List</legend>
+		<div>
+			<select id="profile_select" class="chosen"></select>
+		</div>
+	</fieldset>
+	
+	<fieldset class="tree main_fieldset">
+		<legend>All Profile List</legend>
+		<table>
+			<tr>
+				<td align="left">
+					<a href="#" class="btn btn-inline btn-mini" id="jstree_expand"><span>Expand</span></a> 
+					<a href="#" class="btn btn-inline btn-mini" id="jstree_collapse"><span>Collapse</span></a>
+				</td>
+			</tr>
+		</table>
+		<!-- <div style="overflow:scroll; overflow-x: hidden; height:150px;"> -->
+		<div>
+			<div id="profile_tree">
+			</div>
+		</div>
+		<div class="new_profile" align="right">
+			name <input type="text" id="add_profile_text" style="width: 200px;">
+			<a href="#" class="btn btn-inline btn-mini btn-success" id="add_profile_button"><span>New Profile</span></a>
+			<a href="#" class="btn btn-inline btn-mini btn-danger" id="delete"><span>Delete</span></a>
+		</div>
+		<fieldset class="selected_config sub_fieldset">
+			<legend id="select_config_legend">Selected config</legend>
+			<table id="selected_config_table" class="table">
+				<thead>
+					<tr>
+						<th>id</th>
+						<th>name</th>
+						<th data-sorter="false">capture</th>
+						<th data-sorter="false">shooter</th>
+						<th data-sorter="false">created</th>
+						<th data-sorter="false">updated</th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</fieldset>
+	</fieldset>
+
+	<fieldset class="all_config main_fieldset">
+		<legend>All Config List</legend>
+		<table>
+			<tr>
+				<td align="right">
+					<a href="#" class="btn btn-inline btn-mini btn-success" id="add_config_button"><span>Add Config</span></a>
+				</td>
+			</tr>
+		</table>
+		<table id="all_config_table" class="table">		
+			<thead>
+				<tr>
+					<th>id</th>
+					<th>name</th>
+					<th data-sorter="false">capture</th>
+					<th data-sorter="false">shooter</th>
+					<th data-sorter="false">created</th>
+					<th data-sorter="false">updated</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</fieldset>
+</body>
+
+<script type="text/javascript">
+
+var profile_select_xlat = {
+		tag: "option",
+		html: "$\{name\}",
+		value: "$\{id\}",
+		class: "profile_select_option",
+};
+
+var config_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		name: "$\{name\}",
+		class:"pointer",
+		children: [
+			{"tag":"td", "html":"$\{id\}"},
+			{"tag":"td", "html":"$\{name\}"},
+			{"tag":"td", "html":"$\{capturexml\}", "class":"capture_xml"},
+			{"tag":"td", "html":"$\{shooterxml\}", "class":"shooter_xml"},
+			{"tag":"td", "html":"$\{created\}"},
+			{"tag":"td", "html":"$\{updated\}"},
+		]
+};
+
+function load_selected_config(config_id) {
+	jQuery.ajax({
+		url: "get_config.jsp",
+		data: {id: config_id},
+		cache: false,
+		beforeSend: function() {
+			$("#selected_config_table > tbody").empty();
+		},
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert(result.cause);
+				return;
+			}
+			
+			$("#select_config_legend").html("Selected Config ["+result.name+"]");
+			
+			$("#selected_config_table > tbody").html(json2html.transform(result, config_xlat));
+
+			$("#selected_config_table").tablesorter({
+				widgets: ['zebra'],
+			}).trigger("update");
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+function load_selected_profile(profile_id) {
+	jQuery.ajax({
+		url: "get_profile.jsp",
+		data: {id: profile_id},
+		cache: false,
+		beforeSend: function() {
+			$("#selected_config_table > tbody").empty();
+		},
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert(result.cause);
+				return;
+			}
+			console.log(result);
+			
+			$("#select_config_legend").html("Selected Profile ["+result.name+"]");
+			
+			$("#selected_config_table > tbody")
+			.html(json2html.transform(result.configList, config_xlat));
+
+			$("#selected_config_table").tablesorter({
+				widgets: ['zebra'],
+			}).trigger("update");
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+function load_all_config() {
+	jQuery.ajax({
+		url: "get_config.jsp",
+		cache: false,
+		beforeSend: function() {
+			$("#all_config_table > tbody").empty();
+		},
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert(result.cause);
+				return;
+			}
+//			console.log(result);
+			$("#all_config_table > tbody").html(json2html.transform(result, config_xlat));
+
+			$("#all_config_table").tablesorter({
+				widgets: ['zebra'],
+			}).trigger("update");
+			
+			$("#all_config_table tr").on('click', function(evt) {        
+				$(this).toggleClass('selected'); 
+			});
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+function load_profile() {
+	jQuery.ajax({
+		url: "get_profile.jsp",
+		cache: false,
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert(result.cause);
+				return;
+			}
+			if ("profile_select" == "profile_select") {
+				console.log(result);
+				$("#profile_select").html(json2html.transform(result, profile_select_xlat));
+				$("#profile_select").trigger("chosen:updated");
+			}
+			
+			if ("profile_tree" == "profile_tree") {
+				var id = 0;
+				var data = [];
+				$.each(result, function(i, profile){
+					data.push({
+						id: "p_"+profile.id,
+						parent: '#',
+						text: profile.name,
+					});
+					$.each(profile.configList, function(k, config){
+						data.push({
+							id: "c_"+profile.id+"_"+config.id,
+							text: config.name,
+							parent: "p_"+profile.id,
+						});
+					});
+				});
+				
+				$("#profile_tree").jstree("destroy").jstree({
+					plugins: ["themes","html_data","ui","crrm","search","types","hotkeys","contextmenu"],
+			   		themes: {'theme' : 'default', 'dots' : false, 'icons' : true},
+					search : {'case_insensitive' : true},
+					core: {
+						data: data,
+					},
+					contextmenu: {
+						"items" : {}
+					},
+				})
+				.bind('loaded.jstree', function(event, data){
+		            //트리 로딩 롼료 이벤트
+					$("#profile_tree").jstree("open_all");
+				})
+				.bind('select_node.jstree', function(event, data){
+					//노드 선택 이벤트
+					var profile_id = extract_profile_id(data.selected[0]);
+					var config_id = extract_config_id(data.selected[0]);
+					if (config_id != "") {
+						load_selected_config(config_id)
+					} else if (profile_id != "") {
+						load_selected_profile(profile_id);
+					}
+				})
+			}
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+function add_profile(name) {
+	jQuery.ajax({
+		url: "set_profile.jsp",
+		data: {name: name},
+		cache: false,
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert(result.cause);
+				return;
+			}
+			load_profile();
+			$("#add_profile_text").val("");
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+function delete_profile_config(profile_id, config_id, reload) {	
+	jQuery.ajax({
+		url: "del_profile.jsp",
+		data: { 
+			profile_id: profile_id,
+			config_id: config_id,
+		},
+		cache: false,
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert(result.cause);
+				return;
+			}
+			if (reload) {
+				load_profile();
+			}
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+$(document).ready(function() {
+	$(".table").tablesorter({
+		widgets: ['zebra'],
+	}).trigger("update");
+	
+	load_profile();
+	load_all_config();
+	
+	$(".chosen").chosen({disable_search_threshold:2});
+	
+	$("#delete").click(function() {
+		var node = $('#profile_tree').jstree('get_selected');
+		if (_isnull(node)) {
+			alert("please select the profile or config");
+			return;
+		}
+		
+		if (!confirm("Are you sure delete profile or config ?")) {
+			return;
+		}
+				
+		for (var i=0; i<node.length; i++) {
+			var profile_id = extract_profile_id(node[i]);
+			var config_id = extract_config_id(node[i]);
+			var reload = (i == node.length-1);
+			delete_profile_config(profile_id, config_id, reload);
+		}		
+	});
+	
+	$("#add_profile_button").click(function() {
+		var profile_name = $("#add_profile_text").val();
+		if (profile_name != "") {
+			add_profile(profile_name);
+		}
+	});
+	
+	$("#add_config_button").click(function() {
+		var configs = $("#all_config_table .selected");
+		if (configs.length == 0) {
+			alert("please select the config you want to add to profile");
+			return;
+		}
+		var profile_id = $('#profile_tree').jstree('get_selected');
+//		if (profile_id == null || profile_id == undefined || profile_id.length == 0) {
+		if (_isnull(profile_id)) {
+			alert("please select the profile you want to add to config");
+			return;
+		}
+		
+		profile_id = extract_profile_id(profile_id[0]);
+		if (profile_id == "") {
+			alert("please select the profile you want to add to config");
+			return;
+		}
+		
+		var params = "?profile_id="+profile_id;
+		for (var i=0; i<configs.length; i++) {
+			params += "&config_id="+configs[i].id;
+		}		
+		jQuery.ajax({
+			url: "set_profile.jsp"+params,
+			cache: false,
+			dataType: "json",
+			success: function(result) {
+				if (result.good == false) {
+					alert(result.cause);
+					return;
+				}
+				
+				load_profile();
+				$("#add_profile_text").val("");				
+				$("#all_config_table tr").removeClass('selected');
+			},
+			error: function(e) {
+				ajax_err_handle(e);
+			}
+		});
+//		console.log(configs);
+	});
+	
+	$("#jstree_collapse").click(function(){
+		$("#profile_tree").jstree("close_all");
+	});
+	
+	$("#jstree_expand").click(function(){
+		$("#profile_tree").jstree("open_all");
+	});
+});
+</script>
+</html>

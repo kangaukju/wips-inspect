@@ -1,0 +1,1069 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Insert title here</title>
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+	<link rel="stylesheet" href="/wips-inspect/js/tablesorter-master/css/theme.default.css">
+	<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/d3/3.4.11/d3.js"></script>
+	<script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+	<script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<script type="text/javascript" src="js/tablesorter-master/js/jquery.tablesorter.js"></script>
+	<script type="text/javascript" src="js/tablesorter-master/js/jquery.tablesorter.widgets.js"></script>
+	<script type="text/javascript" src="js/jquery.json2html.js"></script>
+	<script type="text/javascript" src="js/json2html.js"></script>
+	<script type="text/javascript" src="js/jquery.doubleSelect.min.js"></script>
+	
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/css/select2.min.css" rel="stylesheet">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.3/js/select2.min.js"></script>
+	
+	<!-- https://cdnjs.com/libraries/c3  -->
+	<link type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.css">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/c3/0.4.11/c3.min.js"></script>
+	
+	<!-- epoch chart -->
+	<!-- 
+	<script src="js/epoch-0.8.4/dist/js/epoch.js"></script>
+	<link rel="stylesheet" href="js/epoch-0.8.4/dist/css/epoch.css">
+	-->
+	
+	<style type="text/css">
+		.cursor {
+			cursor: pointer;
+		}
+		
+		.start_button {
+			background-color: #4CAF50;
+			color: white;
+			cursor: pointer;
+		}
+		
+		.stop_button {
+			background-color: #f44336;
+			color: white;
+			cursor: pointer;
+		}
+		
+		.form-control {
+			display: block;
+			width: 100%;
+			font-size: 14px;
+		}
+		
+		.float_left {
+			float: left;
+		}
+		
+		.c3-axis-x text {
+			font-size: 12px;
+			fill: purple;
+		}
+		
+		.ui-progressbar {
+			position: relative;
+		}
+		
+		.airshooter_progress_label {
+			position: absolute;
+			left: 50%;
+			top: 4px;
+			font-weight: bold;
+			text-shadow: 1px 1px 0 #fff;
+		}
+		
+		.aircapture_progress_label {
+			position: absolute;
+			left: 50%;
+			top: 4px;
+			font-weight: bold;
+			text-shadow: 1px 1px 0 #fff;
+		}
+	</style>
+</head>
+
+<body>
+
+	<div id="head_tab" class="tab">
+		<ul>			
+			<li><a href="#wifidev_tab">wifi driver</a></li>
+			<li><a href="#config_tab">config</a></li>
+		</ul>
+		<div id="wifidev_tab">
+			driver: 
+			<input type="button" value="load driver" onclick="load_wifidev();">
+			<select id="wifidev"></select>
+			refresh time: 
+			<select id="aircurrent_refresh">
+				<option value="1">1</option>
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="30">30</option>
+			</select>
+			<table id="wifidev_table" class="tablesorter">
+				<thead>
+					<tr>
+						<th>PHY</th>
+						<th>INTERFACE</th>
+						<th>DRIVER</th>
+						<th>CHIPSEET</th>
+						<th>MONITOR</th>
+					</tr>
+				</thead>
+				<tbody/>
+			</table>
+		</div>
+		<div id="config_tab">
+		</div>
+	</div>
+	<div id="main_tab" class="tab">
+		<ul>
+			<li><a href="#aircapture_tab">capture</a></li>
+			<li><a href="#airshooter_tab">shooter</a></li>
+			<li><a href="#airprofiles_tab">profiles</a></li>
+			<li><a href="#aircurrent_tab">current</a></li>
+		</ul>
+		<div id="aircurrent_tab">
+			channel:
+			<select id="aircurrent_channel">
+				<option value="1">1</option>
+			</select>
+			<input type="button" id="aircurrent_btn" value="start" class="start_button">
+			<div id="aircurrent_tabs" class="tab">
+				<ul>
+					<li><a href="#aircurrent_tab_aplist_tab">AP List</a></li>
+					<li><a href="#aircurrent_tab_stlist_tab">ST List</a></li>
+				</ul>
+				<div id="aircurrent_tab_aplist_tab">
+					<table id="aplist_table" class="tablesorter">
+						<thead>
+							<tr>
+								<th>BSSID</th>
+								<th>CH</th>
+								<th>SSID</th>
+								<th>PROTO</th>
+								<th>PWR(AVG)</th>
+								<th>AUTH</th>
+								<th>ENC</th>
+								<th>IP</th>
+								<th>BEGIN</th>
+								<th>LAST</th>
+							</tr>
+						</thead>
+						<tbody/>
+					</table>
+				</div>
+				<div id="aircurrent_tab_stlist_tab">
+					<table id="stlist_table" class="tablesorter">
+						<thead>
+							<tr>
+								<th>STA MAC</th>
+								<th>BSSID</th>
+								<th>CH</th>
+								<th>PWR(AVG)</th>
+								<th>RATE</th>
+								<th>PKTS</th>
+								<th>BYTES</th>
+								<th>BEGIN</th>
+								<th>LAST</th>
+							</tr>
+						</thead>
+						<tbody/>
+					</table>
+				</div>
+			</div>
+		</div>
+		<div id="airprofiles_tab">
+			<div>
+				<fieldset class="float_left">	
+					<legend>Air Profiles</legend>
+					<table id="airprofiles_table" class="tablesorter">
+						<thead>
+							<tr>
+								<th>Name</th>
+<!-- 
+								<th>Shooter</th>
+								<th>Capture</th>
+-->
+								<th>Created</th>
+								<th>Updated</th>
+							</tr>
+						</thead>
+						<tbody />
+					</table>
+				</fieldset>
+				<fieldset class="float_left">
+					<legend>Shooter Config</legend>
+					<form class="airconfig">
+						<table class="tablesorter">
+							<thead/>
+							<tbody>
+								<tr>
+									<td>Frame Type</td>
+									<td>
+										<select id="airshooter_config_frame_type">
+										</select>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table id="airshooter_config" class="tablesorter">
+							<thead/>
+							<tbody>
+								<tr>
+									<td>key</td>
+									<td><input type="text" id="airshooter_config_key"></td>
+								</tr>
+								<tr>
+									<td>desc</td>
+									<td><input type="text" id="airshooter_config_desc"></td>
+								</tr>
+								<tr>
+									<td>seq</td>
+									<td><input type="text" id="airshooter_config_seq"></td>
+								</tr>
+								<tr>
+									<td>channel</td>
+									<td><input type="text" id="airshooter_config_channel"></td>
+								</tr>
+								<tr>
+									<td>ds</td>
+									<td>
+									    <label for="airshooter_config_ds_00">ADHOC</label>
+									    <input type="radio" name="airshooter_config_ds" id="airshooter_config_ds_00" class="ds-radio" value="00">
+									    <label for="airshooter_config_ds_10">fromDS</label>
+									    <input type="radio" name="airshooter_config_ds" id="airshooter_config_ds_10" class="ds-radio" value="10">
+									    <label for="airshooter_config_ds_01">toDS</label>
+									    <input type="radio" name="airshooter_config_ds" id="airshooter_config_ds_01" class="ds-radio" value="01">
+									    <label for="airshooter_config_ds_11">WDS</label>
+									    <input type="radio" name="airshooter_config_ds" id="airshooter_config_ds_11" class="ds-radio" value="11">
+									</td>
+								</tr>
+								<tr>
+									<td>dwell</td>
+									<td><input type="text" id="airshooter_config_dwell"> msec</td>
+								</tr>
+								<tr>
+									<td>dalay</td>
+									<td><input type="text" id="airshooter_config_delay"> msec</td>
+								</tr>
+								<tr>
+									<td>tag</td>
+									<td>
+										<table id="airshooter_config_taglist" class="tablesorter">
+											<thead>
+												<tr>
+													<th>id</th>
+													<th>len</th>
+													<th>data</th>
+													<th>type</th>
+												</tr>
+											</thead>
+											<tbody/>
+										</table>
+									</td>
+								</tr>
+								<tr>
+									<td>address</td>
+									<td>
+										<div id="airshooter_config_address_tabs" class="tab">
+											<ul>			
+												<li><a href="#airshooter_config_address_default_tab">default</a></li>
+												<li><a href="#airshooter_config_address_addr1_tab">address1</a></li>
+												<li><a href="#airshooter_config_address_addr2_tab">address2</a></li>
+												<li><a href="#airshooter_config_address_addr3_tab">address3</a></li>
+												<li><a href="#airshooter_config_address_addr4_tab">address4</a></li>
+											</ul>
+											<div id="airshooter_config_address_default_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>ap</td>
+															<td>
+																<input type="text" id="airshooter_config_ap">
+															</td>
+														</tr>
+														<tr>
+															<td>sta</td>
+															<td>
+																<input type="text" id="airshooter_config_sta">
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+											<div id="airshooter_config_address_addr1_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>da</td>
+															<td>
+																<input type="text" id="airshooter_config_addr1_da">
+															</td>
+														</tr>
+													</tbody>
+												</table>											
+											</div>
+											<div id="airshooter_config_address_addr2_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>da</td>
+															<td>
+																<input type="text" id="airshooter_config_addr2_da">
+															</td>
+														</tr>
+														<tr>
+															<td>sa</td>
+															<td>
+																<input type="text" id="airshooter_config_addr2_sa">
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+											<div id="airshooter_config_address_addr3_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>bssid</td>
+															<td>
+																<input type="text" id="airshooter_config_addr3_bssid">
+															</td>
+														</tr>
+														<tr>
+															<td>da</td>
+															<td>
+																<input type="text" id="airshooter_config_addr3_da">
+															</td>
+														</tr>
+														<tr>
+															<td>sa</td>
+															<td>
+																<input type="text" id="airshooter_config_addr3_sa">
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+											<div id="airshooter_config_address_addr4_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>da</td>
+															<td>
+																<input type="text" id="airshooter_config_addr4_da">
+															</td>
+														</tr>
+														<tr>
+															<td>sa</td>
+															<td>
+																<input type="text" id="airshooter_config_addr4_sa">
+															</td>
+														</tr>
+														<tr>
+															<td>ra</td>
+															<td>
+																<input type="text" id="airshooter_config_addr4_ra">
+															</td>
+														</tr>
+														<tr>
+															<td>ta</td>
+															<td>
+																<input type="text" id="airshooter_config_addr4_ta">
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</fieldset>
+				<fieldset>
+					<legend>Capture Config</legend>
+					<form class="airconfig">
+						<table class="tablesorter">
+							<thead/>
+							<tbody>
+								<tr>
+									<td>Frame Type</td>
+									<td>
+										<select id="aircapture_config_frame_type">
+										</select>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+						<table id="aircapture_config" class="tablesorter">
+							<thead/>
+							<tbody>
+								<tr>
+									<td>key</td>
+									<td><input type="text" id="aircapture_config_key"></td>
+								</tr>
+								<tr>
+									<td>desc</td>
+									<td><input type="text" id="aircapture_config_desc"></td>
+								</tr>
+								<tr>
+									<td>seq</td>
+									<td><input type="text" id="aircapture_config_seq"></td>
+								</tr>
+								<tr>
+									<td>channel</td>
+									<td><input type="text" id="aircapture_config_channel"></td>
+								</tr>
+								<tr>
+									<td>ds</td>
+									<td>
+									    <label for="aircapture_config_ds_00">ADHOC</label>
+									    <input type="radio" name="aircapture_config_ds" id="aircapture_config_ds_00" class="ds-radio" value="00">
+									    <label for="aircapture_config_ds_10">fromDS</label>
+									    <input type="radio" name="aircapture_config_ds" id="aircapture_config_ds_10" class="ds-radio" value="10">
+									    <label for="aircapture_config_ds_01">toDS</label>
+									    <input type="radio" name="aircapture_config_ds" id="aircapture_config_ds_01" class="ds-radio" value="01">
+									    <label for="aircapture_config_ds_11">WDS</label>
+									    <input type="radio" name="aircapture_config_ds" id="aircapture_config_ds_11" class="ds-radio" value="11">
+									</td>
+								</tr>
+								<tr>
+									<td>dwell</td>
+									<td><input type="text" id="aircapture_config_dwell"> msec</td>
+								</tr>
+								<tr>
+									<td>dalay</td>
+									<td><input type="text" id="aircapture_config_delay"> msec</td>
+								</tr>
+								<tr>
+									<td>address</td>
+									<td>
+										<div id="aircapture_config_address_tabs" class="tab">
+											<ul>			
+												<li><a href="#aircapture_config_address_default_tab">default</a></li>
+												<li><a href="#aircapture_config_address_addr1_tab">address1</a></li>
+												<li><a href="#aircapture_config_address_addr2_tab">address2</a></li>
+												<li><a href="#aircapture_config_address_addr3_tab">address3</a></li>
+												<li><a href="#aircapture_config_address_addr4_tab">address4</a></li>
+											</ul>
+											<div id="aircapture_config_address_default_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>ap</td>
+															<td>
+																<input type="text" id="aircapture_config_ap">
+															</td>
+														</tr>
+														<tr>
+															<td>sta</td>
+															<td>
+																<input type="text" id="aircapture_config_sta">
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+											<div id="aircapture_config_address_addr1_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>da</td>
+															<td>
+																<input type="text" id="aircapture_config_addr1_da">
+															</td>
+														</tr>
+													</tbody>
+												</table>											
+											</div>
+											<div id="aircapture_config_address_addr2_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>da</td>
+															<td>
+																<input type="text" id="aircapture_config_addr2_da">
+															</td>
+														</tr>
+														<tr>
+															<td>sa</td>
+															<td>
+																<input type="text" id="aircapture_config_addr2_sa">
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+											<div id="aircapture_config_address_addr3_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>bssid</td>
+															<td>
+																<input type="text" id="aircapture_config_addr3_bssid">
+															</td>
+														</tr>
+														<tr>
+															<td>da</td>
+															<td>
+																<input type="text" id="aircapture_config_addr3_da">
+															</td>
+														</tr>
+														<tr>
+															<td>sa</td>
+															<td>
+																<input type="text" id="aircapture_config_addr3_sa">
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+											<div id="aircapture_config_address_addr4_tab">
+												<table class="tablesorter">
+													<thead/>
+													<tbody>
+														<tr>
+															<td>da</td>
+															<td>
+																<input type="text" id="aircapture_config_addr4_da">
+															</td>
+														</tr>
+														<tr>
+															<td>sa</td>
+															<td>
+																<input type="text" id="aircapture_config_addr4_sa">
+															</td>
+														</tr>
+														<tr>
+															<td>ra</td>
+															<td>
+																<input type="text" id="aircapture_config_addr4_ra">
+															</td>
+														</tr>
+														<tr>
+															<td>ta</td>
+															<td>
+																<input type="text" id="aircapture_config_addr4_ta">
+															</td>
+														</tr>
+													</tbody>
+												</table>
+											</div>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</form>
+				</fieldset>
+			</div>
+		</div>
+		<div id="airshooter_tab">
+			<input type="button" id="airshooter_btn" value="start" class="start_button">
+			<input type="text" id="airshooter_timer" value="5">
+			<div id="airshooter_progressbar">
+				<div class="airshooter_progress_label">Ready...</div>
+			</div>
+			<div id="airshooter_result_chart"></div>
+		</div>
+		<div id="aircapture_tab">
+			<input type="button" id="aircapture_btn" value="start" class="start_button">
+			<input type="text" id="aircapture_timer" value="5">
+			<div id="aircapture_progressbar">
+				<div class="aircapture_progress_label">Ready...</div>
+			</div>
+			<div id="aircapture_result_chart"></div>
+		</div>
+	</div>	
+</body>
+
+<script type="text/javascript">
+
+var aircapture_x = ['x', ];
+var aircapture_y = ['y', ];
+var aircapture_result_chart = c3.generate({
+	bindto: '#aircapture_result_chart',
+	size: {
+		height: 200,
+		width: 800
+	},
+	data : {
+		x: 'x',
+		columns : [
+			aircapture_x,
+			aircapture_y, 
+		],
+		/*
+		names: {
+			x: "x",
+			y: "y",
+		},
+		axes: {
+			aircapture_y: 'y'
+		},
+		*/
+		type: "bar",
+	},
+	bar: {
+//		width: { ratio: 0.1 }
+		width: 0.1
+	},
+	axis: {
+		x: {
+			type: 'category',
+			tick: {
+				culling: {
+					max: 11
+				},
+//				rotate: 45,
+//				multiline: false
+			},
+			height: 130
+		},
+		y: {
+			show: false,
+			label: {
+				text: 'capture',
+				position: 'outer-middle'
+			}
+		}
+	},
+	zoom: {
+		enabled: false
+	}
+});
+
+$(function() {
+	{
+		for(var k=0; k<=500; k++) {
+			airshooter_x.push(k/100);
+			if (k%10 == 0) {
+				airshooter_y.push(2);
+			} else {
+				airshooter_y.push(1);
+			}
+		}
+		aircapture_result_chart.load({
+			columns: [
+				aircapture_x,
+				aircapture_y,
+			]
+		});
+	}
+	{
+		$(".tab").tabs();		
+		$(".tablesorter").tablesorter();
+	}
+	{
+		load_wifidev();
+		load_airprofiles();
+	}
+	{
+		var sp = $("#airshooter_progressbar");
+		var spl = $(".airshooter_progress_label");
+		sp.progressbar({
+			value: false,
+			change: function() {
+				spl.text(sp.progressbar("value") + "%");
+			},
+			complete: function() {
+				spl.text("Complete!");
+			}
+		});
+	}
+	{
+		var cp = $("#aircapture_progressbar");
+		var cpl = $(".aircapture_progress_label");
+		cp.progressbar({
+			value: false,
+			change: function() {
+				cpl.text(cp.progressbar("value") + "%");
+			},
+			complete: function() {
+				cpl.text("Complete!");
+			}
+		});
+	}
+	{
+		$("input.ds-radio").checkboxradio();
+	}
+	{
+		//$("#airshooter_config_frame_type").selectmenu();
+		/*
+		$("#airshooter_config_type").select2({
+			  placeholder: "Select a type",
+			  allowClear: true
+		});
+		*/
+	}
+	{
+		build_frame_type_selectbox($("#airshooter_config_frame_type"));
+		build_frame_type_selectbox($("#aircapture_config_frame_type"));
+	}
+});
+
+function build_frame_type_selectbox(target) {
+	target.empty();
+	var $group1 = $("<optgroup label='Management Frames'>");
+	$group1.append("<option value='00'>Association Request</option>");
+	$group1.append("<option value='01'>Association Response</option>");
+	$group1.append("<option value='02'>Reassociation Request</option>");
+	$group1.append("<option value='03'>Reassociation Response</option>");
+	$group1.append("<option value='04'>Probe Request</option>");
+	$group1.append("<option value='05'>Probe Response</option>");
+	$group1.append("<option value='08'>Beacon</option>");
+	$group1.append("<option value='09'>ATIM</option>");
+	$group1.append("<option value='10'>Disassociation</option>");
+	$group1.append("<option value='11'>Authentication</option>");
+	$group1.append("<option value='12'>Deauthentication</option>");
+	$group1.append("<option value='13'>Action</option>");
+	target.append($group1);
+	
+	var $group2 = $("<optgroup label='Control Frames'>");
+	$group2.append("<option value='24'>Block Ack Request</option>");
+	$group2.append("<option value='25'>Block Ack</option>");
+	$group2.append("<option value='26'>PS-Poll</option>");
+	$group2.append("<option value='27'>RTS</option>");
+	$group2.append("<option value='28'>CTS</option>");
+	$group2.append("<option value='29'>ACK</option>");
+	$group2.append("<option value='30'>CF End</option>");
+	$group2.append("<option value='31'>CF End Ack</option>");
+	target.append($group2);
+	
+	var $group3 = $("<optgroup label='Data Frames'>");
+	$group3.append("<option value='32'>Data</option>");
+	$group3.append("<option value='33'>Data Ack</option>");
+	$group3.append("<option value='34'>Data Poll</option>");
+	$group3.append("<option value='35'>Data Ack Poll</option>");
+	$group3.append("<option value='36'>NULL</option>");
+	$group3.append("<option value='37'>ACK</option>");
+	$group3.append("<option value='38'>Poll</option>");
+	$group3.append("<option value='39'>Ack Poll</option>");
+	$group3.append("<option value='40'>Qos Data</option>");
+	$group3.append("<option value='41'>Qos Data Ack</option>");
+	$group3.append("<option value='42'>Qos Data Poll</option>");
+	$group3.append("<option value='43'>Qos Data Ack Poll</option>");
+	$group3.append("<option value='44'>Qos NULL</option>");
+	$group3.append("<option value='46'>Qos Poll</option>");
+	$group3.append("<option value='47'>Qos Ack</option>");
+	target.append($group3);
+}
+
+var aircurrent_aplist_xlat = {
+	tag: "tr",
+	children: [
+		{"tag":"td","html":"$\{bssid\}"},
+		{"tag":"td","html":"$\{channel\}"},
+		{"tag":"td","html":"$\{ssid\}"},
+		{"tag":"td","html":"$\{proto\}"},
+		{"tag":"td","html":"$\{power\}"},
+		{"tag":"td","html":"$\{auth\}"},
+		{"tag":"td","html":"$\{enc\}"},
+		{"tag":"td","html":"$\{ip\}"},
+		{"tag":"td","html":"$\{tinit\}"},
+		{"tag":"td","html":"$\{tlast\}"},
+	]
+};
+
+var aircurrent_stlist_xlat = {
+	tag: "tr",
+	children: [
+		{"tag":"td","html":"$\{stamac\}"},
+		{"tag":"td","html":"$\{bssid\}"},
+		{"tag":"td","html":"$\{channel\}"},
+		{"tag":"td","html":"$\{power\}"},
+		{"tag":"td","html":"$\{rate\}"},
+		{"tag":"td","html":"$\{pktCount\}"},
+		{"tag":"td","html":"$\{dataBytes\}"},
+		{"tag":"td","html":"$\{tinit\}"},
+		{"tag":"td","html":"$\{tlast\}"},
+	]
+};
+
+var wifidev_ifname_xlat = {
+		"tag":"option","value":"$\{ifname\}","html":"$\{ifname\}"};
+		
+var wifidev_list_xlat = {
+	tag: "tr",
+	children: [
+		{"tag":"td","html":"$\{phy\}"},
+		{"tag":"td","html":"$\{ifname\}"},
+		{"tag":"td","html":"$\{driver\}"},
+		{"tag":"td","html":"$\{chipset\}"},
+		{"tag":"td","html":"$\{monitor\}"},
+	]
+};
+
+var airprofiles_list_xlat = {
+	tag: "tr",
+	class: "cursor profile",
+	id: "$\{name\}",
+	children: [
+		{"tag":"td","html":"$\{name\}"},
+/*
+		{"tag":"td","html":"$\{airCaptureXMLFile\}"},
+		{"tag":"td","html":"$\{airShooterXMLFile\}"},
+*/
+		{"tag":"td","html":"$\{createdTime\}"},
+		{"tag":"td","html":"$\{updatedTime\}"},
+	]
+};
+
+var airshooter_config_taglist_xlat = {
+	tag: "tr",
+	class: "airshooter_config_taglist",
+	children: [
+		{"tag":"td","html":"$\{id\}"},
+		{"tag":"td","html":"$\{len\}"},
+		{"tag":"td","html":"$\{data\}"},
+	]
+}
+
+/**
+ * airshooter processbar
+ */
+function start_progressbar(p, handler) {
+	p.progressbar("value", 0);
+	setTimeout(handler, 1000);
+}
+function airshooter_progressbar() {
+	var p = $("#airshooter_progressbar");
+	var val = p.progressbar("value") || 0;
+	var timer = $("#airshooter_timer").val();
+	p.progressbar("value", val + parseInt(100/timer));
+	if (val < 100) {
+		setTimeout(airshooter_progressbar, 1000);
+	}
+}
+
+/**
+ * airshooter websocket
+ */
+var airshooter_ws;
+$("#airshooter_btn").click(function(){
+	if ("start" == $(this).val()) {
+		$(this).attr("class", "stop_button");		
+		$(this).val("stop");
+		
+		airshooter_ws = new WebSocket("ws://localhost:8080/wips-inspect/airshooter");
+		airshooter_ws.onopen = function(msg) {
+			var params = {
+				state: "start",
+				ifname: $("#wifidev option:selected").val(),
+				channel: $("#aircurrent_channel option:selected").val(),
+				filename: "/home/kinow/git/wips-inspect/src/send_conf/beacon_test/b1.xml",
+				timer: $("#airshooter_timer").val(),
+			};
+			airshooter_ws.send(JSON.stringify(params));
+			start_progressbar($("#airshooter_progressbar"), airshooter_progressbar);
+		}
+		airshooter_ws.onmessage = function(msg){
+			if ("" != msg.data) {
+				var r = JSON.parse(msg.data);
+			}
+		}
+		airshooter_ws.onerror = function(msg) {
+			alert("wins-inspect not running.");
+		}
+		airshooter_ws.onclose = function() {
+			$("#airshooter_btn").attr("class", "start_button");		
+			$("#airshooter_btn").val("start");
+		}
+	}
+	else {
+		$(this).attr("class", "start_button");		
+		$(this).val("start");
+		if (airshooter_ws != undefined) {
+			var params = {
+				state: "stop",
+			};
+			airshooter_ws.send(JSON.stringify(params));
+			airshooter_ws.close();
+		}
+	}
+});
+
+/**
+ * aircapture processbar
+ */
+function aircapture_progressbar() {
+	var p = $("#aircapture_progressbar");
+	var val = p.progressbar("value") || 0;
+	var timer = $("#aircapture_timer").val();
+	p.progressbar("value", val + parseInt(100/timer));
+	if (val < 100) {
+		setTimeout(aircapture_progressbar, 1000);
+	}
+}
+
+/**
+ * aircapture websocket
+ */
+var aircapture_ws;
+$("#aircapture_btn").click(function(){
+	if ("start" == $(this).val()) {
+		$(this).attr("class", "stop_button");		
+		$(this).val("stop");
+		
+		aircapture_ws = new WebSocket("ws://localhost:8080/wips-inspect/aircapture");
+		aircapture_ws.onopen = function(msg) {
+			var params = {
+				state: "start",
+				ifname: $("#wifidev option:selected").val(),
+				channel: $("#aircurrent_channel option:selected").val(),
+				filename: "/home/kinow/git/wips-inspect/src/recv_conf/mgnt/UNETV20.xml",
+				timer: $("#aircapture_timer").val(),
+			};
+			aircapture_ws.send(JSON.stringify(params));
+			start_progressbar($("#aircapture_progressbar"), aircapture_progressbar);
+		}
+		aircapture_ws.onmessage = function(msg){
+			if ("" != msg.data) {
+				var r = JSON.parse(msg.data);
+				// KINOW
+			}
+		}
+		aircapture_ws.onerror = function(msg) {
+			alert("wins-inspect not running.");
+		}
+		aircapture_ws.onclose = function() {
+			$("#aircapture_btn").attr("class", "start_button");		
+			$("#aircapture_btn").val("start");
+		}
+	}
+	else {
+		$(this).attr("class", "start_button");		
+		$(this).val("start");
+		if (aircapture_ws != undefined) {
+			var params = {
+				state: "stop",
+			};
+			aircapture_ws.send(JSON.stringify(params));
+			aircapture_ws.close();
+		}
+	}
+});
+
+function load_wifidev() {
+	jQuery.ajax({
+		url: "wifidriver_json.jsp",
+		cache: false,
+		beforeSend: clear_wifidev,
+		dataType: "json",
+		success: function(result) {
+			$("#wifidev")
+			.html(json2html.transform(result, wifidev_ifname_xlat));
+			$("#wifidev_table > tbody")
+			.html(json2html.transform(result, wifidev_list_xlat));
+		},
+		error: function(e) {
+			alert(e.responseText);  
+		}
+	});
+}
+
+function load_airprofiles() {
+	jQuery.ajax({
+		url: "airprofiles_json.jsp",
+		cache: false,
+		beforeSend: clear_airprofiles,
+		dataType: "json",
+		success: function(result) {
+			$("#airprofiles_table > tbody")
+			.html(json2html.transform(result, airprofiles_list_xlat));
+			$(".profile").click(function() {
+				load_airconfig(this.id);
+			});
+		},
+		error: function(e) {
+			alert(e.responseText);  
+		}
+	});
+}
+
+function fillConfig(target, data) {
+	$("#"+target+"_config_key").val(data.key);
+	$("#"+target+"_config_desc").val(data.desc);
+	$("#"+target+"_config_seq").val(data.seq);
+	$("#"+target+"_config_channel").val(data.channel);
+	$("#"+target+"_config_delay").val(data.delay);
+	$("#"+target+"_config_ds_"+data.fromds+data.tods).attr("checked","checked");
+									
+	$("#"+target+"_config_address_tabs").tabs("option", "active", data.addr_count);
+	switch (data.addr_count*1) {
+	case 0:
+		$("#"+target+"_config_ap").val(data.ap);
+		$("#"+target+"_config_sta").val(data.sta);
+		break;
+	case 1:
+		$("#"+target+"_config_addr1_da").val(data.da);
+		break;
+	case 2:
+		$("#"+target+"_config_addr2_da").val(data.da);
+		$("#"+target+"_config_addr2_sa").val(data.sa);
+		break;
+	case 3:					
+		$("#"+target+"_config_addr3_bssid").val(data.bssid);
+		$("#"+target+"_config_addr3_da").val(data.da);
+		$("#"+target+"_config_addr3_sa").val(data.sa);
+		break;
+	case 4:					
+		$("#"+target+"_config_addr4_da").val(data.da);
+		$("#"+target+"_config_addr4_sa").val(data.sa);
+		$("#"+target+"_config_addr4_ra").val(data.ra);
+		$("#"+target+"_config_addr4_ta").val(data.ta);
+		break;
+	}
+	
+	$("#"+target+"_config_taglist > tbody")
+	.html(json2html.transform(data.taglist, airshooter_config_taglist_xlat));
+	
+}
+
+function load_airconfig(profile) {
+	jQuery.ajax({
+		url: "airprofiles_json.jsp",
+		data: { "profile": profile },
+		cache: false,
+		dataType: "json",
+		success: function(result) {
+			$(".airconfig").each(function() {
+				this.reset();
+			});
+//			$("#airshooter_config_frame_type").
+			for (var i=0; i<result.airShooterList.length; i++) {
+				fillConfig("airshooter", result.airShooterList[i]);
+			}
+			for (var i=0; i<result.airCaptureList.length; i++) {
+				fillConfig("aircapture", result.airCaptureList[i]);
+			}
+		},
+		error: function(e) {
+			alert(e.responseText);  
+		}
+	});
+}
+
+function clear_airprofiles() {
+	$("#airprofiles_table > tbody").empty();
+}
+
+function clear_wifidev() {
+	$("#wifidev")[0].options.length = 0;
+	$("#wifidev_table > tbody").empty();
+}
+
+</script>
+</html>

@@ -1,0 +1,27 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+		<seq>1</seq>
+		<key>1</key>
+		<delay>0</delay>
+		<channel>1</channel>
+		<dwell>100</dwell>
+        <desc>notfound-1</desc>
+        <type>0</type>
+        <subtype>8</subtype>
+        <ds tods="0" fromds="0" />
+        <addr count="3">
+               <da>ff:ff:ff:ff:ff:ff</da>
+               <sa>00:11:22:33:44:12</sa>
+            <bssid>00:11:22:33:44:12</bssid>
+        </addr>
+        <taglist>
+            <tag id="0"  len="19" data="윤송이 사랑해" />
+            <tag id="1"  len="8"  type="hex" data="82848b0c12961824" />
+            <tag id="50" len="4"  type="hex" data="3048606c" />
+            <tag id="48" len="20" type="hex" data="0100000fac040100000fac040100000fac020000" />
+        </taglist>
+    </airconf>
+
+</list>

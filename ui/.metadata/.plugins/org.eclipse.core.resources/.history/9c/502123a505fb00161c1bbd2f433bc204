@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Wips-Inspect</title>
+	<link rel="stylesheet" href="js/menu2/css/style.css">
+	<!-- jquery -->
+	<script type="text/javascript" src="js/jquery/1.11.1/jquery-1.11.1.min.js"></script>
+	<link rel="stylesheet" href="js/jquery/ui/jquery-ui-1.12.1/jquery-ui.css">
+	<script type="text/javascript" src="js/jquery/ui/jquery-ui-1.12.1/jquery-ui.js"></script>	
+	<!-- tablesorter -->
+	<link rel="stylesheet" href="js/tablesorter-master/css/theme.default.css">
+	<script type="text/javascript" src="js/tablesorter-master/js/jquery.tablesorter.js"></script>
+	<script type="text/javascript" src="js/tablesorter-master/js/jquery.tablesorter.widgets.js"></script>
+	<!-- json2html -->	
+	<script type="text/javascript" src="js/jquery.json2html.js"></script>
+	<script type="text/javascript" src="js/json2html.js"></script>		
+	<!-- https://cdnjs.com/libraries/c3  -->
+	<link rel="stylesheet" href="js/c3/0.4.11/c3.min.css"/>	
+	<script type="text/javascript" src="js/d3/d3.v3.min.js"></script>
+	<script type="text/javascript" src="js/c3/0.4.11/c3.min.js"></script>	
+	<!-- my js -->
+	<script src="js/multiCharts.js"></script>
+	<script src="js/get_set.js"></script>
+	<!-- js tree -->
+	<link rel="stylesheet" href="js/vakata-jstree-3.0.4/dist/themes/default/style.css" />
+	<script src="js/vakata-jstree-3.0.4/dist/jstree.min.js"></script>
+	
+	<!-- chosen (selectbox) -->
+	<script src="js/chosen/chosen.jquery.min.js"></script>
+	<link rel="stylesheet" href="js/chosen/chosen.min.css" />
+	
+	<script src="js/err.js"></script>
+	<script src="js/wifi_protocol.js"></script>
+	
+		<script src="js/inspectChart.js"></script>
+		
+	<link rel="stylesheet" href="js/obvious-buttons.css" />
+	
+	<style type="text/css">
+	.gree_add_img {
+		cursor: pointer;
+		vertical-align: middle;
+	}
+	.red_remove_img {
+		cursor: pointer;
+		vertical-align: middle;
+	}
+	.legend_img {
+		width: 12px;
+		height: 12px;
+		cursor: pointer;
+		vertical-align: middle;
+		padding-left: 1px;
+		padding-right: 1px;
+		margin-bottom: 1px;
+	}
+	.closeable_img {
+		width: 26px;
+		height: 26px;
+		cursor: pointer;
+		vertical-align: middle;
+		padding-left: 1px;
+		padding-right: 1px;
+		margin-bottom: 1px;
+	}
+	.input_img {
+		width: 15px;
+		height: 15px;
+		vertical-align: middle;
+	}
+	.icon_img {
+		width: 25px;
+		height: 25px;
+		vertical-align: middle;
+		cursor: pointer;
+	}
+	* {
+		font-size: 13px;
+		font-family: Arial, Sans-serif
+	}
+	.content {
+		padding: 10px;
+	}
+	.main_fieldset {
+		border: 2px solid #1F497D;
+		border-radius: 5px;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		padding: 10px;
+		background: #ddd;
+	}
+	.main_fieldset > legend {
+	    background: #1F497D;
+	    color: #fff;
+	    padding: 5px 10px ;
+	    font-size: 18px;
+	    border-radius: 5px;
+	    box-shadow: 0 0 0 5px #ddd;
+	    margin-left: 20px;
+	}
+	.sub_fieldset {
+		border: 2px solid #666C73;
+		border-radius: 5px;
+		margin-top: 30px;
+		margin-bottom: 10px;
+		padding: 10px;
+		background: #ddd;
+	}
+	.sub_fieldset > legend {
+	    background: #666C73;
+	    color: #fff;
+	    padding: 5px 10px ;
+	    font-size: 15px;
+	    border-radius: 5px;
+	    box-shadow: 0 0 0 5px #ddd;
+	    margin-left: 20px;
+	}
+	input[type=text], select {
+	    width: 100%;
+	    padding: 3px 5px;
+	    display: inline-block;
+	    border: 1px solid #ccc;
+	    border-radius: 4px;
+	    box-sizing: border-box;
+	    background: #fff;
+	}
+	table {
+		width: 100%;
+	}
+	</style>
+</head>
+
+<body style="background-color: white;">
+	<div id="magic" style="width: 100%; height: 100%;"></div>
+	<header>
+		<nav id='cssmenu'>
+			<div class="logo menu" id="hello">
+				<a href='#'>Wips-Inspect </a>
+			</div>
+			<div id="head-mobile"></div>
+			<div class="button"></div>
+			<ul>
+				<li id="inspect" class="menu"><a href='#'><img src="img/ana.png">INSPECT</a>
+				<li id="config" class="menu"><a href='#'>CONFIG</a>
+				<li><a href='#'>MENU</a>
+					<ul>
+						<li id="profile" class="menu"><a href='#'>Profile</a></li>
+						<li id="monitor" class="menu"><a href='#'>Monitor</a></li>
+					</ul>
+				</li>
+				<li id="setting" class="menu"><a href='#'>SETTING</a></li>
+				<li id="help"><a href='#'>HELP</a>
+					<ul>
+						<li><a href='#'>Product 1</a>
+							<ul>
+								<li><a href='#'>Sub Product</a></li>
+								<li><a href='#'>Sub Product</a></li>
+							</ul></li>
+						<li><a href='#'>Product 2</a>
+							<ul>
+								<li><a href='#'>Sub Product</a></li>
+								<li><a href='#'>Sub Product</a></li>
+							</ul></li>
+					</ul>
+				</li>
+			</ul>
+		</nav>
+	</header>
+	<div id="content" class="content"></div>
+	<!-- 
+	<section
+		style='padding-top: 20px; font: bold 44px arial; color: #68D800;'>
+		Responsive CSS3 Menu <br />Dropdown + Submenus <br /> Width Toggle
+		Animation
+	</section>
+	-->
+	<script src="js/menu2/js/index.js"></script>	
+	<script type="text/javascript">
+	$(function() {
+		$(".menu").click(function(e) {
+			e.preventDefault();
+//			$("#content").html("");
+			$("#content").load(this.id+".jsp");
+		})
+	});
+	</script>	
+</body>
+</html>

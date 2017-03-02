@@ -1,0 +1,101 @@
+26-Feb-2017 13:58:17.043 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Server version:        Apache Tomcat/9.0.0.M15
+26-Feb-2017 13:58:17.045 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Dec 5 2016 13:44:25 UTC
+26-Feb-2017 13:58:17.045 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Server number:         9.0.0.0
+26-Feb-2017 13:58:17.045 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Linux
+26-Feb-2017 13:58:17.045 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            4.4.0-53-generic
+26-Feb-2017 13:58:17.045 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+26-Feb-2017 13:58:17.045 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             /usr/lib/jvm/java-8-openjdk-amd64/jre
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           1.8.0_121-8u121-b13-0ubuntu1.16.04.2-b13
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         /home/kinow/git/wips-inspect/tomcat
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         /home/kinow/git/wips-inspect/tomcat
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=/home/kinow/git/wips-inspect/tomcat/conf/logging.properties
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=/home/kinow/git/wips-inspect/tomcat
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=/home/kinow/git/wips-inspect/tomcat
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=/home/kinow/git/wips-inspect/tomcat/temp
+26-Feb-2017 13:58:17.046 정보 [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: /usr/java/packages/lib/amd64:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
+26-Feb-2017 13:58:17.089 정보 [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+26-Feb-2017 13:58:17.098 정보 [main] org.apache.tomcat.util.net.NioSelectorPool.getSharedSelector Using a shared selector for servlet write/read
+26-Feb-2017 13:58:17.099 정보 [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["ajp-nio-8009"]
+26-Feb-2017 13:58:17.116 정보 [main] org.apache.tomcat.util.net.NioSelectorPool.getSharedSelector Using a shared selector for servlet write/read
+26-Feb-2017 13:58:17.116 정보 [main] org.apache.catalina.startup.Catalina.load Initialization processed in 269 ms
+26-Feb-2017 13:58:17.129 정보 [main] org.apache.catalina.core.StandardService.startInternal Starting service Catalina
+26-Feb-2017 13:58:17.129 정보 [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet Engine: Apache Tomcat/9.0.0.M15
+26-Feb-2017 13:58:17.134 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/tomcat/webapps/docs
+26-Feb-2017 13:58:17.405 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 13:58:17.425 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/tomcat/webapps/docs has finished in 290 ms
+26-Feb-2017 13:58:17.425 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/tomcat/webapps/.metadata
+26-Feb-2017 13:58:17.522 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 13:58:17.526 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/tomcat/webapps/.metadata has finished in 101 ms
+26-Feb-2017 13:58:17.526 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/tomcat/webapps/ROOT
+26-Feb-2017 13:58:17.611 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 13:58:17.613 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/tomcat/webapps/ROOT has finished in 87 ms
+26-Feb-2017 13:58:17.613 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/tomcat/webapps/host-manager
+26-Feb-2017 13:58:17.701 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 13:58:17.705 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/tomcat/webapps/host-manager has finished in 92 ms
+26-Feb-2017 13:58:17.705 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/tomcat/webapps/examples
+26-Feb-2017 13:58:17.916 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 13:58:17.925 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/tomcat/webapps/examples has finished in 219 ms
+26-Feb-2017 13:58:17.925 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/tomcat/webapps/manager
+26-Feb-2017 13:58:18.018 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 13:58:18.019 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/tomcat/webapps/manager has finished in 94 ms
+26-Feb-2017 13:58:18.020 정보 [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler [http-nio-8080]
+26-Feb-2017 13:58:18.023 정보 [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler [ajp-nio-8009]
+26-Feb-2017 13:58:18.024 정보 [main] org.apache.catalina.startup.Catalina.start Server startup in 907 ms
+26-Feb-2017 14:00:03.569 정보 [main] org.apache.catalina.core.StandardServer.await A valid shutdown command was received via the shutdown port. Stopping the Server instance.
+26-Feb-2017 14:00:03.569 정보 [main] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+26-Feb-2017 14:00:03.621 정보 [main] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["ajp-nio-8009"]
+26-Feb-2017 14:00:03.672 정보 [main] org.apache.catalina.core.StandardService.stopInternal Stopping service Catalina
+26-Feb-2017 14:00:03.686 정보 [main] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+26-Feb-2017 14:00:03.687 정보 [main] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["ajp-nio-8009"]
+26-Feb-2017 14:00:03.688 정보 [main] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
+26-Feb-2017 14:00:03.688 정보 [main] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["ajp-nio-8009"]
+26-Feb-2017 14:00:10.445 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Server version:        Apache Tomcat/9.0.0.M15
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Server built:          Dec 5 2016 13:44:25 UTC
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Server number:         9.0.0.0
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name:               Linux
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log OS Version:            4.4.0-53-generic
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture:          amd64
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home:             /usr/lib/jvm/java-8-openjdk-amd64/jre
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Version:           1.8.0_121-8u121-b13-0ubuntu1.16.04.2-b13
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log JVM Vendor:            Oracle Corporation
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_BASE:         /home/kinow/git/wips-inspect/tomcat
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log CATALINA_HOME:         /home/kinow/git/wips-inspect/tomcat
+26-Feb-2017 14:00:10.448 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.config.file=/home/kinow/git/wips-inspect/tomcat/conf/logging.properties
+26-Feb-2017 14:00:10.449 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+26-Feb-2017 14:00:10.449 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djdk.tls.ephemeralDHKeySize=2048
+26-Feb-2017 14:00:10.449 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.protocol.handler.pkgs=org.apache.catalina.webresources
+26-Feb-2017 14:00:10.449 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.base=/home/kinow/git/wips-inspect/tomcat
+26-Feb-2017 14:00:10.449 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Dcatalina.home=/home/kinow/git/wips-inspect/tomcat
+26-Feb-2017 14:00:10.449 정보 [main] org.apache.catalina.startup.VersionLoggerListener.log Command line argument: -Djava.io.tmpdir=/home/kinow/git/wips-inspect/tomcat/temp
+26-Feb-2017 14:00:10.449 정보 [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent The APR based Apache Tomcat Native library which allows optimal performance in production environments was not found on the java.library.path: /usr/java/packages/lib/amd64:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib
+26-Feb-2017 14:00:10.491 정보 [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["http-nio-8080"]
+26-Feb-2017 14:00:10.500 정보 [main] org.apache.tomcat.util.net.NioSelectorPool.getSharedSelector Using a shared selector for servlet write/read
+26-Feb-2017 14:00:10.502 정보 [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler ["ajp-nio-8009"]
+26-Feb-2017 14:00:10.516 정보 [main] org.apache.tomcat.util.net.NioSelectorPool.getSharedSelector Using a shared selector for servlet write/read
+26-Feb-2017 14:00:10.516 정보 [main] org.apache.catalina.startup.Catalina.load Initialization processed in 263 ms
+26-Feb-2017 14:00:10.530 정보 [main] org.apache.catalina.core.StandardService.startInternal Starting service Catalina
+26-Feb-2017 14:00:10.530 정보 [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet Engine: Apache Tomcat/9.0.0.M15
+26-Feb-2017 14:00:10.536 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/ui/wips-inspect/WebContent
+26-Feb-2017 14:00:10.806 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 14:00:10.822 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/ui/wips-inspect/WebContent has finished in 286 ms
+26-Feb-2017 14:00:10.823 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/ui/wips-inspect/.settings
+26-Feb-2017 14:00:10.900 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 14:00:10.901 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/ui/wips-inspect/.settings has finished in 78 ms
+26-Feb-2017 14:00:10.901 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deploying web application directory /home/kinow/git/wips-inspect/ui/wips-inspect/src
+26-Feb-2017 14:00:10.982 정보 [localhost-startStop-1] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs. Enable debug logging for this logger for a complete list of JARs that were scanned but no TLDs were found in them. Skipping unneeded JARs during scanning can improve startup time and JSP compilation time.
+26-Feb-2017 14:00:10.984 정보 [localhost-startStop-1] org.apache.catalina.startup.HostConfig.deployDirectory Deployment of web application directory /home/kinow/git/wips-inspect/ui/wips-inspect/src has finished in 83 ms
+26-Feb-2017 14:00:10.985 정보 [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler [http-nio-8080]
+26-Feb-2017 14:00:10.988 정보 [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler [ajp-nio-8009]
+26-Feb-2017 14:00:10.988 정보 [main] org.apache.catalina.startup.Catalina.start Server startup in 472 ms
+26-Feb-2017 14:01:44.896 정보 [main] org.apache.catalina.core.StandardServer.await A valid shutdown command was received via the shutdown port. Stopping the Server instance.
+26-Feb-2017 14:01:44.896 정보 [main] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["http-nio-8080"]
+26-Feb-2017 14:01:44.948 정보 [main] org.apache.coyote.AbstractProtocol.pause Pausing ProtocolHandler ["ajp-nio-8009"]
+26-Feb-2017 14:01:44.999 정보 [main] org.apache.catalina.core.StandardService.stopInternal Stopping service Catalina
+26-Feb-2017 14:01:45.007 정보 [main] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["http-nio-8080"]
+26-Feb-2017 14:01:45.009 정보 [main] org.apache.coyote.AbstractProtocol.stop Stopping ProtocolHandler ["ajp-nio-8009"]
+26-Feb-2017 14:01:45.009 정보 [main] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["http-nio-8080"]
+26-Feb-2017 14:01:45.009 정보 [main] org.apache.coyote.AbstractProtocol.destroy Destroying ProtocolHandler ["ajp-nio-8009"]

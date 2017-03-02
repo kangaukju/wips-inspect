@@ -1,0 +1,26 @@
+package air.wips.inspect.analyzer.factors;
+
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import air.wips.inspect.result.AirCaptureResult;
+
+public class FirstDiscoveryInspection implements Inspectable {
+
+	@Override
+	public double inspect(List<AirCaptureResult> captureResults, List<AirCaptureResult> shooterResults) {
+		
+	}
+
+	@Override
+	public String analyzeReport() {
+		return new Gson().toJson(this);
+	}
+
+	@Override
+	public String inspectName() {
+		return "FirstDiscoveryInspection";
+	}
+
+}

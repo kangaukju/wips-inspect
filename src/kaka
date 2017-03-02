@@ -1,0 +1,43 @@
+gnupg - GNU 프라이버시 가드 - PGP 대체 자유 소프트웨어
+libcurl3 - easy-to-use client-side URL transfer library (OpenSSL flavour)
+libcurl3-dbg - debugging symbols for libcurl (OpenSSL, GnuTLS and NSS flavours)
+libcurl3-gnutls - easy-to-use client-side URL transfer library (GnuTLS flavour)
+libcurl3-nss - easy-to-use client-side URL transfer library (NSS flavour)
+libcurl4-doc - documentation for libcurl
+libcurl4-gnutls-dev - development files and documentation for libcurl (GnuTLS flavour)
+libcurl4-nss-dev - development files and documentation for libcurl (NSS flavour)
+libcurl4-openssl-dev - development files and documentation for libcurl (OpenSSL flavour)
+libstrongswan-extra-plugins - strongSwan utility and crypto library (extra plugins)
+python-pycurl - Python bindings to libcurl
+python-pycurl-dbg - Python bindings to libcurl (debug extension)
+python-pycurl-doc - Python bindings to libcurl (documentation)
+python3-pycurl - Python bindings to libcurl (Python 3)
+python3-pycurl-dbg - Python bindings to libcurl (debug extension, Python 3)
+fp-units-net - Free Pascal - networking units dependency package
+fp-units-net-3.0.0 - Free Pascal - networking units
+gnupg-curl - GNU privacy guard - a free PGP replacement (cURL)
+libcupt4-1-downloadmethod-curl - flexible package manager -- libcurl download method
+libcurl-ocaml - OCaml curl bindings (Runtime Library)
+libcurl-ocaml-dev - OCaml libcurl bindings (Development package)
+libcurlpp-dev - c++ wrapper for libcurl (development files)
+libcurlpp0 - c++ wrapper for libcurl
+libghc-curl-dev - GHC libraries for the libcurl Haskell bindings
+libghc-curl-doc - Documentation for the libcurl Haskell bindings; documentation
+libghc-curl-prof - Profiling libraries for the libcurl Haskell bindings; profiling libraries
+libghc-hxt-curl-dev - LibCurl interface for HXT
+libghc-hxt-curl-doc - LibCurl interface for HXT; documentation
+libghc-hxt-curl-prof - LibCurl interface for HXT; profiling libraries
+libjsonrpccpp-client0 - library implementing json-rpc C++ clients
+libjsonrpccpp-client0-dbg - debugging symbols for libjsonrpccpp-client0
+libresource-retriever-dev - Robot OS resource_retriever library - development files
+libresource-retriever0d - Robot OS resource_retriever library
+libwww-curl-perl - Perl bindings to libcurl
+lua-curl - libcURL bindings for the Lua language
+lua-curl-dev - libcURL development files for the Lua language
+python-resource-retriever - Robot OS resource_retriever library - Python
+ruby-curb - Ruby libcurl bindings
+ruby-ethon - libcurl wrapper using ffi
+ruby-typhoeus - parallel HTTP library on top of ethon
+strongswan-plugin-curl - strongSwan plugin for the libcurl based HTTP/FTP fetcher
+tclcurl - Tcl bindings to libcurl
+wmget - Background download manager in a Window Maker dock app

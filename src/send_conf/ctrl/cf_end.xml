@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+	<default>
+		<disable>1</disable>
+		<desc>cf-end</desc>
+		<channel>1</channel>
+		<count>10</count>
+		<sleep>10000</sleep>
+	</default>
+
+    <airconf>
+        <type>1</type>
+        <subtype>14</subtype>
+		<duration>1234</duration>
+        <ds tods="0" fromds="0" />
+        <addr count="3">
+               <da>00:11:22:33:44:31</da>
+               <sa>00:11:22:33:44:32</sa>
+               <bssid>00:11:22:33:44:33</bssid>
+        </addr>
+    </airconf>
+
+</list>

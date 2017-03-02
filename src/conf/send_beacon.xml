@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+    <airconf>
+		<key>1</key>
+        <desc>send beacon</desc>
+        <count>1000</count>
+        <sleep>100000</sleep>
+        <type>0</type>
+        <subtype>8</subtype>
+        <ds tods="0" fromds="0" />
+		<ap>90:9f:33:6a:fd:f1</ap>
+        <taglist>
+            <tag id="0"  len="10" data="choisunsil" />
+            <tag id="50" len="4"  type="hex" data="3048606c" />
+            <tag id="48" len="20" type="hex" data="0100000fac040100000fac040100000fac020000" />
+            <tag id="1"  len="8"  type="hex" data="82848b0c12961824" />
+        </taglist>
+    </airconf>
+
+</list>

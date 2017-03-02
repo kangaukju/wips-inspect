@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+        <desc>beacon</desc>
+        <channel>1</channel>
+    
+    <airconf>
+        <count>500</count>
+        <type>0</type>
+        <subtype>8</subtype>
+        <ds tods="0" fromds="0" />
+        <protect>0</protect>
+        <duration>0</duration>
+        <addr count="3">
+               <da>ff:ff:ff:ff:ff:ff</da>
+               <sa>00:11:22:33:44:02</sa>
+            <bssid>00:11:22:33:44:02</bssid>
+        </addr>
+        <taglist>
+            <tag id="0"  len="9" data="not found" />
+            <tag id="1"  len="8"  type="hex" data="82848b0c12961824" />
+            <tag id="50" len="4"  type="hex" data="3048606c" />
+<!--            <tag id="50" len="26" type="hex" data="ac792cffff000000000000000000000000000000000000000000" /> -->
+            <tag id="48" len="20" type="hex" data="0100000fac040100000fac040100000fac020000" />
+        </taglist>
+    </airconf>
+
+</list>

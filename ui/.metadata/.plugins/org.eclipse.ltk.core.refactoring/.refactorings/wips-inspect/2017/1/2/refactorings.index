@@ -1,0 +1,5 @@
+1484195645827	Delete element
+1484267511952	Rename field 'version'
+1484375640970	Rename field 'chipser'
+1484375646492	Rename method 'getChipser'
+1484375655532	Rename method 'setChipser'

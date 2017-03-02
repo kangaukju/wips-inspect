@@ -1,0 +1,18 @@
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+	$(".link").click(function() {
+		var page = $(this).attr("page");
+		if (page != undefined) {
+	        $("body").animate({
+	            "opacity": "0",
+	            "top": "10px"
+	        },500, function () {
+				$(location).attr('href',page);
+	        });
+		}
+	});
+});
+
+</script>

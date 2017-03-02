@@ -1,0 +1,45 @@
+package air.wips.inspect.analyzer.factors;
+
+import java.util.List;
+
+import com.google.gson.Gson;
+
+import air.wips.inspect.result.AirCaptureResult;
+
+public class FirstDiscoveryInspection implements Inspectable {
+	
+	private double threshold;
+	
+	public FirstDiscoveryInspection(double threshold) {
+		this.threshold = threshold;
+	}
+
+	public double inspect(
+			List<AirCaptureResult> captureResults, 
+			List<AirCaptureResult> shooterResults) 
+					throws NotInspectionDataException 
+	{
+		if (shooterResults.size() == 0) {
+			throw new NotInspectionDataException(inspectName());
+		}
+		
+		double elapsedTime = Double.valueOf(shooterResults.get(0).getElapsed());
+		
+		/* perfect */
+		if (elapsedTime <= threshold) {
+			return 100;
+		}
+		
+	}
+
+	@Override
+	public String analyzeReport() {
+		return new Gson().toJson(this);
+	}
+
+	@Override
+	public String inspectName() {
+		return this.getClass().getSimpleName();
+	}
+
+}

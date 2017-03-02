@@ -1,0 +1,18 @@
+<%@page import="result.inspect.wips.air.AirResult"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Insert title here</title>
+</head>
+<body>
+<%
+	AirResult airResult = new AirResult(
+		request.getParameter("ver"),
+		request.getParameter("actor"),
+		request.getParameter("type"));
+	System.out.println(airResult);
+%>
+</body>
+</html>
