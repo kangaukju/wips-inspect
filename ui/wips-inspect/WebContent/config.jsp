@@ -472,7 +472,7 @@ function fill_config_data(to, result) {
 		break;
 	case 4:
 		_val(to, "addr4_ra", result.ra);
-		_val(to, "addr4_ra", result.ta);
+		_val(to, "addr4_ta", result.ta);
 		_val(to, "addr4_da", result.da);
 		_val(to, "addr4_sa", result.sa);
 		addrtype = "addr4";

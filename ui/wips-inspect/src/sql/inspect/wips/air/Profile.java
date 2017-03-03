@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import air.wips.inspect.utils.DateUtil;
+import air.wips.inspect.utils.ListUtil;
 import air.wips.inspect.utils.StringUtil;
 
 public class Profile {
@@ -16,7 +17,12 @@ public class Profile {
 	private String created;
 	private String updated;
 	private List<Config> configList;
+	private String configListNames;
 	
+	
+	public String getConfigListNames() {
+		return configListNames;
+	}
 	public String getId() {
 		return id;
 	}
@@ -76,7 +82,24 @@ public class Profile {
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
 		}
-	} 
+	}
+	
+	public static void removeAllConfig(String profileId) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql;
+		try {
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			sql = "delete from profile_config_ref where profile_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
 
 	public static void removeConfig(String profileId, String configId) {
 		Connection conn = null;
@@ -168,6 +191,10 @@ public class Profile {
 		}
 	}
 	
+	public void update() {
+		update(this);
+	}
+	
 	public static void update(Profile profile) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -241,15 +268,33 @@ public class Profile {
 		return list;
 	}
 	
-	public static List<Profile> getAllWithConfig() {
+	static private String getConfigListNames(List<Config> list) {
+		String names = "";
+		int i = 0;
+		
+		if (ListUtil.isNull(list)) {
+			return "";
+		}
+		for (Config c : list) {
+			if (i != 0) {
+				names += ",";
+			}
+			names += c.getName();
+			i++;
+		}
+		return names;
+	}
+	
+	public static List<Profile> getAllWithConfig(boolean loadAirConf) {
 		List<Profile> list = getAll();
 		for (Profile p : list) {
-			p.configList = getConfig(p.id);
+			p.configList = getConfig(p.id, loadAirConf);
+			p.configListNames = getConfigListNames(p.configList);
 		}
 		return list;
 	}
 	
-	public static List<Profile> getByName(String name) {
+	public static List<Profile> getByName(String name, boolean loadAirConf) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -267,7 +312,8 @@ public class Profile {
 				profile.name = rs.getString("name");
 				profile.updated = rs.getString("updated");
 				profile.created = rs.getString("created");
-				profile.configList = getConfig(profile.id);
+				profile.configList = getConfig(profile.id, loadAirConf);
+				profile.configListNames = getConfigListNames(profile.configList);				
 				list.add(profile);
 			}
 		} catch (Exception e) {
@@ -278,7 +324,7 @@ public class Profile {
 		return list;
 	}
 	
-	public static Profile getById(String id) {
+	public static Profile getById(String id, boolean loadAirConf) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -298,7 +344,8 @@ public class Profile {
 			profile.name = rs.getString("name");
 			profile.updated = rs.getString("updated");
 			profile.created = rs.getString("created");
-			profile.configList = getConfig(profile.id);
+			profile.configList = getConfig(profile.id, loadAirConf);
+			profile.configListNames = getConfigListNames(profile.configList);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -307,7 +354,7 @@ public class Profile {
 		return profile;
 	}
 	
-	public static List<Config> getConfig(String profileId) {
+	public static List<Config> getConfig(String profileId, boolean loadAirConf) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -321,7 +368,7 @@ public class Profile {
 			rs = pstmt.executeQuery();
 			
 			while (rs.next()) {
-				Config c = Config.getById(rs.getString("config_id"));
+				Config c = Config.getById(rs.getString("config_id"), loadAirConf);
 				list.add(c);
 			}
 		} catch (Exception e) {
@@ -330,11 +377,5 @@ public class Profile {
 			SQLite3Connection.sqlClose(conn, pstmt, rs);
 		}
 		return list;
-	}
-	
-	public static void main(String[] args) {
-		for (Profile p : Profile.getAllWithConfig()) {
-			System.out.println(p);
-		}
 	}
 }

@@ -18,5 +18,9 @@
 	<classpathentry kind="lib" path="/home/kinow/git/wips-inspect/tomcat/lib/tomcat-catalina-9.0.0.M15.jar"/>
 	<classpathentry kind="lib" path="/home/kinow/git/wips-inspect/tomcat/lib/tomcat-websocket.jar"/>
 	<classpathentry kind="lib" path="/home/kinow/git/wips-inspect/tomcat/lib/websocket-api.jar"/>
+	<classpathentry kind="lib" path="/home/kinow/git/wips-inspect/tomcat/lib/taglibs-standard-compat-1.2.5.jar"/>
+	<classpathentry kind="lib" path="/home/kinow/git/wips-inspect/tomcat/lib/taglibs-standard-impl-1.2.5.jar"/>
+	<classpathentry kind="lib" path="/home/kinow/git/wips-inspect/tomcat/lib/taglibs-standard-jstlel-1.2.5.jar"/>
+	<classpathentry kind="lib" path="/home/kinow/git/wips-inspect/tomcat/lib/taglibs-standard-spec-1.2.5.jar"/>
 	<classpathentry kind="output" path="WebContent/WEB-INF/classes"/>
 </classpath>

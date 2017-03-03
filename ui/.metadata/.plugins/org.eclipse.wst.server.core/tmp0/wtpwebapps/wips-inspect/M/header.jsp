@@ -1,3 +1,10 @@
+<%--
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="x" uri="http://java.sun.com/jsp/jstl/xml" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %> 
+--%>
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,6 +27,9 @@
 	<link rel="stylesheet" href="/js/tablesorter-master/css/theme.default.css">
 	<script type="text/javascript" src="/js/tablesorter-master/js/jquery.tablesorter.js"></script>
 	<script type="text/javascript" src="/js/tablesorter-master/js/jquery.tablesorter.widgets.js"></script>
+	<!-- loading -->
+	<script src="/js/loading/jquery.loading.min.js"></script>
+	<link rel="stylesheet" href="/js/loading/jquery.loading.min.css">
 	<!-- my js -->
 	<script src="/js/multiCharts.js"></script>
 	<script src="/js/get_set.js"></script>
@@ -33,14 +43,14 @@
 	}
 	table.tablesorter thead tr th {
 		background: #1F497D;
-    color: #fff;
+		color: #fff;
 	}
 	table.tablesorter thead tr, table.tablesorter tbody tr {
 		cursor: pointer;
-    height: 35px;
+		height: 35px;
 	}
 	table.tablesorter tbody tr.selected td {
-    background: none repeat scroll 0 0 #FF9900;
+    	background: none repeat scroll 0 0 #FF9900;
 	}
 	img {
 		vertical-align: middle;
@@ -56,6 +66,9 @@
 	    border-radius: 4px;
 	    box-sizing: border-box;
 	    background: #fff;
+	}
+	.head_img {
+		width: 20px;
 	}
 	.action_img {
 		cursor: pointer;
@@ -77,12 +90,12 @@
 	}
 	.main_fieldset > legend {
 		background: #1F497D;
-    color: #fff;
-    padding: 5px 10px ;
-    font-size: 18px;
-    border-radius: 5px;
-    box-shadow: 0 0 0 5px #ddd;
-    margin-left: 20px;
+	    color: #fff;
+	    padding: 5px 10px ;
+	    font-size: 18px;
+	    border-radius: 5px;
+	    box-shadow: 0 0 0 5px #ddd;
+	    margin-left: 20px;
 	}
 	.sub_fieldset {
 		background: #ddd;
@@ -110,16 +123,54 @@
 	.title_img {		
 		width: 30px;
 	}
+	.hidden {
+		display: none;
+	}
 	</style>
 </head>
 <body>
 <table class="title">
 	<tr>
-		<td><img class="title_img" src="/img/M/internet.svg"></td>
+		<td><img class="title_img" src="/img/M/wifi.svg"></td>
 		<td><b>WIPS INSPECTOR</b></td>
 	</tr>
 </table>
 <script type="text/javascript">
+function _defined_(v) {
+	return (typeof v != "undefined");
+}
+
+function pop(msg, config) {
+	var c = {};
+	
+	if (_defined_(config)) {
+		c = config;
+	}
+	
+	if (1) {
+		$("body").loading({
+			message: msg,
+			onStart: function(loading) {
+				loading.overlay.fadeIn(150);
+			},
+			onClick: function(loading) {
+				loading.overlay.fadeOut(150);
+				if (_defined_(c.focus)) {
+					c.focus.focus();
+				}
+				if (_defined_(c.page)) {
+					gogo(c.page);
+				}
+			}
+		});
+		$("body").loading();
+	} else {		
+		alert(msg);
+		if (typeof $focus != "undefined") {
+			$focus.focus();
+		}
+	}
+}
 function gogo(page) {
 	$("body").animate({
 		"opacity": "0",
@@ -128,7 +179,13 @@ function gogo(page) {
 		location.href = page;
 	});
 }
-
+function pN($this, n) {
+	var p = $this;
+	for (var i=0; i<n; i++) {
+		p = p.parent();
+	}
+	return p;
+}
 $(function() {
 	$(".title").click(function() {
 		gogo("index.jsp");

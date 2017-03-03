@@ -1,0 +1,355 @@
+package sql.inspect.wips.air;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import air.wips.inspect.utils.DateUtil;
+import air.wips.inspect.utils.StringUtil;
+
+public class Profile {
+	private final static String PROFILE_ID_PREFIX = "P_";
+	private String id;
+	private String name;
+	private String created;
+	private String updated;
+	private List<Config> configList;
+	
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getCreated() {
+		return created;
+	}
+	public void setCreated(String created) {
+		this.created = created;
+	}
+	public String getUpdated() {
+		return updated;
+	}
+	public void setUpdated(String updated) {
+		this.updated = updated;
+	}
+	public List<Config> getConfigList() {
+		return configList;
+	}
+	public void setConfigList(List<Config> configList) {
+		this.configList = configList;
+	}
+	@Override
+	public String toString() {
+		return "Profile [id=" + id + ", name=" + name + ", created=" + created + ", updated=" + updated
+				+ ", configList=" + configList + "]";
+	}
+
+	public static void del(String profileId) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql;
+		try {
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			conn.setAutoCommit(false);
+			sql = "delete from profile where id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.executeUpdate();
+			pstmt.close();
+			
+			sql = "delete from profile_config_ref where profile_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.executeUpdate();
+			conn.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
+	
+	public static void removeAllConfig(String profileId) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql;
+		try {
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			sql = "delete from profile_config_ref where profile_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
+
+	public static void removeConfig(String profileId, String configId) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql;
+		try {
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			sql = "delete from profile_config_ref where profile_id=? and config_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.setString(2, configId);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
+	
+	public static boolean existProfileConfig(String profileId, String configId) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			String sql = "select profile_id from profile_config_ref where profile_id=? and config_id=?";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.setString(2, configId);
+			rs = pstmt.executeQuery();
+			if (rs == null || !rs.next()) {
+				return false;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt, rs);
+		}
+		return true;
+	}
+	
+	public static void addConfig(String profileId, List<String> configIdList) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		try {
+			String sql = "insert into profile_config_ref (profile_id, config_id) values (?,?)";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			for (String configId : configIdList) {
+				if (!existProfileConfig(profileId, configId)) {
+					pstmt.setString(1, profileId);
+					pstmt.setString(2, configId);
+					pstmt.addBatch();
+				}
+			}
+			pstmt.executeBatch();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
+	
+	public void addProfile() {
+		Profile.addProfile(this);
+	}
+	
+	public static void addProfile(Profile profile) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String now = DateUtil.yyyyMMDDHHmmss();
+		try {
+			String sql = "insert into profile (id, name, created, updated) values (?,?,?,?)";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			if (StringUtil.isNull(profile.id)) {
+				profile.id = String.valueOf(newProfileId());
+			}
+			pstmt.setString(1, profile.id);
+			pstmt.setString(2, profile.name);
+			pstmt.setString(3, now); profile.created = now;
+			pstmt.setString(4, now); profile.updated = now;
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
+	
+	public void update() {
+		update(this);
+	}
+	
+	public static void update(Profile profile) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String now = DateUtil.yyyyMMDDHHmmss();
+		try {
+			String sql = "update profile set name=?,updated=? where id=?";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profile.name);
+			pstmt.setString(2, now); profile.updated = now;
+			pstmt.setString(3, profile.id);
+			pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
+	
+	public static String newProfileId() {
+		return PROFILE_ID_PREFIX + System.currentTimeMillis();
+	}
+	/*
+	public static String newProfileId() {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		String newId = "P"+System.currentTimeMillis();
+		
+		try {
+			String sql = "select max(id) + 1 from profile";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			if (rs != null && rs.next()) {
+				newId = rs.getString(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt, rs);
+		}
+		return newId;
+	}
+	*/
+	
+	public static List<Profile> getAll() {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<Profile> list = new ArrayList<>();
+		
+		try {
+			String sql = "select id, name, created, updated from profile order by id asc";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Profile p = new Profile();
+				p.id = rs.getString("id");
+				p.name = rs.getString("name");
+				p.updated = rs.getString("updated");
+				p.created = rs.getString("created");
+				list.add(p);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt, rs);
+		}
+		return list;
+	}
+	
+	public static List<Profile> getAllWithConfig(boolean loadAirConf) {
+		List<Profile> list = getAll();
+		for (Profile p : list) {
+			p.configList = getConfig(p.id, loadAirConf);
+		}
+		return list;
+	}
+	
+	public static List<Profile> getByName(String name, boolean loadAirConf) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<Profile> list = new ArrayList<>();
+		
+		try {
+			String sql = "select id,name,updated,created from profile where name=? order by id asc";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, name);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Profile profile = new Profile();
+				profile.id = rs.getString("id");
+				profile.name = rs.getString("name");
+				profile.updated = rs.getString("updated");
+				profile.created = rs.getString("created");
+				profile.configList = getConfig(profile.id, loadAirConf);
+				list.add(profile);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt, rs);
+		}
+		return list;
+	}
+	
+	public static Profile getById(String id, boolean loadAirConf) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		Profile profile = null;
+		
+		try {
+			String sql = "select id,name,updated,created from profile where id=?";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, id);
+			rs = pstmt.executeQuery();
+			if (rs == null || !rs.next()) {
+				return null;
+			}
+			profile = new Profile();
+			profile.id = rs.getString("id");
+			profile.name = rs.getString("name");
+			profile.updated = rs.getString("updated");
+			profile.created = rs.getString("created");
+			profile.configList = getConfig(profile.id, loadAirConf);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt, rs);
+		}
+		return profile;
+	}
+	
+	public static List<Config> getConfig(String profileId, boolean loadAirConf) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<Config> list = new ArrayList<>();
+		
+		try {
+			String sql = "select profile_id, config_id from profile_config_ref where profile_id=? order by config_id";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			rs = pstmt.executeQuery();
+			
+			while (rs.next()) {
+				Config c = Config.getById(rs.getString("config_id"), loadAirConf);
+				list.add(c);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt, rs);
+		}
+		return list;
+	}
+}

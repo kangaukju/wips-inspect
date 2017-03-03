@@ -8,6 +8,7 @@ import java.util.List;
 
 import air.wips.inspect.conf.XmlAirConf;
 import air.wips.inspect.utils.DateUtil;
+import air.wips.inspect.utils.ListUtil;
 
 public class Config {
 	private final static String CONFIG_ID_PREFIX = "C_";
@@ -17,9 +18,39 @@ public class Config {
 	private String shooterxml;
 	private String created;
 	private String updated;
-	private XmlAirConf captureAirConf;
-	private XmlAirConf shooterAirConf;
+	private List<XmlAirConf> captureXmlAirConfList;
+	private List<XmlAirConf> shooterXmlAirConfList;
+	private String captureAirConfDescs;
+	private String shooterAirConfDescs;
 	
+	static private String getAirConfDescs(List<XmlAirConf> xmlAirConfList) {
+		String descs = "";
+		int i = 0;
+		if (ListUtil.isNull(xmlAirConfList)) {
+			return "";
+		}
+		for (XmlAirConf ac : xmlAirConfList) {
+			if (i != 0) {
+				descs += ",";
+			}
+			descs += ac.getDesc();
+			i++;
+		}
+		return descs;
+	}
+	
+	public List<XmlAirConf> getCaptureXmlAirConfList() {
+		return captureXmlAirConfList;
+	}
+	public List<XmlAirConf> getShooterXmlAirConfList() {
+		return shooterXmlAirConfList;
+	}
+	public String getCaptureAirConfDescs() {
+		return captureAirConfDescs;
+	}
+	public String getShooterAirConfDescs() {
+		return shooterAirConfDescs;
+	}	
 	public String getId() {
 		return id;
 	}
@@ -180,10 +211,6 @@ public class Config {
 		return CONFIG_ID_PREFIX + System.currentTimeMillis();
 	}
 	
-	public static List<Config> getByName(String name) {
-		return getByName(name, false);
-	}
-	
 	public static List<Config> getByName(String name, boolean loadAirConf) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -207,16 +234,20 @@ public class Config {
 				if (loadAirConf) {
 					try {
 						String captureFilename = XmlAirConf.captureFilename(c.id);
-						c.captureAirConf = XmlAirConf.loadAirConf(captureFilename);
+						c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
+						c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
 					} catch (Exception e) {
-						c.captureAirConf = null;
+						c.captureAirConfDescs = "";
+						c.captureXmlAirConfList = null;
 						e.printStackTrace();
 					}
 					try {
 						String shooterFilename = XmlAirConf.shooterFilename(c.id);
-						c.shooterAirConf = XmlAirConf.loadAirConf(shooterFilename);
+						c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
+						c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
 					} catch (Exception e) {
-						c.shooterAirConf = null;
+						c.shooterAirConfDescs = "";
+						c.shooterXmlAirConfList = null;
 						e.printStackTrace();
 					}
 				}
@@ -229,10 +260,6 @@ public class Config {
 			SQLite3Connection.sqlClose(conn, pstmt, rs);
 		}
 		return list;
-	}
-	
-	public static Config getById(String id) {
-		return getById(id, false);
 	}
 	
 	public static Config getById(String id, boolean loadAirConf) {
@@ -258,16 +285,20 @@ public class Config {
 				if (loadAirConf) {
 					try {
 						String captureFilename = XmlAirConf.captureFilename(c.id);
-						c.captureAirConf = XmlAirConf.loadAirConf(captureFilename);
+						c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
+						c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
 					} catch (Exception e) {
-						c.captureAirConf = null;
+						c.captureXmlAirConfList = null;
+						c.captureAirConfDescs = "";
 						e.printStackTrace();
 					}
 					try {
 						String shooterFilename = XmlAirConf.shooterFilename(c.id);
-						c.shooterAirConf = XmlAirConf.loadAirConf(shooterFilename);
+						c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
+						c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
 					} catch (Exception e) {
-						c.shooterAirConf = null;
+						c.shooterXmlAirConfList = null;
+						c.shooterAirConfDescs = "";
 						e.printStackTrace();
 					}
 				}
@@ -279,11 +310,7 @@ public class Config {
 		}
 		return c;
 	}
-	
-	public static List<Config> getAll() {
-		return getAll(false);
-	}
-	
+		
 	public static List<Config> getAll(boolean loadAirConf) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -306,16 +333,76 @@ public class Config {
 				if (loadAirConf) {
 					try {
 						String captureFilename = XmlAirConf.captureFilename(c.id);
-						c.captureAirConf = XmlAirConf.loadAirConf(captureFilename);
+						c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
+						c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
 					} catch (Exception e) {
-						c.captureAirConf = null;
+						c.captureXmlAirConfList = null;
+						c.captureAirConfDescs = "";
 						e.printStackTrace();
 					}
 					try {
 						String shooterFilename = XmlAirConf.shooterFilename(c.id);
-						c.shooterAirConf = XmlAirConf.loadAirConf(shooterFilename);
+						c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
+						c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
 					} catch (Exception e) {
-						c.shooterAirConf = null;
+						c.shooterXmlAirConfList = null;
+						c.shooterAirConfDescs = "";
+						e.printStackTrace();
+					}
+				}
+				list.add(c);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt, rs);
+		}
+		return list;
+	}
+	
+	public static List<Config> getSelectedProfile(String profileId, boolean selected, boolean loadAirConf) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<Config> list = new ArrayList<>();
+		
+		try {
+			String sql;
+			if (selected) {
+				sql = "select * from config where id IN (select config_id from profile_config_ref where profile_id = ?)";
+			} else {
+				sql = "select * from config where id NOT IN (select config_id from profile_config_ref where profile_id = ?)";
+			}
+			System.out.println(selected);
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				Config c = new Config();
+				c.id = rs.getString("id");
+				c.name = rs.getString("name");
+				c.capturexml = rs.getString("capturexml");
+				c.shooterxml = rs.getString("shooterxml");
+				c.updated = rs.getString("updated");
+				c.created = rs.getString("created");
+				if (loadAirConf) {
+					try {
+						String captureFilename = XmlAirConf.captureFilename(c.id);
+						c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
+						c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
+					} catch (Exception e) {
+						c.captureXmlAirConfList = null;
+						c.captureAirConfDescs = "";
+						e.printStackTrace();
+					}
+					try {
+						String shooterFilename = XmlAirConf.shooterFilename(c.id);
+						c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
+						c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
+					} catch (Exception e) {
+						c.shooterXmlAirConfList = null;
+						c.shooterAirConfDescs = "";
 						e.printStackTrace();
 					}
 				}

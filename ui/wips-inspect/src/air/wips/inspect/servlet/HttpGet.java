@@ -39,6 +39,14 @@ public class HttpGet {
 		return StringUtil.Null(request.getParameter(name));
 	}
 	
+	public static String get(HttpServletRequest request, final String name, String def) {
+		String v = request.getParameter(name);
+		if (StringUtil.isNull(v)) {
+			return def;
+		}
+		return v;
+	}
+	
 	public static boolean getBoolean(HttpServletRequest request, final String name, boolean def) {
 		String value = request.getParameter(name);
 		if (StringUtil.isNull(value)) {
@@ -72,6 +80,22 @@ public class HttpGet {
 			results[i++] = StringUtil.Null(request.getParameter(p+"_"+name));
 		}
 		return results;
+	}
+	
+	public static void debugRequestParameterValues(HttpServletRequest request) {
+		Enumeration<String> e = request.getParameterNames();
+		String key;
+		while (e.hasMoreElements()) {
+			key = e.nextElement();
+			String [] vals = request.getParameterValues(key);
+			if (vals != null) {
+				int i = 0;
+				for (String val : vals) {
+					System.out.println("{"+i+"} ["+key+"]=["+val+"]");
+					i++;
+				}
+			}
+		}
 	}
 	
 	public static void debugRequestParameters(HttpServletRequest request) {

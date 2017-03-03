@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>gogo-cap</desc>
+    <type>0</type>
+    <subtype>10</subtype>
+    <key>1</key>
+    <dwell>50</dwell>
+    <channel>12</channel>
+  </airconf>
+</list>

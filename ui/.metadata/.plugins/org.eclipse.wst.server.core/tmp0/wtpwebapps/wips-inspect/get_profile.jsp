@@ -8,14 +8,15 @@
 <%
 	String name = HttpGet.get(request, "name");
 	String id = HttpGet.get(request, "id");
+	boolean detail = HttpGet.getBoolean(request, "detail", false);
 	
 	try {
 		if (id != null) {
-			response.getWriter().print(new Gson().toJson(Profile.getById(id)));
+			response.getWriter().print(new Gson().toJson(Profile.getById(id, detail)));
 		} else if (name != null) {
-			response.getWriter().print(new Gson().toJson(Profile.getByName(name)));
+			response.getWriter().print(new Gson().toJson(Profile.getByName(name, detail)));
 		} else {
-			response.getWriter().print(new Gson().toJson(Profile.getAllWithConfig()));	
+			response.getWriter().print(new Gson().toJson(Profile.getAllWithConfig(detail)));	
 		}
 	} catch (Exception e) {
 		e.printStackTrace();

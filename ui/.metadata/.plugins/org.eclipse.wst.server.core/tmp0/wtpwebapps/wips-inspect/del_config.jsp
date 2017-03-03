@@ -6,9 +6,16 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%
 	String[] ids = HttpGet.gets(request, "capture_id", "shooter_id");
+	String[] configId = HttpGet.gets(request, "config_id");
 
 	try {
 		for (String id : ids) {
+			if (id != null) {
+				Config.del(id);
+				break;
+			}
+		}
+		for (String id : configId) {
 			if (id != null) {
 				Config.del(id);
 				break;

@@ -40,9 +40,9 @@
 		<item value="360" key="DIALOG_Y_ORIGIN"/>
 	</section>
 	<section name="DialogBounds_GetterSetterTreeSelectionDialog">
-		<item value="597" key="DIALOG_WIDTH"/>
-		<item value="1|나눔고딕|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
-		<item value="688" key="DIALOG_HEIGHT"/>
+		<item value="541" key="DIALOG_WIDTH"/>
+		<item value="1|Noto Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="755" key="DIALOG_HEIGHT"/>
 		<item value="363" key="DIALOG_X_ORIGIN"/>
 		<item value="197" key="DIALOG_Y_ORIGIN"/>
 	</section>

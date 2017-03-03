@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>미관리단말</desc>
+    <type>0</type>
+    <subtype>8</subtype>
+    <ds fromds="0" tods="0"/>
+    <key>0</key>
+    <dwell>100</dwell>
+    <channel>3</channel>
+    <addr count="3">
+      <bssid>02:11:22:33:44:55</bssid>
+      <da>FF:FF:FF:FF:FF:FF</da>
+      <sa>02:11:22:33:44:55</sa>
+    </addr>
+  </airconf>
+</list>

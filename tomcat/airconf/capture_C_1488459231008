@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>kaka-cap</desc>
+    <type>2</type>
+    <subtype>2</subtype>
+    <ds fromds="1" tods="1"/>
+    <key>2</key>
+    <dwell>200</dwell>
+    <channel>13</channel>
+    <addr count="3">
+      <bssid>11:22:33:11:22:33</bssid>
+      <da>11:22:33:11:22:11</da>
+      <sa>11:22:33:11:22:22</sa>
+    </addr>
+    <taglist>
+      <tag data="abc" id="10" len="3" type="string"/>
+    </taglist>
+  </airconf>
+</list>

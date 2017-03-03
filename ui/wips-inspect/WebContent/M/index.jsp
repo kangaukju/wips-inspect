@@ -26,8 +26,8 @@
 				<td>
 					<img class="home_img link" id="users"   src="/img/M/analytics2.png" >
 					<img class="home_img link" id="inspect" src="/img/M/analytics_balls.svg">
-					<img class="home_img link" id="profile" src="/img/M/edit2.svg">		
-					<img class="home_img link" id="config"  src="/img/M/config2.svg">
+					<img class="home_img link" id="profile_list" src="/img/M/edit2.svg">		
+					<img class="home_img link" id="config_list"  src="/img/M/config4.svg">
 				</td>
 			</tr>
 		</table>
@@ -39,11 +39,11 @@ $(function() {
 	$("#inspect").click(function() {
 		gogo("/M/inspect.jsp");
 	});
-	$("#profile").click(function() {
-		gogo("/M/profile.jsp");
+	$("#profile_list").click(function() {
+		gogo("/M/profile_list.jsp");
 	});
-	$("#config").click(function() {
-		gogo("/M/config.jsp");
+	$("#config_list").click(function() {
+		gogo("/M/config_list.jsp");
 	});
 });
 </script>

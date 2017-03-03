@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>koma-captue</desc>
+    <key>1</key>
+    <dwell>50</dwell>
+    <channel>1</channel>
+  </airconf>
+</list>
