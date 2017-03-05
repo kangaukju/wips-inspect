@@ -62,7 +62,7 @@ public class WipsInspectWebSocket extends AirResult {
 				}
 				
 				// check profile
-				Profile profile = Profile.getById(p.profileId);
+				Profile profile = Profile.getById(p.profileId, false);
 				if (profile == null) {
 					return new Gson().toJson(new GoodBad().bad(
 							String.format("unknown [%s] profile", p.profileId)));
@@ -98,8 +98,8 @@ public class WipsInspectWebSocket extends AirResult {
 				String shooterWif = Tools.getDefaultShooterWifiDev();
 				String captureWif = Tools.getDefaultCaptureWifiDev();
 				
-				System.out.println("defuatl SHOOTER_WIFI="+shooterWif);
-				System.out.println("defuatl CAPTURE_WIFI="+captureWif);
+				//System.out.println("defuatl SHOOTER_WIFI="+shooterWif);
+				//System.out.println("defuatl CAPTURE_WIFI="+captureWif);
 				
 				if (shooterWif == null || !WifiDevice.contains(wifiDevList, shooterWif)) {
 					shooterWif = wifiDevList.get(0).getIfname();
@@ -107,7 +107,8 @@ public class WipsInspectWebSocket extends AirResult {
 				if (captureWif == null || !WifiDevice.contains(wifiDevList, captureWif)) {
 					captureWif = wifiDevList.get(1).getIfname();
 				}
-				
+
+				Tools.stopWipsInspect();
 				process = Tools.startWipsInspect(shooterWif, captureWif, p.profileId, p.timer);
 				if (!Tools.isRunningWipsInspect(true)) {
 					D.log("unable run wips-inspect tool");
@@ -115,8 +116,9 @@ public class WipsInspectWebSocket extends AirResult {
 					if (process == null) {
 						return new Gson().toJson(new GoodBad().bad("Error! execute wips-inspect"));
 					} else {
-						return new Gson().toJson(new GoodBad().bad(
-								ProcessUtil.getProcessError(process)));
+						String errorTxt = ProcessUtil.getProcessError(process);
+						D.log(errorTxt);
+						return new Gson().toJson(new GoodBad().bad(StringUtil.str2Html(errorTxt)));
 					}
 				}
 			} catch (Exception e) {

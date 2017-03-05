@@ -213,7 +213,8 @@ function load_selected_profile(profile_id) {
 			$("#select_config_legend").html("Inspect Process ["+result.name+"]");			
 			$("#selected_config_table > tbody").html(json2html.transform(result.configList, config_xlat));
 			$("#selected_config_table").tablesorter({widgets: ["zebra"]}).trigger("update");
-			$("#inspect_results_div").html(json2html.transform(result.configList, inspect_results_xlat));
+			$("#inspect_results_div")
+			.html(json2html.transform(result.configList, inspect_results_xlat));
 			
 			/* detail log table popup */
 			bind_detail_log();
@@ -438,6 +439,7 @@ $(document).ready(function() {
 				inspect_refresh_times = {0: 0, 1:0};
 				
 				/* prepare chart drawing */
+				/*
 				if (0) {
 					var max_sec = parseInt($("#inspect_timer").val()) + 2;
 					$(".inspect_chart").each(function(i){
@@ -449,6 +451,7 @@ $(document).ready(function() {
 								});
 					});
 				}
+				*/
 				
 				var params = {
 					state: "start",

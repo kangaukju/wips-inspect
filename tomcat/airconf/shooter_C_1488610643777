@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>YSY</desc>
+    <type>0</type>
+    <subtype>8</subtype>
+    <ds fromds="0" tods="0"/>
+    <key>0</key>
+    <dwell>100</dwell>
+    <channel>6</channel>
+    <addr count="3">
+      <bssid>02:86:04:EE:4C:31</bssid>
+      <da>FF:FF:FF:FF:FF:FF</da>
+      <sa>02:86:04:EE:4C:31</sa>
+    </addr>
+    <taglist>
+      <tag data="YSY" id="0" len="3" type="string"/>
+    </taglist>
+  </airconf>
+</list>

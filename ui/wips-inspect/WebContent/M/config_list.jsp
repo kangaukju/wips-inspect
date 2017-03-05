@@ -1,3 +1,4 @@
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -26,12 +27,42 @@
 					<th>capture</th>
 					<th>shooter</th>
 					<th>updated</th>
+					<th>xml</th>
 					<th></th>
 				</tr>
 			</thead>
 			<tbody></tbody>
 		</table>
 	</fieldset>
+	
+	<div id="config_xml_modal">
+		<div style="width: 100%; text-align: center;">
+			<img src="/img/M/close.svg" id="btn-close-modal" class="close-config_xml_modal" style="cursor: pointer; width:30px;">
+		</div>
+		<div id="config_xml_tabs" class="modal-content tab_header" style="background-color:rgba(0,0,0,0); border-color:rgba(0,0,0,0);">
+			<ul style="background-color:rgba(0,0,0,0); border-color:rgba(0,0,0,0);">
+				<li>
+					<a href="#shooter_xml">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						Shooter
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</a>
+				</li>
+				<li>
+					<a href="#capture_xml">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						Capture
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</a>
+				</li>
+			</ul>
+			<div id="shooter_xml">
+			</div>
+			<div id="capture_xml">
+			</div>
+		</div>
+	</div>
+	
 </body>
 
 <script type="text/javascript">
@@ -45,6 +76,7 @@ var config_list_table_xlat = {
 			{tag:"td", html:"$\{captureAirConfDescs\}"},
 			{tag:"td", html:"$\{shooterAirConfDescs\}"},
 			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<a class='config_xml_img' href='#config_xml_modal' id='$\{id\}'><img class='table_img' src='/img/M/file-xml2.svg'></a>"},
 			{tag:"td", html:"<img class='config_del_img table_img' src='/img/M/trash.svg' id='$\{id\}'>"},
 		]
 };
@@ -81,7 +113,7 @@ function load_config_list() {
 				$("#img_"+$(this).attr("id")).toggleClass('hidden');
 			});
 			
-			bind_delete_config();
+			bind_config_handler();
 		},
 		error: function(e) {
 			ajax_err_handle(e);
@@ -89,20 +121,48 @@ function load_config_list() {
 	});
 }
 
-function bind_delete_config() {
+function bind_config_handler() {
+	$(".config_xml_img").animatedModal({
+		modalTarget: 'config_xml_modal',
+		animatedIn: 'lightSpeedIn',
+		animatedOut: 'bounceOutDown',
+		beforeOpen: function($from) {
+			var config_id = $from.attr("id");
+			jQuery.ajax({
+				url: "/config_xml.jsp",
+				data: { 'config_id': config_id },
+				cache: false,
+				dataType: "json",
+				success: function(result) {
+					if (result.good == false) {
+						pop("Error loading config XML.\n"+result.cause);
+						return;
+					}
+					$("#config_xml_tabs").tabs();
+					$("#shooter_xml").html(result.shooter);
+					$("#capture_xml").html(result.capture);
+				},
+				error: function(e) {
+					//ajax_err_handle(e);
+					pop("Error loading config XML.\nplease retry...");
+				}
+			});
+		},
+	});
+	
 	$(".config_del_img").click(function() {
 		if (!confirm("Are you sure delete config ?")) {
 			return;
 		}
-		var configId = $(this).attr("id");
+		var config_id = $(this).attr("id");
 		jQuery.ajax({
 			url: "/del_config.jsp",
-			data: { 'config_id': configId },
+			data: { 'config_id': config_id },
 			cache: false,
 			dataType: "json",
 			success: function(result) {
 				if (result.good == false) {
-					pop("Error loading for config.\n"+result.cause);
+					pop("Error loading config.\n"+result.cause);
 					return;
 				}
 				pop("success delete config");
@@ -110,7 +170,7 @@ function bind_delete_config() {
 			},
 			error: function(e) {
 				//ajax_err_handle(e);
-				pop("Error loading for config.\nplease retry...");
+				pop("Error loading config.\nplease retry...");
 			}
 		});
 	});

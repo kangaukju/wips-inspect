@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>401</desc>
+    <type>0</type>
+    <subtype>8</subtype>
+    <ds fromds="0" tods="0"/>
+    <key>0</key>
+    <dwell>100</dwell>
+    <channel>9</channel>
+    <addr count="3">
+      <bssid>02:66:55:44:33:11</bssid>
+      <da>FF:FF:FF:FF:FF:FF</da>
+      <sa>02:66:55:44:33:11</sa>
+    </addr>
+    <taglist>
+      <tag data="401" id="0" len="3" type="string"/>
+    </taglist>
+  </airconf>
+</list>

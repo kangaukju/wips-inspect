@@ -1,3 +1,4 @@
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>			
@@ -24,10 +25,10 @@
 		<table class="home_contain">
 			<tr>
 				<td>
-					<img class="home_img link" id="users"   src="/img/M/analytics2.png" >
-					<img class="home_img link" id="inspect" src="/img/M/analytics_balls.svg">
-					<img class="home_img link" id="profile_list" src="/img/M/edit2.svg">		
-					<img class="home_img link" id="config_list"  src="/img/M/config4.svg">
+					<img class="home_img home_link_users"        id="users"   src="/img/M/analytics2.png" >
+					<img class="home_img home_link_inspect"      id="inspect" src="/img/M/analytics_balls.svg">
+					<img class="home_img home_link_profile_list" id="profile_list" src="/img/M/edit2.svg">		
+					<img class="home_img home_link_config_list"  id="config_list"  src="/img/M/config4.svg">
 				</td>
 			</tr>
 		</table>
@@ -35,17 +36,7 @@
 </body>
 
 <script type="text/javascript">
-$(function() {
-	$("#inspect").click(function() {
-		gogo("/M/inspect.jsp");
-	});
-	$("#profile_list").click(function() {
-		gogo("/M/profile_list.jsp");
-	});
-	$("#config_list").click(function() {
-		gogo("/M/config_list.jsp");
-	});
-});
+
 </script>
 <%@include file="/M/footer.jsp"%>
 </html>

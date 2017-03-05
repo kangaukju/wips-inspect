@@ -3,8 +3,7 @@ page import="air.wips.inspect.error.GoodBad"%><%@
 page import="com.google.gson.Gson"%><%@
 page import="sql.inspect.wips.air.Profile"%><%@
 page import="air.wips.inspect.servlet.HttpGet"%><%@
-page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%
+page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
 
 	String profileId = Profile.newProfileId();
 	boolean edit = false;

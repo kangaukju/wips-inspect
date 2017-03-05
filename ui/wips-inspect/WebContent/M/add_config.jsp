@@ -25,7 +25,7 @@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
 	}
 	
 	try {
-		HttpGet.debugRequestParameterValues(request);
+		//HttpGet.debugRequestParameterValues(request);
 		String [] target      = HttpGet.vals(request, "target");
 		String [] tags        = HttpGet.vals(request, "tags");
 		String [] enable      = HttpGet.vals(request, "enable");
@@ -143,7 +143,6 @@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
 		Config c = new Config();
 		c.setId(configId);
 		c.setName(HttpGet.get(request, "config_name"));
-		System.out.println(c.getName());
 		if (shooterXmlFilename != null)
 			c.setShooterxml(shooterXmlFilename);
 		if (captureXmlFilename != null)

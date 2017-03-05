@@ -1,0 +1,25 @@
+package air.wips.inspect.utils;
+
+import java.io.BufferedReader;
+import java.io.File;
+
+public class FileUtil {
+
+	
+	public static String getContent(final String filename) {
+		File f = new File(filename);
+		if (!f.exists()) {
+			return "";
+		}
+		BufferedReader br = null;
+		try {
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null) { br.close(); }
+			} catch (Exception e) {}
+		}
+	}
+}

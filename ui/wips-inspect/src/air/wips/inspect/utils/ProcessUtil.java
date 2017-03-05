@@ -3,7 +3,6 @@ package air.wips.inspect.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -280,11 +279,5 @@ public class ProcessUtil {
 				killall, "-9", name
 		};
 		new ProcessBuilder(cmd).start();
-	}
-	
-	
-	public static void main(String [] args) throws Exception {
-		String c = getProcCommand("2313");
-		System.out.println(c);
 	}
 }

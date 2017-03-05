@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>T Free WiFi Zone</desc>
+    <type>0</type>
+    <subtype>8</subtype>
+    <ds fromds="0" tods="0"/>
+    <key>1</key>
+    <dwell>50</dwell>
+    <channel>9</channel>
+    <any_addr>06:30:0D:9F:6D:63</any_addr>
+  </airconf>
+</list>

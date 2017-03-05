@@ -1,5 +1,5 @@
-<%@ page import="air.wips.inspect.servlet.HttpGet"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="air.wips.inspect.servlet.HttpGet"%>
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,7 +20,7 @@
 	vertical-align: middle;
 }
 #tabs .ui-tabs-active {
-	background-color: #1F497D;
+	background-color: #407bbf;
 	border-width: 0px;
 }
 </style>
@@ -36,6 +36,9 @@
 				<input type="hidden" name="config_id" id="config_id">
 				<input type="text" name="config_name" id="config_name">
 				<img class="action_img" src="/img/M/upload.svg" id="save_config">
+				<a id="config_xml_link" href='#config_xml_modal'>
+					<img class='action_img' src='/img/M/file-xml2.svg'>
+				</a>
 			</div>		
 		
 			<div id="tabs" class="tab_header">
@@ -287,6 +290,35 @@
 			</tbody>
 		</table>
 	</fieldset>
+	
+	<div id="config_xml_modal">
+		<div style="width: 100%; text-align: center;">
+			<img src="/img/M/close.svg" id="btn-close-modal" class="close-config_xml_modal" style="cursor: pointer; width:30px;">
+		</div>
+		<div id="config_xml_tabs" class="modal-content tab_header" style="background-color:rgba(0,0,0,0); border-color:rgba(0,0,0,0);">
+			<ul style="background-color:rgba(0,0,0,0); border-color:rgba(0,0,0,0);">
+				<li>
+					<a href="#shooter_xml">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						Shooter
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</a>
+				</li>
+				<li>
+					<a href="#capture_xml">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						Capture
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</a>
+				</li>
+			</ul>
+			<div id="shooter_xml">
+			</div>
+			<div id="capture_xml">
+			</div>
+		</div>
+	</div>
+	
 </body>
 
 <script type="text/javascript">
@@ -325,6 +357,7 @@ function bind_add_config() {
 	// config 설정 추가
 	$(".add_config_img").click(function() {
 		var c = $("#sample_config").clone(true);
+		c.find(".addr").hide();
 		c.find("input").val("");
 		c.find(".tag_div").empty();
 		var t = $(this).attr("target");
@@ -455,7 +488,7 @@ function build_config_list(target, list) {
 	});
 }
 $(document).ready(function() {
-	$("#tabs").tabs();	
+	$("#tabs").tabs();
 	$(".addr").hide();
 	
 	bind_all();
@@ -484,13 +517,41 @@ $(document).ready(function() {
 				if (result.good == false) {
 					pop("Error add config: "+result.cause);
 					return;
-				}
-				else {
+				} else {
 					pop("success registered config: "+$("#config_name").val(), {
-						page: "/M/config_list.jsp"
+						page: "/M/config_list.jsp",
+						type: "success",
 					});
 				}
 		}, "json");
+	});
+		
+	$("#config_xml_link").animatedModal({
+		modalTarget: 'config_xml_modal',
+		animatedIn: 'lightSpeedIn',
+		animatedOut: 'bounceOutDown',
+		beforeOpen: function() {
+			var config_id = $("#config_id").val();
+			jQuery.ajax({
+				url: "/config_xml.jsp",
+				data: { 'config_id': config_id },
+				cache: false,
+				dataType: "json",
+				success: function(result) {
+					if (result.good == false) {
+						pop("Error loading config XML.\n"+result.cause);
+						return;
+					}
+					$("#config_xml_tabs").tabs();
+					$("#shooter_xml").html(result.shooter);
+					$("#capture_xml").html(result.capture);
+				},
+				error: function(e) {
+					//ajax_err_handle(e);
+					pop("Error loading config XML.\nplease retry...");
+				}
+			});
+		},
 	});
 	
 	if (config_id != '') {
@@ -506,11 +567,9 @@ $(document).ready(function() {
 			dataType: "json",
 			success: function(result) {
 				if (result.good == false) {
-					pop("Error loading for config.\n"+result.cause);
+					pop("Error load config: "+result.cause);
 					return;
 				}
-				console.log(result);
-				
 				$("#config_id").val(result.id);
 				$("#config_name").val(result.name);
 				build_config_list("shooter", result.shooterXmlAirConfList);
@@ -522,6 +581,9 @@ $(document).ready(function() {
 				pop("Error loading for config.\nplease retry...");
 			}
 		});
+	}
+	else {
+		$("#config_xml_link").addClass("hidden");
 	}
 });
 </script>

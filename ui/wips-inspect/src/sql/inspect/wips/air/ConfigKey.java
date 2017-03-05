@@ -45,9 +45,4 @@ public class ConfigKey {
 		}
 		return key;
 	}
-	
-	public static void main(String[] args) {
-		System.out.println(ConfigKey.newKey());
-		System.out.println(ConfigKey.newKey());
-	}
 }

@@ -1,3 +1,4 @@
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,7 +9,7 @@
 </style>
 </head>
 <body>
-	<fieldset class="main_fieldset">
+	<fieldset class="main_fieldset_r">
 		<legend>
 			<img class="head_img" src="/img/M/list_banner.svg">
 			<span>Profile List</span>
@@ -18,7 +19,7 @@
 			<img class="action_img" src="/img/M/edit.svg" id="modify_profile">
 		</div>
 		
-		<table id="profile_list_table">
+		<table id="profile_list_table" class="tablesorter_r">
 			<thead>
 				<tr>
 					<th width="20px;"></th>
@@ -58,7 +59,7 @@ function load_profile_list() {
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				alert("load_profile_list: "+result.cause);
+				pop("Error load profile list: "+result.cause);
 				return;
 			}			
 			$("#profile_list_table > tbody").html(
@@ -81,7 +82,8 @@ function load_profile_list() {
 			bind_delete_profile();
 		},
 		error: function(e) {
-			ajax_err_handle(e);
+			//ajax_err_handle(e);
+			pop("Error loading for profile.\nplease retry...");
 		}
 	});
 }
@@ -107,7 +109,7 @@ function bind_delete_profile() {
 			},
 			error: function(e) {
 				//ajax_err_handle(e);
-				pop("Error loading for profile.\nplease retry...");
+				pop("Error delete profile.\nplease retry...");
 			}
 		});
 	});
@@ -126,8 +128,6 @@ $(document).ready(function() {
 	$("#add_profile").click(function() {
 		gogo("profile.jsp");
 	});
-	
-	
 });
 </script>
 <%@include file="/M/footer.jsp"%>

@@ -1,0 +1,14 @@
+<%@page import="com.google.gson.Gson"%>
+<%@page import="air.wips.inspect.error.GoodBad"%>
+<%@page import="air.wips.inspect.servlet.HttpGet"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
+
+	String configId = HttpGet.get(request, "config_id");
+
+	try {
+		String shooterXML = "", captureXML = "";
+	} catch (Exception e) {
+		e.printStackTrace();
+		response.getWriter().print(new Gson().toJson(new GoodBad().bad(e)));
+	}
+%>

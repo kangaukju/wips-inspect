@@ -1,5 +1,5 @@
-<%@ page import="air.wips.inspect.servlet.HttpGet"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="air.wips.inspect.servlet.HttpGet"%>
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,8 +10,8 @@
 </style>
 </head>
 <body>
-	<fieldset class="main_fieldset">
-		<legend id="profile_fieldset">
+	<fieldset class="main_fieldset_r">
+		<legend id="profile_fieldset_r">
 			<img class="head_img" src="/img/M/edit_banner.svg">
 			<span>New Profile</span>			
 		</legend>
@@ -22,9 +22,9 @@
 				<img class="action_img" src="/img/M/upload.svg" id="save_profile">
 			</div>			
 		
-			<fieldset id="selected_config_list" class="sub_fieldset">
+			<fieldset id="selected_config_list" class="sub_fieldset_r">
 				<legend>Selected Config List</legend>
-				<table id="selected_config_list_table" class="list_table">
+				<table id="selected_config_list_table" class="list_table tablesorter_r">
 					<thead>
 						<tr>
 							<th width="20px;"></th>
@@ -40,9 +40,9 @@
 			</fieldset>
 		</form>
 		
-		<fieldset id="non_selected_config_list" class="sub_fieldset">
+		<fieldset id="non_selected_config_list" class="sub_fieldset_r">
 			<legend>Non Selected Config List</legend>
-			<table id="non_selected_config_list_table" class="list_table">
+			<table id="non_selected_config_list_table" class="list_table tablesorter_r">
 				<thead>
 					<tr>
 						<th width="20px;"></th>
@@ -137,7 +137,8 @@ function load_config_list(profile_id, selected) {
 			bind_del_config_to_profile();
 		},
 		error: function(e) {
-			ajax_err_handle(e);
+			//ajax_err_handle(e);
+			pop("Error loading for config.\nplease retry...");
 		}
 	});
 }
@@ -183,7 +184,8 @@ $("#save_profile").click(function() {
 			}
 			else {
 				pop("success registered profile: "+$("#profile_name").val(), {
-					page: "/M/profile_list.jsp"
+					page: "/M/profile_list.jsp",
+					type: "success",
 				});
 			}
 	}, "json");

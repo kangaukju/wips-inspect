@@ -1,0 +1,401 @@
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<%@include file="/M/header.jsp"%>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+	<fieldset class="main_fieldset">
+		<legend>
+			<img class="head_img" src="/img/M/list_banner.svg">
+			<span>Profile List</span>
+		</legend>
+		
+		<div>
+			<img class="action_img" src="/img/M/clock.svg">
+			<select id="inspect_timer" style="width: 100px;">
+				<option value="5">5</option>
+				<option value="10">10</option>
+				<option value="15">15</option>
+				<option value="20">20</option>
+				<option value="25">25</option>
+				<option value="30">30</option>
+			</select>
+			<img class="action_img" src="/img/M/play4.svg" id="inspect_run_button">
+		</div>
+		
+		<table id="profile_list_table" class="tablesorter">
+			<thead>
+				<tr>
+					<th width="20px;"></th>
+					<th>name</th>
+					<th>selected configs</th>
+					<th>updated</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</fieldset>
+	
+	<fieldset class="main_fieldset">
+		<legend>Config List</legend>
+		<table id="config_list_table">
+			<thead>
+				<tr>
+					<th width="20px;"></th>
+					<th>name</th>
+					<th>capture</th>
+					<th>shooter</th>
+					<th>updated</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</fieldset>
+	
+	<fieldset class="main_fieldset">
+		<legend id="inspect_results_legend">Inspect Results</legend>
+		<div id="inspect_results_div">
+		</div>
+	</fieldset>
+	
+	<fieldset id="sample_inspect" class="sub_fieldset hidden">
+		<legend></legend>
+		<table style="width: 100%;">
+			<tr>
+				<td>progressbar</td>
+			</tr>
+			<tr>
+				<td>
+					<img config_id="" class="icon_img detail_log_img" align="left" src="/img/list2.svg" target="inspect_log_table_"/>
+					<img config_id="" class="icon_img detail_ana_img" align="left" src="/img/ana.png" />
+					<img config_id="" class="icon_img wireshark_img"  align="left" src="/img/wireshark.png" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="overflow-x: hidden; height: 100px;" id="inspect_log_div_" class="inspect_log_div">
+						<table id="inspect_log_table_" class="inspect_log_table color_over_table tablesorter">
+							<thead>
+								<tr>
+									<th>xid</th>
+									<th>elapsed</th>
+									<th>pwr</th>
+									<th>subtype</th>
+									<th>ds</th>
+									<th>addr1</th>
+									<th>addr2</th>
+									<th>addr3</th>
+									<th>addr4</th>
+									<th>seq</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	
+</body>
+
+<script type="text/javascript">
+var profile_list_table_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		class:"pointer",
+		children: [
+			{tag:"td", html:"<img class='profile_check_img hidden table_img' src='/img/M/profile.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{configListNames\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<img class='profile_log_img table_img' src='/img/M/Graph-Magnifier.svg' id='$\{id\}'>"},
+		]
+};
+
+var config_list_table_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		class:"pointer",
+		children: [
+			{tag:"td", html:"<img class='config_check_img table_img' src='/img/M/menu.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{captureAirConfDescs\}"},
+			{tag:"td", html:"$\{shooterAirConfDescs\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<img class='profile_del_img table_img' src='/img/M/trash.svg' id='$\{id\}'>"},
+			{tag:"input", value:"$\{id\}", type:"hidden", name:"config_id"},
+		]
+};
+
+function get_inspect_log_table_html(data) {
+	var html = 
+	"<tr>"+
+		"<td>"+data.xid+"</td>"+
+		"<td>"+data.elapsed+"</td>"+
+		"<td>"+data.pwr+"</td>"+
+		"<td>"+get_framesubtype_string(data.type, data.subtype)+"</td>"+
+		"<td>"+get_ds_string(data.ds, (data.type == 2))+"</td>"+
+		"<td>"+data.addr1+"</td>"+
+		"<td>"+data.addr2+"</td>"+
+		"<td>"+data.addr3+"</td>"+
+		"<td>"+data.addr4+"</td>"+
+		"<td>"+data.seq+"</td>"+
+	"</tr>";
+	return html;
+}
+
+function load_config_list(profile_id) {
+	var $t = $("#config_list_table");
+	var xlat = config_list_table_xlat;
+	
+	jQuery.ajax({
+		url: "/get_selected_config.jsp",
+		data: {
+			detail: 'true',
+			selected: 'true',
+			profile_id: profile_id,
+		},
+		cache: false,
+		beforeSend: function() {
+			$t.find("tbody").empty();
+		},
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				pop("Error load config list: "+result.cause);
+				return;
+			}			
+			$t.find("tbody").html(
+				json2html.transform(result, xlat)
+			);
+			$t.tablesorter({
+				headers: {
+					0: {sorter: false},
+					2: {sorter: false},
+					3: {sorter: false},
+					5: {sorter: false},
+				}
+			}).trigger("update");
+			
+			$("#inspect_results_div").empty();
+			inspect_config_keys = {};
+			$.each(result, function(i, v) {
+				var c = $("#sample_inspect").clone(true);
+				c.find("legend").html(v.name);			
+				c.find(".detail_log_img").attr("config_id", v.id);
+				c.find(".detail_log_img").attr("target", "inspect_log_table_"+v.id);
+				c.find(".detail_ana_img").attr("config_id", v.id);
+				c.find(".wireshark_img").attr("config_id", v.id);
+				c.find(".inspect_log_div").attr("id", "inspect_log_div_"+v.id);
+				c.find(".inspect_log_table").attr("id", "inspect_log_table_"+v.id);
+				c.find(".inspect_log_table").tablesorter();
+				c.removeClass("hidden");
+				c.appendTo($("#inspect_results_div"));
+				
+				/* mapping config key to config desc */
+				inspect_config_keys[v.id] = {};
+				$.each(v.captureXmlAirConfList, function(ii, vv) {
+					inspect_config_keys[v.id][vv.key] = vv.desc;
+				});
+				$.each(v.shooterXmlAirConfList, function(ii, vv) {
+					inspect_config_keys[v.id][vv.key] = vv.desc;
+				});
+				//console.log(inspect_config_keys);
+			});
+		},
+		error: function(e) {
+			//ajax_err_handle(e);
+			pop("Error loading for config.\nplease retry...");
+		}
+	});
+}
+
+function load_profile_list() {
+	jQuery.ajax({
+		url: "/get_profile.jsp",
+		data: {detail: 'true'},
+		cache: false,
+		beforeSend: function() {
+			$("#profile_list_table > tbody").empty();
+		},
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				pop("Error load profile list: "+result.cause);
+				return;
+			}
+			$("#profile_list_table > tbody").html(
+				json2html.transform(result, profile_list_table_xlat)
+			);
+			$("#profile_list_table").tablesorter({
+				headers: {
+					0: {sorter: false},
+					2: {sorter: false},
+					4: {sorter: false},
+				}
+			}).trigger("update");
+			$("#profile_list_table > tbody > tr").click(function(e) {
+				$("#profile_list_table > tbody > tr").removeClass('selected');				
+				$(this).toggleClass('selected');
+				$(".profile_check_img").addClass('hidden');
+				$("#img_"+$(this).attr("id")).toggleClass('hidden');
+				
+				load_config_list($(this).attr("id"));
+			});
+		},
+		error: function(e) {
+			//ajax_err_handle(e);
+			pop("Error loading for profile.\nplease retry...");
+		}
+	});
+}
+
+var inspect_config_keys = {};
+var inspect_charts = {};
+var inspect_refresh_times = {};
+var inspect_render_time = 1000; // msec
+var ws_raise_error;
+var ws;
+var host = '<%=request.getHeader("host")%>';
+
+$(document).ready(function() {
+	load_profile_list();
+
+	$("#profile_list_table").tablesorter({
+		headers: {
+			0: {sorter: false},
+			2: {sorter: false},
+			4: {sorter: false},
+		}
+	});
+	$("#config_list_table").tablesorter({
+		headers: {
+			0: {sorter: false},
+			2: {sorter: false},
+			3: {sorter: false},
+			5: {sorter: false},
+		}
+	});
+	
+	$("#inspect_run_button").click(function() {
+		ws_raise_error = false;
+		var running = ($(this).attr("src") == "/img/M/play4.svg") ? false : true;
+		if (running) {
+			$(this).attr("src", "/img/M/play4.svg");
+			
+		} else {
+			var profile_id = $("#profile_list_table > tbody .selected").attr("id");
+			if (!_defined_(profile_id)) {
+				return;
+			}
+			
+			ws = new WebSocket("ws://"+host+"/inspect");
+			/* onopen */
+			ws.onopen = function(msg) {
+				// for clear config list data
+				load_config_list(profile_id);
+				
+				$.each(inspect_charts, function(i, v){
+					v.empty();
+				});
+				$(".inspect_log_table > tbody").empty();
+				
+				inspect_charts = {};
+				inspect_refresh_times = {0:0, 1:0};
+				
+				ws.send(JSON.stringify({
+					state: "start",
+					timer: $("#inspect_timer").val(),
+					profileId: profile_id
+				}));
+				$(this).attr("src", "/img/M/stop4.svg");
+			}
+			/* onmessage */
+			ws.onmessage = function(msg) {
+				if (_isnull(msg.data)) {
+					return;
+				}
+				var result = JSON.parse(msg.data);
+				if (result.good == false) {
+					pop("Error inspect: "+result.cause);
+					$(this).attr("src", "/img/M/play4.svg");
+					ws_raise_error = true;
+					ws.close();
+					return;
+				}
+				if (result.good == true) {
+					return;
+				}
+				/* dynamic logging table */
+				if (0) {
+					$("#inspect_log_table_"+result.conf+" > tbody:last")
+						.append(get_inspect_log_table_html(result));						
+					$("#inspect_log_table_"+result.conf)
+						.tablesorter({widgets: ["zebra"]})
+						.trigger("update");
+					
+					/* for scroll inspect log table */
+					var scroll_div = $("#inspect_log_div_"+result.conf);
+					scroll_div.scrollTop(scroll_div[0].scrollHeight);
+				}
+				/* dynamic char drawing */
+				if (1) {
+					// append capture data to chart
+					if (!_defined_(inspect_charts[result.conf])) {
+						var items = new Array();
+						$.each(inspect_config_keys[result.conf], function(i, v) {
+							items.push(v);
+						});
+						console.log(items);
+						var max_sec = parseInt($("#inspect_timer").val()) + 2;
+						inspect_charts[result.conf] 
+							= inspectChart.generate(
+									"inspect_chart_"+result.conf, {
+										items: items,
+										max_sec: max_sec,
+									}
+								);
+					}
+					// capture or shooter result
+					var x = result.elapsed;
+					var y = result.pwr;
+					var now = new Date().getTime();
+					
+					var item = inspect_config_keys[result.conf][result.key];
+					if (_defined_(item)) {
+						inspect_charts[result.conf].push(item, x, y, false);
+						if (now - inspect_refresh_times[0] > inspect_render_time) {
+							console.log(result);
+							inspect_refresh_times[0] = now;
+							inspect_charts[result.conf].refresh(item);
+						}
+					}
+				}
+			}
+			/* onerror */
+			ws.onerror = function(msg) {
+				$(this).attr("src", "/img/M/play4.svg");
+				pop("Error inspect: "+msg);
+				ws_raise_error = true;
+			}
+			/* onerror */
+			ws.onclose = function() {
+				$(this).attr("src", "/img/M/play4.svg");
+				if (ws_raise_error == false) {
+					pop("Finished inspect", {type:"success"});
+				}
+			}
+		}
+	});
+});
+</script>
+<%@include file="/M/footer.jsp"%>
+</html>

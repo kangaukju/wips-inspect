@@ -1,0 +1,201 @@
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<%@include file="/M/header.jsp"%>
+<link rel="stylesheet" href="/js/animatedModal/normalize.min.css">
+<link rel="stylesheet" href="/js/animatedModal/animate.min.css">
+<style type="text/css">
+
+</style>
+</head>
+<body>
+	<fieldset class="main_fieldset">
+		<legend>
+			<img class="head_img" src="/img/M/list_banner.svg">
+			<span>Config List</span>
+		</legend>
+		<div align="right">
+			<img class="action_img" src="/img/M/plus.svg" id="add_config">
+			<img class="action_img" src="/img/M/edit.svg" id="modify_config">
+		</div>
+		
+		<table id="config_list_table">
+			<thead>
+				<tr>
+					<th width="20px;"></th>
+					<th>name</th>
+					<th>capture</th>
+					<th>shooter</th>
+					<th>updated</th>
+					<th>xml</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</fieldset>
+	
+	<div id="config_xml_modal">
+		<div id="btn-close-modal" class="close-config_xml_modal" style="text-align: center; cursor: pointer;"> 
+			<img src="/img/M/close.svg" style="width:50px;">
+		</div>
+		<div class="modal-content"></div>
+	</div>
+	
+	
+	
+</body>
+
+<script type="text/javascript">
+var config_list_table_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		class:"pointer",
+		children: [
+			{tag:"td", html:"<img class='config_check_img hidden table_img' src='/img/M/menu.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{captureAirConfDescs\}"},
+			{tag:"td", html:"$\{shooterAirConfDescs\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<a class='config_xml_img' href='#config_xml_modal' id='$\{id\}'><img class='table_img' src='/img/M/file-xml2.svg'></a>"},
+			{tag:"td", html:"<img class='config_del_img table_img' src='/img/M/trash.svg' id='$\{id\}'>"},
+		]
+};
+
+function load_config_list() {
+	jQuery.ajax({
+		url: "/get_config.jsp",
+		data: {detail: 'true'},
+		cache: false,
+		beforeSend: function() {
+			$("#config_list_table > tbody").empty();
+		},
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				alert("load_config_list: "+result.cause);
+				return;
+			}			
+			$("#config_list_table > tbody").html(
+				json2html.transform(result, config_list_table_xlat)
+			);
+			$("#config_list_table").tablesorter({
+				headers: {
+					0: {sorter: false},
+					2: {sorter: false},
+					3: {sorter: false},
+					5: {sorter: false},
+				}
+			}).trigger("update");
+			$("#config_list_table > tbody > tr").click(function(e) {
+				$("#config_list_table > tbody > tr").removeClass('selected');				
+				$(this).toggleClass('selected');
+				$(".config_check_img").addClass('hidden');
+				$("#img_"+$(this).attr("id")).toggleClass('hidden');
+			});
+			
+			bind_config_handler();
+		},
+		error: function(e) {
+			ajax_err_handle(e);
+		}
+	});
+}
+
+function bind_config_handler() {
+	$(".config_xml_img").animatedModal({
+		configId: $(this).attr("id"),
+		modalTarget: 'config_xml_modal',
+		animatedIn: 'lightSpeedIn',
+		animatedOut: 'bounceOutDown',
+		beforeOpen: function() {
+			console.log($(this));
+			jQuery.ajax({
+				url: "/config_xml.jsp",
+				data: { 'config_id': config_id },
+				cache: false,
+				dataType: "json",
+				success: function(result) {
+					if (result.good == false) {
+						pop("Error loading config XML.\n"+result.cause);
+						return;
+					}
+					
+				},
+				error: function(e) {
+					//ajax_err_handle(e);
+					pop("Error loading config XML.\nplease retry...");
+				}
+			});
+		},
+	});
+	/*
+	$(".config_xml_img").click(function() {
+		var config_id = $(this).attr("id");
+		jQuery.ajax({
+			url: "/config_xml.jsp",
+			data: { 'config_id': config_id },
+			cache: false,
+			dataType: "json",
+			success: function(result) {
+				if (result.good == false) {
+					pop("Error loading config XML.\n"+result.cause);
+					return;
+				}
+				
+			},
+			error: function(e) {
+				//ajax_err_handle(e);
+				pop("Error loading config XML.\nplease retry...");
+			}
+		});
+	});
+	*/
+	
+	$(".config_del_img").click(function() {
+		if (!confirm("Are you sure delete config ?")) {
+			return;
+		}
+		var config_id = $(this).attr("id");
+		jQuery.ajax({
+			url: "/del_config.jsp",
+			data: { 'config_id': config_id },
+			cache: false,
+			dataType: "json",
+			success: function(result) {
+				if (result.good == false) {
+					pop("Error loading config.\n"+result.cause);
+					return;
+				}
+				pop("success delete config");
+				load_config_list();
+			},
+			error: function(e) {
+				//ajax_err_handle(e);
+				pop("Error loading config.\nplease retry...");
+			}
+		});
+	});
+}
+
+$(document).ready(function() {
+	load_config_list();
+	
+	$("#modify_config").click(function() {
+		var $s = $("#config_list_table > tbody .selected");
+		if ($s.length == 1) {
+			gogo("config.jsp?config_id="+$s.attr("id"));
+		}
+	});
+	
+	$("#add_config").click(function() {
+		gogo("config.jsp");
+	});
+	
+	
+});
+</script>
+<%@include file="/M/footer.jsp"%>
+</html>

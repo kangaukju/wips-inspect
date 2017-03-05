@@ -1,19 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <qualifiedTypeNameHistroy>
-<fullyQualifiedTypeName name="java.util.StringTokenizer"/>
 <fullyQualifiedTypeName name="air.wips.inspect.utils.ArrayUtil"/>
 <fullyQualifiedTypeName name="air.wips.inspect.osdep.WifiDevice"/>
 <fullyQualifiedTypeName name="java.util.concurrent.TimeUnit"/>
 <fullyQualifiedTypeName name="javax.websocket.Session"/>
 <fullyQualifiedTypeName name="java.lang.Runnable"/>
 <fullyQualifiedTypeName name="javax.websocket.RemoteEndpoint.Basic"/>
-<fullyQualifiedTypeName name="java.lang.StringBuffer"/>
 <fullyQualifiedTypeName name="java.io.InputStream"/>
 <fullyQualifiedTypeName name="java.lang.ProcessBuilder"/>
 <fullyQualifiedTypeName name="java.io.FileWriter"/>
 <fullyQualifiedTypeName name="java.io.InputStreamReader"/>
 <fullyQualifiedTypeName name="java.io.FileInputStream"/>
-<fullyQualifiedTypeName name="java.io.BufferedReader"/>
 <fullyQualifiedTypeName name="javax.annotation.processing.Filer"/>
 <fullyQualifiedTypeName name="air.wips.inspect.utils.ProcessUtil"/>
 <fullyQualifiedTypeName name="java.lang.Process"/>
@@ -21,7 +18,6 @@
 <fullyQualifiedTypeName name="org.w3c.dom.Node"/>
 <fullyQualifiedTypeName name="air.wips.inspect.servlet.AirResultParse"/>
 <fullyQualifiedTypeName name="java.nio.channels.DatagramChannel"/>
-<fullyQualifiedTypeName name="java.io.FileReader"/>
 <fullyQualifiedTypeName name="java.lang.Byte"/>
 <fullyQualifiedTypeName name="java.nio.ByteOrder"/>
 <fullyQualifiedTypeName name="java.lang.Thread"/>
@@ -38,7 +34,6 @@
 <fullyQualifiedTypeName name="java.util.Set"/>
 <fullyQualifiedTypeName name="java.lang.String"/>
 <fullyQualifiedTypeName name="java.util.Iterator"/>
-<fullyQualifiedTypeName name="java.io.File"/>
 <fullyQualifiedTypeName name="java.util.Enumeration"/>
 <fullyQualifiedTypeName name="java.net.NetworkInterface"/>
 <fullyQualifiedTypeName name="air.wips.inspect.log.D"/>
@@ -52,12 +47,17 @@
 <fullyQualifiedTypeName name="air.wips.inspect.analyzer.factors.BusyTimeInspection"/>
 <fullyQualifiedTypeName name="air.wips.inspect.analyzer.factors.InspectorAbstract"/>
 <fullyQualifiedTypeName name="org.w3c.dom.Document"/>
-<fullyQualifiedTypeName name="java.lang.Exception"/>
 <fullyQualifiedTypeName name="air.wips.inspect.utils.StringUtil"/>
 <fullyQualifiedTypeName name="javax.swing.plaf.ListUI"/>
 <fullyQualifiedTypeName name="air.wips.inspect.utils.ListUtil"/>
-<fullyQualifiedTypeName name="air.wips.inspect.conf.XmlAirConf"/>
 <fullyQualifiedTypeName name="java.util.List"/>
 <fullyQualifiedTypeName name="java.util.ArrayList"/>
 <fullyQualifiedTypeName name="sql.inspect.wips.air.Config"/>
+<fullyQualifiedTypeName name="java.io.File"/>
+<fullyQualifiedTypeName name="java.lang.Exception"/>
+<fullyQualifiedTypeName name="java.lang.StringBuffer"/>
+<fullyQualifiedTypeName name="java.io.BufferedReader"/>
+<fullyQualifiedTypeName name="java.io.FileReader"/>
+<fullyQualifiedTypeName name="air.wips.inspect.utils.FileUtil"/>
+<fullyQualifiedTypeName name="air.wips.inspect.conf.XmlAirConf"/>
 </qualifiedTypeNameHistroy>

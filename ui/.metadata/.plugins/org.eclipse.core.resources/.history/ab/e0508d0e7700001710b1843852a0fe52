@@ -1,0 +1,237 @@
+<%@page import="air.wips.inspect.servlet.HttpGet"%>
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<%@include file="/M/header.jsp"%>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+	<fieldset class="main_fieldset_r">
+		<legend id="profile_fieldset_r">
+			<img class="head_img" src="/img/M/edit_banner.svg">
+			<span>New Profile</span>			
+		</legend>
+		<form id="profile_form">					
+			<div>
+				<input type="hidden" name="profile_id" id="profile_id">
+				<input type="text" name="profile_name" id="profile_name">
+				<img class="action_img" src="/img/M/upload.svg" id="save_profile">
+			</div>			
+		
+			<fieldset id="selected_config_list" class="sub_fieldset_r">
+				<legend>Selected Config List</legend>
+				<table id="selected_config_list_table" class="list_table">
+					<thead>
+						<tr>
+							<th width="20px;"></th>
+							<th>name</th>
+							<th>capture</th>
+							<th>shooter</th>
+							<th>updated</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</fieldset>
+		</form>
+		
+		<fieldset id="non_selected_config_list" class="sub_fieldset_r">
+			<legend>Non Selected Config List</legend>
+			<table id="non_selected_config_list_table" class="list_table">
+				<thead>
+					<tr>
+						<th width="20px;"></th>
+						<th>name</th>
+						<th>capture</th>
+						<th>shooter</th>
+						<th>updated</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody></tbody>
+			</table>
+		</fieldset>
+		
+	</fieldset>
+</body>
+<script type="text/javascript">
+var profile_id = '<%= HttpGet.get(request, "profile_id", "")%>';
+
+var non_selected_config_list_table_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		class:"pointer",
+		children: [
+			{tag:"td", html:"<img class='config_check_img table_img' src='/img/M/menu.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{captureAirConfDescs\}"},
+			{tag:"td", html:"$\{shooterAirConfDescs\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<img class='profile_add_img table_img' src='/img/M/plus.svg' id='$\{id\}'>"},
+			{tag:"input", value:"$\{id\}", type:"hidden", name:"config_id"},
+		]
+};
+
+var selected_config_list_table_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		class:"pointer",
+		children: [
+			{tag:"td", html:"<img class='config_check_img table_img' src='/img/M/menu.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{captureAirConfDescs\}"},
+			{tag:"td", html:"$\{shooterAirConfDescs\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<img class='profile_del_img table_img' src='/img/M/trash.svg' id='$\{id\}'>"},
+			{tag:"input", value:"$\{id\}", type:"hidden", name:"config_id"},
+		]
+};
+
+function load_config_list(profile_id, selected) {
+	var $t;
+	var xlat;
+		
+	if (selected) {
+		$t = $("#selected_config_list_table");
+		xlat = selected_config_list_table_xlat;
+	} else {
+		$t = $("#non_selected_config_list_table");
+		xlat = non_selected_config_list_table_xlat;
+	}
+	
+	jQuery.ajax({
+		url: "/get_selected_config.jsp",
+		data: {
+			detail: 'true',
+			selected: selected,
+			profile_id: profile_id,
+		},
+		cache: false,
+		beforeSend: function() {
+			$t.find("tbody").empty();
+		},
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				pop("Error load config list: "+result.cause);
+				return;
+			}			
+			$t.find("tbody").html(
+				json2html.transform(result, xlat)
+			);
+			$t.tablesorter({
+				headers: {
+					0: {sorter: false},
+					2: {sorter: false},
+					3: {sorter: false},
+					5: {sorter: false},
+				}
+			}).trigger("update");
+			
+			bind_add_config_to_profile();
+			bind_del_config_to_profile();
+		},
+		error: function(e) {
+			//ajax_err_handle(e);
+			pop("Error loading for config.\nplease retry...");
+		}
+	});
+}
+
+function bind_del_config_to_profile() {	
+	$(".profile_del_img").click(function() {
+		$(this).attr("src", "/img/M/plus.svg");
+		$(this).removeClass("profile_del_img");
+		$(this).addClass("profile_add_img");
+		
+		$("#non_selected_config_list_table").append(pN($(this), 2).remove());
+		
+		bind_add_config_to_profile();
+	});
+}
+
+function bind_add_config_to_profile() {
+	$(".profile_add_img").click(function() {
+		$(this).attr("src", "/img/M/trash.svg");
+		$(this).removeClass("profile_add_img");
+		$(this).addClass("profile_del_img");
+		
+		$("#selected_config_list_table").append(pN($(this), 2).remove());
+		
+		bind_del_config_to_profile();
+	});
+}
+
+$("#save_profile").click(function() {
+	var $profile_name = $("#profile_name");
+	if ($profile_name.val() == "") {
+		pop("missing profile name...", {
+			focus: $profile_name,
+		});
+		return;
+	}
+	
+	$.post("add_profile.jsp", $("#profile_form").serialize())
+		.done(function(result) {
+			if (result.good == false) {
+				pop("Error add profile: "+result.cause);
+				return;
+			}
+			else {
+				pop("success registered profile: "+$("#profile_name").val(), {
+					page: "/M/profile_list.jsp"
+				});
+			}
+	}, "json");
+});
+
+$(document).ready(function() {
+	
+	if (profile_id != '') {
+		$("#profile_fieldset span").html("Edit Profile");
+		
+		jQuery.ajax({
+			url: "/get_profile.jsp",
+			data: {
+				id: profile_id,
+				detail: true,
+			},
+			cache: false,
+			dataType: "json",
+			success: function(result) {
+				if (result.good == false) {
+					pop("Error load profile: "+result.cause);
+					return;
+				}
+				$("#profile_id").val(result.id);
+				$("#profile_name").val(result.name);
+			},
+			error: function(e) {
+				ajax_err_handle(e);
+			}
+		});
+		
+
+		load_config_list(profile_id, true);
+		load_config_list(profile_id, false);
+	} else {
+		load_config_list(profile_id, false);
+	}
+	
+	$(".list_table").tablesorter({
+		headers: {
+			0: {sorter: false},
+			2: {sorter: false},
+			3: {sorter: false},
+			5: {sorter: false},
+		}
+	});
+});
+</script>
+<%@include file="/M/footer.jsp"%>
+</html>

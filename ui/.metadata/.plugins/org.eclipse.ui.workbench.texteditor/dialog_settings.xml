@@ -6,28 +6,28 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="" key="selection"/>
+		<item value="$(this)" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="console"/>
-			<item value="aaaa"/>
-			<item value="loadAirConf"/>
-			<item value="p.configListNames"/>
-			<item value="getConfigListNames"/>
-			<item value="setAirConfDescs"/>
-			<item value="configList"/>
-			<item value="detai"/>
+			<item value="$(this)"/>
+			<item value="inspect_run_button"/>
+			<item value="pop"/>
+			<item value="inspect_render_time"/>
+			<item value="1:1"/>
+			<item value="1.0"/>
+			<item value="inspect_chart"/>
+			<item value="detail_log_img"/>
 		</list>
 		<list key="replacehistory">
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item value="316" key="DIALOG_WIDTH"/>
-		<item value="1|Noto Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
-		<item value="418" key="DIALOG_HEIGHT"/>
+		<item value="323" key="DIALOG_WIDTH"/>
+		<item value="1|나눔고딕|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="403" key="DIALOG_HEIGHT"/>
 		<item value="482" key="DIALOG_X_ORIGIN"/>
 		<item value="422" key="DIALOG_Y_ORIGIN"/>
 	</section>
