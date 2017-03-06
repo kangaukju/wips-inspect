@@ -245,6 +245,7 @@
 			<img class="head_link_img home_link_inspect"      src="/img/M/analytics_balls.svg">
 			<img class="head_link_img home_link_profile_list" src="/img/M/edit2.svg">
 			<img class="head_link_img home_link_config_list"  src="/img/M/config4.svg">
+			<img class="head_link_img home_link_wifi_search"  src="/img/M/wifi_rader.png">
 			<img class="head_link_img home_link_setting_list" src="/img/M/setting2.svg">
 		</td>
 	</tr>
@@ -333,6 +334,9 @@ $(function() {
 	});
 	$(".home_link_setting_list").click(function() {
 		gogo("/M/setting.jsp");
+	});
+	$(".home_link_wifi_search").click(function() {
+		gogo("/M/wifi_search.jsp");
 	});
 });
 

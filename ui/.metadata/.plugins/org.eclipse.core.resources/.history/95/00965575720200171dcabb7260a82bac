@@ -25,7 +25,7 @@
 				<option value="25">25</option>
 				<option value="30">30</option>
 			</select>
-			<img class="action_img" src="/img/M/play4.svg" id="inspect_run_button">
+			<img class="action_img" src="/img/M/play4.svg" id="inspect_run_img">
 		</div>
 		
 		<table id="profile_list_table" class="tablesorter">
@@ -101,6 +101,11 @@
 					</div>
 				</td>
 			</tr>
+			<tr>
+				<td>
+					<div class="inspect_chart" id="inspect_chart_"></div>
+				</td>
+			</tr>
 		</table>
 	</fieldset>
 	
@@ -170,7 +175,7 @@ function load_config_list(profile_id) {
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				pop("Error load config list: "+result.cause);
+				pop("Error loading for config list: "+result.cause);
 				return;
 			}			
 			$t.find("tbody").html(
@@ -188,8 +193,6 @@ function load_config_list(profile_id) {
 			$("#inspect_results_div").empty();
 			inspect_config_keys = {};
 			$.each(result, function(i, v) {
-				console.log(v);
-				inspect_config_keys[v.key] = v.desc;
 				var c = $("#sample_inspect").clone(true);
 				c.find("legend").html(v.name);			
 				c.find(".detail_log_img").attr("config_id", v.id);
@@ -199,11 +202,19 @@ function load_config_list(profile_id) {
 				c.find(".inspect_log_div").attr("id", "inspect_log_div_"+v.id);
 				c.find(".inspect_log_table").attr("id", "inspect_log_table_"+v.id);
 				c.find(".inspect_log_table").tablesorter();
+				c.find(".inspect_chart").attr("id", "inspect_chart_"+v.id);
 				c.removeClass("hidden");
 				c.appendTo($("#inspect_results_div"));
+				
+				/* mapping config key to config desc */
+				inspect_config_keys[v.id] = {};
+				$.each(v.captureXmlAirConfList, function(ii, vv) {
+					inspect_config_keys[v.id][vv.key] = vv.desc;
+				});
+				$.each(v.shooterXmlAirConfList, function(ii, vv) {
+					inspect_config_keys[v.id][vv.key] = vv.desc;
+				});
 			});
-			
-			console.log(inspect_config_keys);
 		},
 		error: function(e) {
 			//ajax_err_handle(e);
@@ -212,7 +223,6 @@ function load_config_list(profile_id) {
 	});
 }
 
-var inspect_config_keys = {};
 function load_profile_list() {
 	jQuery.ajax({
 		url: "/get_profile.jsp",
@@ -224,7 +234,7 @@ function load_profile_list() {
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				pop("Error load profile list: "+result.cause);
+				pop("Error loading for profile list: "+result.cause);
 				return;
 			}
 			$("#profile_list_table > tbody").html(
@@ -253,9 +263,10 @@ function load_profile_list() {
 	});
 }
 
+var inspect_config_keys = {};
 var inspect_charts = {};
 var inspect_refresh_times = {};
-var inspect_render_time = 1000; // msec
+var inspect_render_time = 500; // msec
 var ws_raise_error;
 var ws;
 var host = '<%=request.getHeader("host")%>';
@@ -279,18 +290,19 @@ $(document).ready(function() {
 		}
 	});
 	
-	$("#inspect_run_button").click(function() {
+	$("#inspect_run_img").click(function() {
+		var $img = $(this);
 		ws_raise_error = false;
-		var running = ($(this).attr("src") == "/img/M/play4.svg") ? false : true;
+		var running = ($img.attr("src") == "/img/M/play4.svg") ? false : true;
 		if (running) {
-			$(this).attr("src", "/img/M/play4.svg");
+			$img.attr("src", "/img/M/play4.svg");
 			
 		} else {
 			var profile_id = $("#profile_list_table > tbody .selected").attr("id");
 			if (!_defined_(profile_id)) {
 				return;
 			}
-			
+			alert("ws://"+host+"/inspect");
 			ws = new WebSocket("ws://"+host+"/inspect");
 			/* onopen */
 			ws.onopen = function(msg) {
@@ -300,13 +312,17 @@ $(document).ready(function() {
 				$.each(inspect_charts, function(i, v){
 					v.empty();
 				});
+				$(".inspect_log_table > tbody").empty();
+				
+				inspect_charts = {};
+				inspect_refresh_times = {0:0, 1:0};
 				
 				ws.send(JSON.stringify({
 					state: "start",
 					timer: $("#inspect_timer").val(),
 					profileId: profile_id
 				}));
-				$(this).attr("src", "/img/M/stop4.svg");
+				$img.attr("src", "/img/M/stop4.svg");
 			}
 			/* onmessage */
 			ws.onmessage = function(msg) {
@@ -315,8 +331,8 @@ $(document).ready(function() {
 				}
 				var result = JSON.parse(msg.data);
 				if (result.good == false) {
-					pop("Error inspect: "+result.cause);
-					$(this).attr("src", "/img/M/play4.svg");
+					pop("Error running inspect: "+result.cause);
+					$img.attr("src", "/img/M/play4.svg");
 					ws_raise_error = true;
 					ws.close();
 					return;
@@ -324,25 +340,32 @@ $(document).ready(function() {
 				if (result.good == true) {
 					return;
 				}
-				//console.log(result);
-				$("#inspect_log_table_"+result.conf+" > tbody:last")
-					.append(get_inspect_log_table_html(result));						
-				$("#inspect_log_table_"+result.conf)
-					.tablesorter({widgets: ["zebra"]}).trigger("update");
-				
-				/* for scroll inspect log table */
-				var scroll_div = $("#inspect_log_div_"+result.conf);
-				scroll_div.scrollTop(scroll_div[0].scrollHeight);
-				
+				/* dynamic logging table */
+				if (0) {
+					$("#inspect_log_table_"+result.conf+" > tbody:last")
+						.append(get_inspect_log_table_html(result));						
+					$("#inspect_log_table_"+result.conf)
+						.tablesorter({widgets: ["zebra"]})
+						.trigger("update");
+					
+					/* for scroll inspect log table */
+					var scroll_div = $("#inspect_log_div_"+result.conf);
+					scroll_div.scrollTop(scroll_div[0].scrollHeight);
+				}
 				/* dynamic char drawing */
 				if (1) {
 					// append capture data to chart
 					if (!_defined_(inspect_charts[result.conf])) {
+						var items = new Array();
+						$.each(inspect_config_keys[result.conf], function(i, v) {
+							items.push(v);
+						});
+						console.log(items);
 						var max_sec = parseInt($("#inspect_timer").val()) + 2;
 						inspect_charts[result.conf] 
 							= inspectChart.generate(
 									"inspect_chart_"+result.conf, {
-										items: ["shooter", "capture"],
+										items: items,
 										max_sec: max_sec,
 									}
 								);
@@ -351,38 +374,35 @@ $(document).ready(function() {
 					var x = result.elapsed;
 					var y = result.pwr;
 					var now = new Date().getTime();
-					if (result.key == 1) {
-						// capture chart
-						inspect_charts[result.conf].push("capture", x, y, false);
+					
+					var item = inspect_config_keys[result.conf][result.key];
+					if (_defined_(item)) {
+						inspect_charts[result.conf].push(item, x, y, false);
 						if (now - inspect_refresh_times[0] > inspect_render_time) {
+							console.log(result);
 							inspect_refresh_times[0] = now;
-							inspect_charts[result.conf].refresh("capture");
+							inspect_charts[result.conf].refresh(item);
 						}
-					} else if (result.key == 2) {
-						// shooter chart
-						inspect_charts[result.conf].push("shooter", x, y, false);
-						if (now - inspect_refresh_times[1] > inspect_render_time) {
-							inspect_refresh_times[1] = now;
-							inspect_charts[result.conf].refresh("shooter");
-						}
-					}						
+					}
 				}
 			}
 			/* onerror */
 			ws.onerror = function(msg) {
-				$(this).attr("src", "/img/M/play4.svg");
-				pop("Error inspect: "+msg);
+				$img.attr("src", "/img/M/play4.svg");
+				pop("Error running inspect: "+msg);
 				ws_raise_error = true;
 			}
 			/* onerror */
 			ws.onclose = function() {
-				$(this).attr("src", "/img/M/play4.svg");
+				$img.attr("src", "/img/M/play4.svg");
 				if (ws_raise_error == false) {
 					pop("Finished inspect", {type:"success"});
 				}
 			}
 		}
 	});
+	
+	load_ok();
 });
 </script>
 <%@include file="/M/footer.jsp"%>

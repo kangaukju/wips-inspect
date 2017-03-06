@@ -295,8 +295,8 @@ $(document).ready(function() {
 		ws_raise_error = false;
 		var running = ($img.attr("src") == "/img/M/play4.svg") ? false : true;
 		if (running) {
+			ws.close();
 			$img.attr("src", "/img/M/play4.svg");
-			
 		} else {
 			var profile_id = $("#profile_list_table > tbody .selected").attr("id");
 			if (!_defined_(profile_id)) {

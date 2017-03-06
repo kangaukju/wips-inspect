@@ -166,12 +166,25 @@ public class ProcessUtil {
 	}
 	
 	static public boolean isRunningProcess(String name, String pidpath, boolean wait) throws Exception {
-		File f = new File(pidpath);
+		File f = null;
 		BufferedReader br = null;
-		if (!f.exists()) {
-			return false;
-		}
 		long waitTime = 0;
+		final long timeout = 30;
+		
+		while (true) {
+			f = new File(pidpath);
+			if (f.exists()) {
+				break;
+			} else {
+				Thread.sleep(100);
+				waitTime++;
+				if (waitTime > timeout) {
+					return false;
+				}
+			}
+		};
+		
+		waitTime = 0;
 		try {
 			D.log("wait for read pid from "+pidpath + (wait ? "(wait)" : ""));
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(f)));
@@ -179,7 +192,7 @@ public class ProcessUtil {
 				while (!br.ready()) {
 					Thread.sleep(100);
 					waitTime++;
-					if (waitTime > 30)
+					if (waitTime > timeout)
 						break;
 				}
 			}

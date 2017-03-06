@@ -249,7 +249,13 @@
 		</td>
 	</tr>
 </table>
-<% boolean debug = HttpGet.getBoolean(request, "debug", false); %>
+
+
+<div id="custom-overlay" style="text-align: center; vertical-align: middle;">
+	<img src="/img/M/loading.svg" style="width: 70px; height: 70px;">
+</div>
+
+<% boolean debug = HttpGet.sessionBoolean(request, "debug", false); %>
 <script type="text/javascript">
 var debug = <%= debug %>;
 function CtrlAlt() {
@@ -299,17 +305,20 @@ if (!debug) {
 
 $("body").loading({
 	theme: 'dark',
+	overlay: $("#custom-overlay"),
 	onStart: function(loading) {
-		loading.overlay.slideDown(10);
+		loading.overlay.fadeIn(10);
 	},
 	onStop: function(loading) {
-		loading.overlay.slideUp(20);
+		loading.overlay.fadeOut(1000);
 	}
 });
 
-$(function() {
+function load_ok() {
 	$("body").loading('stop');
-	
+}
+
+$(function() {
 	$(".title").click(function() {
 		gogo("/M/index.jsp");
 	});

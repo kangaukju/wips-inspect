@@ -6,28 +6,28 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="1000" key="selection"/>
+		<item value="home_link_config_list" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
+			<item value="home_link_config_list"/>
+			<item value="stop"/>
+			<item value="30"/>
+			<item value="unable"/>
+			<item value="ws"/>
 			<item value="1000"/>
 			<item value="box_msg"/>
 			<item value="custom-overlay"/>
-			<item value="overlay: $(&quot;#custom-overlay&quot;)"/>
-			<item value="overlay"/>
-			<item value="load_config_list"/>
-			<item value="bind_delete_profile"/>
-			<item value="load_profile_list"/>
 		</list>
 		<list key="replacehistory">
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item value="316" key="DIALOG_WIDTH"/>
-		<item value="1|Noto Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
-		<item value="418" key="DIALOG_HEIGHT"/>
+		<item value="323" key="DIALOG_WIDTH"/>
+		<item value="1|나눔고딕|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="402" key="DIALOG_HEIGHT"/>
 		<item value="482" key="DIALOG_X_ORIGIN"/>
 		<item value="422" key="DIALOG_Y_ORIGIN"/>
 	</section>

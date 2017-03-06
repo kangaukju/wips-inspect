@@ -114,7 +114,7 @@ public class WipsInspectWebSocket extends AirResult {
 					D.log("unable run wips-inspect tool");
 					doExit();
 					if (process == null) {
-						return new Gson().toJson(new GoodBad().bad("Error! execute wips-inspect"));
+						return new Gson().toJson(new GoodBad().bad("Error! unable execute wips-inspect"));
 					} else {
 						String errorTxt = ProcessUtil.getProcessError(process);
 						D.log(errorTxt);
