@@ -56,8 +56,12 @@ function load_wifidev() {
 				.html(json2html.transform(result, wifi_dev_xlat));
 			$("#wifi_dev_table")
 				.tablesorter({widgets: ["zebra"]}).trigger("update");
+			
+			load_ok();
 		},
 		error: function(e) {
+			load_ok();
+			//ajax_err_handle(e);
 			pop("Error load wifi devices.\nplease retry...");  
 		}
 	});

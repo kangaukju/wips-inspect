@@ -515,7 +515,7 @@ $(document).ready(function() {
 		$.post("add_config.jsp", $("#config_form").serialize())
 			.done(function(result) {
 				if (result.good == false) {
-					pop("Error add config: "+result.cause);
+					pop("Error register config: "+result.cause);
 					return;
 				} else {
 					pop("success registered config: "+$("#config_name").val(), {
@@ -539,7 +539,7 @@ $(document).ready(function() {
 				dataType: "json",
 				success: function(result) {
 					if (result.good == false) {
-						pop("Error loading config XML.\n"+result.cause);
+						pop("Error loading for config XML.\n"+result.cause);
 						return;
 					}
 					$("#config_xml_tabs").tabs();
@@ -548,7 +548,7 @@ $(document).ready(function() {
 				},
 				error: function(e) {
 					//ajax_err_handle(e);
-					pop("Error loading config XML.\nplease retry...");
+					pop("Error loading for config XML.\nplease retry...");
 				}
 			});
 		},
@@ -567,7 +567,7 @@ $(document).ready(function() {
 			dataType: "json",
 			success: function(result) {
 				if (result.good == false) {
-					pop("Error load config: "+result.cause);
+					pop("Error loading for config: "+result.cause);
 					return;
 				}
 				$("#config_id").val(result.id);
@@ -575,8 +575,10 @@ $(document).ready(function() {
 				build_config_list("shooter", result.shooterXmlAirConfList);
 				build_config_list("capture", result.captureXmlAirConfList);
 				
+				load_ok();
 			},
 			error: function(e) {
+				load_ok();
 				//ajax_err_handle(e);
 				pop("Error loading for config.\nplease retry...");
 			}
@@ -584,6 +586,7 @@ $(document).ready(function() {
 	}
 	else {
 		$("#config_xml_link").addClass("hidden");
+		load_ok();
 	}
 });
 </script>

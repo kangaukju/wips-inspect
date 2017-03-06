@@ -59,7 +59,7 @@ function load_profile_list() {
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				pop("Error load profile list: "+result.cause);
+				pop("Error loading for profile list: "+result.cause);
 				return;
 			}			
 			$("#profile_list_table > tbody").html(
@@ -80,8 +80,11 @@ function load_profile_list() {
 			});
 			
 			bind_delete_profile();
+			
+			load_ok();
 		},
 		error: function(e) {
+			load_ok();
 			//ajax_err_handle(e);
 			pop("Error loading for profile.\nplease retry...");
 		}

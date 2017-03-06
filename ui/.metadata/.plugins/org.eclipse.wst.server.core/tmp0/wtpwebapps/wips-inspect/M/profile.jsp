@@ -118,7 +118,7 @@ function load_config_list(profile_id, selected) {
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				pop("Error load config list: "+result.cause);
+				pop("Error loading for config list: "+result.cause);
 				return;
 			}			
 			$t.find("tbody").html(
@@ -135,8 +135,11 @@ function load_config_list(profile_id, selected) {
 			
 			bind_add_config_to_profile();
 			bind_del_config_to_profile();
+			
+			load_ok();
 		},
 		error: function(e) {
+			load_ok();
 			//ajax_err_handle(e);
 			pop("Error loading for config.\nplease retry...");
 		}
@@ -179,7 +182,7 @@ $("#save_profile").click(function() {
 	$.post("add_profile.jsp", $("#profile_form").serialize())
 		.done(function(result) {
 			if (result.good == false) {
-				pop("Error add profile: "+result.cause);
+				pop("Error register profile: "+result.cause);
 				return;
 			}
 			else {
@@ -206,7 +209,7 @@ $(document).ready(function() {
 			dataType: "json",
 			success: function(result) {
 				if (result.good == false) {
-					pop("Error load profile: "+result.cause);
+					pop("Error loading for profile: "+result.cause);
 					return;
 				}
 				$("#profile_id").val(result.id);

@@ -1,0 +1,74 @@
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<%@include file="/M/header.jsp"%>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+	<fieldset class="main_fieldset">
+		<legend id="config_fieldset">
+			<img class="head_img" src="/img/M/connection_bar.svg">
+			<span>Wifi Driver</span>
+		</legend>
+		<table id="wifi_dev_table" class="tablesorter">
+			<thead>
+				<tr>
+					<th>phy</th>
+					<th>interface</th>
+					<th>driver</th>
+					<th>chipset</th>
+					<th>monitor</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</fieldset>
+</body>
+
+<script type="text/javascript">
+var wifi_dev_xlat = {
+	tag: "tr",
+	children: [
+		{tag:"td", html:"$\{phy\}"},
+		{tag:"td", html:"$\{ifname\}"},
+		{tag:"td", html:"$\{driver\}"},
+		{tag:"td", html:"$\{chipset\}"},
+		{tag:"td", html:"$\{monitor\}"},
+	]
+};
+
+function load_wifidev() {
+	jQuery.ajax({
+		url: "/wifidriver_json.jsp",
+		cache: false,
+		dataType: "json",
+		success: function(result) {
+			if (result.good == false) {
+				pop("Error load wifi devices: "+result.cause);
+				return;
+			}
+			/* complete */
+			$("#wifi_dev_table > tbody")
+				.html(json2html.transform(result, wifi_dev_xlat));
+			$("#wifi_dev_table")
+				.tablesorter({widgets: ["zebra"]}).trigger("update");
+			
+			load_ok();
+		},
+		error: function(e) {
+			load_ok();
+			pop("Error load wifi devices.\nplease retry...");  
+		}
+	});
+}	
+
+$(document).ready(function() {
+	load_wifidev();
+});
+</script>
+<%@include file="/M/footer.jsp"%>
+</html>

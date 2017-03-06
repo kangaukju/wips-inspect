@@ -175,7 +175,7 @@ function load_config_list(profile_id) {
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				pop("Error load config list: "+result.cause);
+				pop("Error loading for config list: "+result.cause);
 				return;
 			}			
 			$t.find("tbody").html(
@@ -234,7 +234,7 @@ function load_profile_list() {
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				pop("Error load profile list: "+result.cause);
+				pop("Error loading for profile list: "+result.cause);
 				return;
 			}
 			$("#profile_list_table > tbody").html(
@@ -331,7 +331,7 @@ $(document).ready(function() {
 				}
 				var result = JSON.parse(msg.data);
 				if (result.good == false) {
-					pop("Error inspect: "+result.cause);
+					pop("Error running inspect: "+result.cause);
 					$img.attr("src", "/img/M/play4.svg");
 					ws_raise_error = true;
 					ws.close();
@@ -389,7 +389,7 @@ $(document).ready(function() {
 			/* onerror */
 			ws.onerror = function(msg) {
 				$img.attr("src", "/img/M/play4.svg");
-				pop("Error inspect: "+msg);
+				pop("Error running inspect: "+msg);
 				ws_raise_error = true;
 			}
 			/* onerror */
@@ -401,6 +401,8 @@ $(document).ready(function() {
 			}
 		}
 	});
+	
+	load_ok();
 });
 </script>
 <%@include file="/M/footer.jsp"%>

@@ -18,8 +18,8 @@
 </head>
 <%@include file="/M/header.jsp"%>
 <body>
-	<div align="center">
-		<img src="/img/M/quality-control.jpg" style="height: 300px;">
+	<div align="center" style="height: 200px; width: 100%;">
+		
 	</div>
 	<div>
 		<table class="home_contain">
@@ -36,7 +36,9 @@
 </body>
 
 <script type="text/javascript">
-
+$(document).ready(function() {
+	load_ok();
+});
 </script>
 <%@include file="/M/footer.jsp"%>
 </html>

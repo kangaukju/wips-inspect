@@ -5,6 +5,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %> 
 --%>
+<%@page import="air.wips.inspect.servlet.HttpGet"%>
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <head>
 	<meta charset="UTF-8">
@@ -94,6 +95,9 @@
 		cursor: pointer;
 		width: 20px;
 	}
+	.index_background {
+		background-color: #407bbf;
+	}
 	.main_fieldset {
 		background: #ddd;
 		border: 2px solid #407bbf;
@@ -104,12 +108,12 @@
 	}
 	.main_fieldset > legend {
 		background: #407bbf;
-    color: #fff;
-    padding: 5px 10px ;
-    font-size: 18px;
-    border-radius: 5px;
-    box-shadow: 0 0 0 5px #ddd;
-    margin-left: 20px;
+		color: #fff;
+		padding: 5px 10px ;
+		font-size: 18px;
+		border-radius: 5px;
+		box-shadow: 0 0 0 5px #ddd;
+		margin-left: 20px;
 	}
 	.main_fieldset > legend > span {
 		font-size: 18px;
@@ -245,7 +249,15 @@
 		</td>
 	</tr>
 </table>
+
+
+<div id="custom-overlay" style="text-align: center; vertical-align: middle;">
+	<img src="/img/M/loading.svg" style="width: 70px; height: 70px;">
+</div>
+
+<% boolean debug = HttpGet.sessionBoolean(request, "debug", false); %>
 <script type="text/javascript">
+var debug = <%= debug %>;
 function CtrlAlt() {
 	if (event.keyCode == 17) { return false; }
 	if (event.keyCode == 18) { return false; }
@@ -256,7 +268,7 @@ function CtrlAlt() {
 		return false;
 	}
 }
-if (0) {
+if (!debug) {
 	document.onkeydown = CtrlAlt;
 	document.onmousedown = CtrlAlt;
 	
@@ -289,6 +301,21 @@ if (0) {
 			}
 		}
 	});
+}
+
+$("body").loading({
+	theme: 'dark',
+	overlay: $("#custom-overlay"),
+	onStart: function(loading) {
+		loading.overlay.fadeIn(10);
+	},
+	onStop: function(loading) {
+		loading.overlay.fadeOut(1000);
+	}
+});
+
+function load_ok() {
+	$("body").loading('stop');
 }
 
 $(function() {

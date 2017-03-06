@@ -5,6 +5,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import air.wips.inspect.utils.StringUtil;
 
@@ -35,27 +36,56 @@ public class HttpGet {
 		return vals;
 	}
 	
-	public static String get(HttpServletRequest request, final String name) {
-		return StringUtil.Null(request.getParameter(name));
-	}
-	
-	public static String get(HttpServletRequest request, final String name, String def) {
-		String v = request.getParameter(name);
-		if (StringUtil.isNull(v)) {
-			return def;
+	public static String session(HttpServletRequest request, final String name) {
+		String value;
+		HttpSession session = request.getSession();
+		Object o = session.getAttribute(name);
+		if (o == null || StringUtil.isNull((String)o)) {
+			value = get(request, name);
+			if (value == null) {
+				return null;
+			}
+			session.setAttribute(name, value);
+		} else {
+			value = (String)o;
 		}
-		return v;
+		return value;
 	}
 	
-	public static boolean getBoolean(HttpServletRequest request, final String name, boolean def) {
-		String value = request.getParameter(name);
+	public static boolean sessionBoolean(HttpServletRequest request, final String name, boolean def) {
+		String value = session(request, name);
 		if (StringUtil.isNull(value)) {
 			return def;
 		}
 		if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value)) {
 			return true;
+		} else if ("false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value)) {
+			return false;
+		} else {
+			return def;
 		}
-		else if ("false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value)) {
+	}
+	
+	public static String get(HttpServletRequest request, final String name) {
+		return StringUtil.Null(request.getParameter(name));
+	}
+	
+	public static String get(HttpServletRequest request, final String name, String def) {
+		String value = get(request, name);
+		if (value == null) {
+			return def;
+		}
+		return value;
+	}
+	
+	public static boolean getBoolean(HttpServletRequest request, final String name, boolean def) {
+		String value = get(request, name);
+		if (value == null) {
+			return def;
+		}
+		if ("true".equalsIgnoreCase(value) || "yes".equalsIgnoreCase(value)) {
+			return true;
+		} else if ("false".equalsIgnoreCase(value) || "no".equalsIgnoreCase(value)) {
 			return false;
 		} else {
 			return def;
