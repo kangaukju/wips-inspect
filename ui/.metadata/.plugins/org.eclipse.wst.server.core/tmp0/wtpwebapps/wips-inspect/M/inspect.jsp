@@ -26,6 +26,7 @@
 				<option value="30">30</option>
 			</select>
 			<img class="action_img" src="/img/M/play4.svg" id="inspect_run_img">
+			<img class="action_img" src="/img/M/save.png" id="inspect_save_img">
 		</div>
 		
 		<table id="profile_list_table" class="tablesorter">
@@ -60,7 +61,10 @@
 	</fieldset>
 	
 	<fieldset class="main_fieldset">
-		<legend id="inspect_results_legend">Inspect Results</legend>
+		<legend id="inspect_results_legend">
+			<img class="head_img" src="/img/M/radio.svg">
+			Inspect Results
+		</legend>
 		<div id="inspect_results_div">
 		</div>
 	</fieldset>
@@ -109,6 +113,8 @@
 		</table>
 	</fieldset>
 	
+	<form id="hidden_form">
+	</form>
 </body>
 
 <script type="text/javascript">
@@ -290,6 +296,36 @@ $(document).ready(function() {
 		}
 	});
 	
+	$("#inspect_save_img").click(function() {
+		$("#hidden_form").empty();
+		$.each($(".inspect_chart"), function(i, v) {
+			html2canvas(v, {
+				onrendered: function(canvas) {
+					var img = canvas.toDataURL("image/png");					 
+					
+					$("<input></input>").attr({
+						type: "hidden",
+						name: "chart_img",
+						value: img,
+					}).appendTo($("#hidden_form"));
+				}
+			});
+		});
+		
+		$.post("/M/save_inspect.jsp", $("#hidden_form").serialize())
+			.done(function(result) {
+				if (result.good == false) {
+					pop("Error register profile: "+result.cause);
+					return;
+				}
+				else {
+					pop("success saved inspect result", {
+						type: "success",
+					});
+				}
+			}, "json");
+	});
+	
 	$("#inspect_run_img").click(function() {
 		var $img = $(this);
 		ws_raise_error = false;
@@ -360,7 +396,7 @@ $(document).ready(function() {
 						$.each(inspect_config_keys[result.conf], function(i, v) {
 							items.push(v);
 						});
-						console.log(items);
+						//console.log(items);
 						var max_sec = parseInt($("#inspect_timer").val()) + 2;
 						inspect_charts[result.conf] 
 							= inspectChart.generate(
@@ -379,7 +415,7 @@ $(document).ready(function() {
 					if (_defined_(item)) {
 						inspect_charts[result.conf].push(item, x, y, false);
 						if (now - inspect_refresh_times[0] > inspect_render_time) {
-							console.log(result);
+							//console.log(result);
 							inspect_refresh_times[0] = now;
 							inspect_charts[result.conf].refresh(item);
 						}

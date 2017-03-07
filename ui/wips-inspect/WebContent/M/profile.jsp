@@ -191,7 +191,7 @@ $("#save_profile").click(function() {
 					type: "success",
 				});
 			}
-	}, "json");
+		}, "json");
 });
 
 $(document).ready(function() {

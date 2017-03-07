@@ -82,6 +82,10 @@ function load_config_list() {
 				$("#img_"+$(this).attr("id")).toggleClass('hidden');
 			});
 			
+			$("#config_list_table > tbody > tr").dblclick(function(e) {
+				$("#modify_config").trigger("click");
+			});
+			
 			bind_config_handler();
 			
 			load_ok();

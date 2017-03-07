@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>CAP_AUTH</desc>
+    <type>0</type>
+    <subtype>8</subtype>
+    <ds fromds="0" tods="0"/>
+    <key>1</key>
+    <dwell>50</dwell>
+    <channel>6</channel>
+    <any_addr>9C:1C:12:97:10:82</any_addr>
+  </airconf>
+</list>

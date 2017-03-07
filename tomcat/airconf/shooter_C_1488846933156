@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<list>
+  <airconf>
+    <enable>1</enable>
+    <desc>CAP_AUTH attack</desc>
+    <type>0</type>
+    <subtype>4</subtype>
+    <ds fromds="0" tods="0"/>
+    <key>0</key>
+    <dwell>70</dwell>
+    <channel>8</channel>
+    <addr count="3">
+      <bssid>FF:FF:FF:FF:FF:FF</bssid>
+      <da>FF:FF:FF:FF:FF:FF</da>
+      <sa>02:42:12:13:44:77</sa>
+    </addr>
+  </airconf>
+</list>

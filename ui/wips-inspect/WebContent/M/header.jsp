@@ -36,6 +36,8 @@
 	<script src="/js/animatedModal/animatedModal.js"></script>
 	<link rel="stylesheet" href="/js/animatedModal/normalize.min.css">
 	<link rel="stylesheet" href="/js/animatedModal/animate.min.css">
+	<!-- html2canvas -->
+	<script src="/js/html2canvas/html2canvas.js"></script>
 	<!-- my js -->
 	<script src="/js/multiCharts.js"></script>
 	<script src="/js/get_set.js"></script>

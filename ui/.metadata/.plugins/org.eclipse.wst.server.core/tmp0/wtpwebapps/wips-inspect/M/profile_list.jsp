@@ -79,6 +79,10 @@ function load_profile_list() {
 				$("#img_"+$(this).attr("id")).toggleClass('hidden');
 			});
 			
+			$("#profile_list_table > tbody > tr").dblclick(function(e) {
+				$("#modify_profile").trigger("click");
+			});
+			
 			bind_delete_profile();
 			
 			load_ok();
