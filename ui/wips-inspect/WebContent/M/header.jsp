@@ -5,6 +5,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %> 
 --%>
+<%@page import="air.wips.inspect.Login.Admin"%>
 <%@page import="air.wips.inspect.servlet.HttpGet"%>
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <head>
@@ -45,9 +46,16 @@
 	<script src="/js/wifi_protocol.js"></script>	
 	<script src="/js/inspectChart.js"></script>
 	<style type="text/css">
-	* {
+	* {		
 		font: 13px/18px Arial, Sans-serif;
 		font-weight: bold;
+	}
+	body {
+		background: url(/img/login/bg.png) repeat;
+		font-family: "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+		font-weight:300;
+		text-align: left;
+		text-decoration: none;
 	}
 	table.tablesorter thead tr th {
 		background: #407bbf;
@@ -75,14 +83,17 @@
 	input {
 		vertical-align: middle;
 	}
-	input[type=text], select {
-    width: 90%;
-    padding: 3px 5px;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-    background: #fff;
+	input[type=text], input[type=password], select {
+	    width: 40%;
+	    padding: 3px 5px;
+	    display: inline-block;
+	    border: 1px solid #ccc;
+	    border-radius: 4px;
+	    box-sizing: border-box;
+	    background: #fff;
+	}
+	.login_img {
+		width: 60px;
 	}
 	.head_img {
 		width: 20px;
@@ -258,6 +269,18 @@
 	<img src="/img/M/loading.svg" style="width: 70px; height: 70px;">
 </div>
 
+<%
+	Admin admin = null;
+	String curPage = HttpGet.currentPage(request);
+	if (!"index.jsp".equals(curPage) && !"".equals(curPage)) {
+		if ((session == null) || (session.getAttribute("admin") == null)) {
+			response.sendRedirect("/M/index.jsp");
+		}
+		admin = (Admin)session.getAttribute("admin");
+	}
+	System.out.println(HttpGet.currentPage(request)+":"+admin);
+%>
+
 <% boolean debug = HttpGet.sessionBoolean(request, "debug", false); %>
 <script type="text/javascript">
 var debug = <%= debug %>;
@@ -321,9 +344,25 @@ function load_ok() {
 	$("body").loading('stop');
 }
 
+$(window).on('unload ',function() {
+	jQuery.ajax({
+		url: "/M/login_out.jsp",
+		type: "POST",
+		cache: false,
+		async: false,
+		dataType: "json",
+		success: function(result) {
+			gogo("/M");
+		},
+		error: function(e) {
+			gogo("/M");
+		}
+	});
+});
+
 $(function() {
 	$(".title").click(function() {
-		gogo("/M/index.jsp");
+		gogo("/M/main.jsp");
 	});
 	$(".home_link_inspect").click(function() {
 		gogo("/M/inspect.jsp");

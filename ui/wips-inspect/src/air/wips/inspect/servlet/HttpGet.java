@@ -11,6 +11,12 @@ import air.wips.inspect.utils.StringUtil;
 
 public class HttpGet {
 	
+	public static String currentPage(HttpServletRequest request) {
+		String uri = request.getRequestURI();
+		String pageName = uri.substring(uri.lastIndexOf("/")+1);
+		return pageName;
+	}
+	
 	public static List<String> valList(HttpServletRequest request, final String name) {
 		List<String> list = new ArrayList<>();
 		String[] vals = request.getParameterValues(name);

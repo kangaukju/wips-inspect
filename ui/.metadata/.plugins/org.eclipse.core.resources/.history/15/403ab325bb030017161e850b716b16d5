@@ -1,0 +1,7 @@
+package air.wips.inspect.Login;
+
+public class Admin {
+	private String username;
+	private String password;
+	private String lastLogin;
+}

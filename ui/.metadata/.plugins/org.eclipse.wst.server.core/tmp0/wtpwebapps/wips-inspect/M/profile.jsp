@@ -15,7 +15,7 @@
 			<img class="head_img" src="/img/M/edit_banner.svg">
 			<span>New Profile</span>			
 		</legend>
-		<form id="profile_form">					
+		<form id="profile_form" method="post">					
 			<div>
 				<input type="hidden" name="profile_id" id="profile_id">
 				<input type="text" name="profile_name" id="profile_name">
@@ -120,7 +120,7 @@ function load_config_list(profile_id, selected) {
 			if (result.good == false) {
 				pop("Error loading for config list: "+result.cause);
 				return;
-			}			
+			}
 			$t.find("tbody").html(
 				json2html.transform(result, xlat)
 			);

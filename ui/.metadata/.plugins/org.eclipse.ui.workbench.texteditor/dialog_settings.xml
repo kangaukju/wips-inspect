@@ -6,20 +6,20 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="$(&quot;#hidden_form&quot;)" key="selection"/>
+		<item value="sess" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="$(&quot;#hidden_form&quot;)"/>
-			<item value="#hidden_form"/>
-			<item value="hidden_form"/>
-			<item value="post"/>
-			<item value="form"/>
-			<item value="animatedModal"/>
-			<item value=", function(i, v) {"/>
-			<item value="inspect_charts"/>
+			<item value="sess"/>
+			<item value="z-index"/>
+			<item value="z-in"/>
+			<item value="loading"/>
+			<item value="body"/>
+			<item value="submit"/>
+			<item value="pop("/>
+			<item value="result"/>
 		</list>
 		<list key="replacehistory">
 		</list>

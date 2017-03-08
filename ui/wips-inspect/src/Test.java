@@ -1,3 +1,7 @@
+import java.io.ByteArrayInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+
 import air.wips.inspect.utils.ProcessUtil;
 
 public class Test {
@@ -13,6 +17,11 @@ public class Test {
 		Process process = ProcessUtil.processRun("cat", new String[] { file }, null, true, 1);
 		
 		System.out.println(ProcessUtil.getProcessInput(process));
+		
+		
+		byte [] a;
+		
+		FileOutputStream fos =
 	}
 
 }

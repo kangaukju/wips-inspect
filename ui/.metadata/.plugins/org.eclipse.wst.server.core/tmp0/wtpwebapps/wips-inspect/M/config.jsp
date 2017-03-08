@@ -31,7 +31,7 @@
 			<img class="head_img" src="/img/M/edit_banner.svg">
 			<span>New Config</span>
 		</legend>
-		<form id="config_form">
+		<form id="config_form" method="post">
 			<div>
 				<input type="hidden" name="config_id" id="config_id">
 				<input type="text" name="config_name" id="config_name">

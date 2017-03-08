@@ -1,0 +1,44 @@
+package air.wips.inspect.Login;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import sql.inspect.wips.air.DBFILE;
+import sql.inspect.wips.air.SQLite3Connection;
+
+public class Admin {
+	private String username;
+	private String password;
+	private String lastLogin;
+	private String expireDate;
+	
+	@Override
+	public String toString() {
+		return "Admin [username=" + username + ", password=" + password + ", lastLogin=" + lastLogin + "]";
+	}
+	
+	public static void del(String username) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql;
+		try {
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			conn.setAutoCommit(false);
+			sql = "delete from profile where id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.executeUpdate();
+			pstmt.close();
+			
+			sql = "delete from profile_config_ref where profile_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.executeUpdate();
+			conn.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
+}

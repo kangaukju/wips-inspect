@@ -1,0 +1,13 @@
+package air.wips.inspect.Login;
+
+public class Admin {
+	private String username;
+	private String password;
+	private String lastLogin;
+	
+	
+	@Override
+	public String toString() {
+		return "Admin [username=" + username + ", password=" + password + ", lastLogin=" + lastLogin + "]";
+	}
+}

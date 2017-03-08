@@ -113,7 +113,7 @@
 		</table>
 	</fieldset>
 	
-	<form id="hidden_form">
+	<form id="hidden_form" method="post">
 	</form>
 </body>
 
@@ -209,6 +209,7 @@ function load_config_list(profile_id) {
 				c.find(".inspect_log_table").attr("id", "inspect_log_table_"+v.id);
 				c.find(".inspect_log_table").tablesorter();
 				c.find(".inspect_chart").attr("id", "inspect_chart_"+v.id);
+				c.find(".inspect_chart").attr("config_id", v.id);
 				c.removeClass("hidden");
 				c.appendTo($("#inspect_results_div"));
 				
@@ -297,21 +298,6 @@ $(document).ready(function() {
 	});
 	
 	$("#inspect_save_img").click(function() {
-		$("#hidden_form").empty();
-		$.each($(".inspect_chart"), function(i, v) {
-			html2canvas(v, {
-				onrendered: function(canvas) {
-					var img = canvas.toDataURL("image/png");					 
-					
-					$("<input></input>").attr({
-						type: "hidden",
-						name: "chart_img",
-						value: img,
-					}).appendTo($("#hidden_form"));
-				}
-			});
-		});
-		
 		$.post("/M/save_inspect.jsp", $("#hidden_form").serialize())
 			.done(function(result) {
 				if (result.good == false) {
@@ -430,6 +416,36 @@ $(document).ready(function() {
 			}
 			/* onerror */
 			ws.onclose = function() {
+				
+				$("#hidden_form").empty();
+				$(".inspect_chart").each(function(i) {
+					var config_id = $(this).attr("config_id");
+					if (_defined_(config_id)) {
+						html2canvas($(this).find("svg"), {
+							onrendered: function(canvas) {
+								var png = canvas.toDataURL("image/png", 1.0);
+								$("<input></input>").attr({
+									type: "hidden",
+									name: "chart_img",
+									value: png,
+								}).appendTo($("#hidden_form"));
+								
+								$("<input></input>").attr({
+									type: "hidden",
+									name: "config_id",
+									value: config_id,
+								}).appendTo($("#hidden_form"));
+							}
+						});
+					}
+				});
+				$("<input></input>").attr({
+					type: "hidden",
+					name: "profile_id",
+					value: $("#profile_list_table > tbody .selected").attr("id"),
+				}).appendTo($("#hidden_form"));
+				
+				
 				$img.attr("src", "/img/M/play4.svg");
 				if (ws_raise_error == false) {
 					pop("Finished inspect", {type:"success"});

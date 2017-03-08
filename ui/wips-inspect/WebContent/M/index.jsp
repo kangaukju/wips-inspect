@@ -1,44 +1,116 @@
+<%@page import="air.wips.inspect.servlet.HttpGet"%>
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
-<head>			
-	<style type="text/css">
-	.home_img {
-		width: 100px;
-		height: 100px;
-		cursor: pointer;
-	}
-	.home_contain {
-		width: 100%;
-		height: 100%;
-		vertical-align: middle;
-		text-align: center;
-	}
-	</style>
-</head>
+<head>
+<meta charset="UTF-8">
 <%@include file="/M/header.jsp"%>
+<link href="/css/login.css" rel="stylesheet" type="text/css" />
+<style type="text/css">
+	input[type=text], input[type=password] {
+	    width: 100%;
+	}
+</style>
+</head>
 <body>
-	<div align="center" style="height: 200px; width: 100%; padding-top: 50px;">
-		<img src="/img/M/wireless-signal.png" style="width: 200px;">
+	<!--WRAPPER-->
+	<div id="wrapper">
+	
+		<!--SLIDE-IN ICONS-->
+	    <div class="user-icon"></div>
+	    <div class="pass-icon"></div>
+	    <!--END SLIDE-IN ICONS-->
+	
+	<!--LOGIN FORM-->
+	<form id="login-form" class="login-form" method="post">	
+		<!--HEADER-->
+	    <div class="header">	    
+	    <!--TITLE--><h1><img src="/img/M/avatar.svg" class="login_img">Login Admin</h1><!--END TITLE-->
+	    <!--DESCRIPTION--><span></span><!--END DESCRIPTION-->
+	    </div>
+	    <!--END HEADER-->
+		
+		<!--CONTENT-->
+	    <div class="content">
+		<!--USERNAME--><input name="username" type="text" class="input username" value="Username" onfocus="this.value=''" /><!--END USERNAME-->
+	    <!--PASSWORD--><input name="password" type="password" class="input password" value="Password" onfocus="this.value=''" /><!--END PASSWORD-->
+	    </div>
+	    <!--END CONTENT-->
+	    
+	    <!--FOOTER-->
+	    <div class="footer">
+	    <%--
+	    <!--REGISTER BUTTON--><input type="submit" name="submit" value="Register" class="register" /><!--END REGISTER BUTTON-->
+	    --%>
+	    <!--LOGIN BUTTON--><input type="button" id="login_submit" value="Login" class="button" /><!--END LOGIN BUTTON-->
+	    </div>
+	    <!--END FOOTER-->
+	
+	</form>
+	<!--END LOGIN FORM-->
+	
 	</div>
-	<div>
-		<table class="home_contain">
-			<tr>
-				<td>
-					<img class="home_img home_link_users"        id="users"        src="/img/M/analytics2.png" >
-					<img class="home_img home_link_inspect"      id="inspect"      src="/img/M/analytics_balls.svg">
-					<img class="home_img home_link_profile_list" id="profile_list" src="/img/M/edit2.svg">		
-					<img class="home_img home_link_config_list"  id="config_list"  src="/img/M/config4.svg">
-					<img class="home_img home_link_wifi_search"  id="wifi_search"  src="/img/M/wifi_rader.png">
-				</td>
-			</tr>
-		</table>
-	</div>
-</body>
+	<!--END WRAPPER-->
+	
+	<!--GRADIENT--><div class="gradient"></div><!--END GRADIENT-->
 
+</body>
 <script type="text/javascript">
 $(document).ready(function() {
 	load_ok();
+	$("#link_shortcut").hide();
+	
+	$(".username").focus(function() {
+		$(".user-icon").css("left","-48px");
+	});
+	$(".username").blur(function() {
+		$(".user-icon").css("left","0px");
+	});	
+	$(".password").focus(function() {
+		$(".pass-icon").css("left","-48px");
+	});
+	$(".password").blur(function() {
+		$(".pass-icon").css("left","0px");
+	});
+	
+	$("#login_submit").click(function() {
+		jQuery.ajax({
+			url: "/M/check_login.jsp",
+			type: "POST",
+			cache: false,
+			async: false,
+			data: $("#login-form").serialize(),
+			dataType: "json",
+			success: function(result) {
+				if (result.good == false) {
+					alert("Error Unknown user\nPlease check username or password.");
+					return;
+				}
+				gogo("/M/main.jsp");
+			},
+			error: function(e) {
+				pop("Error login.\nplease retry...");
+			}
+		});
+		
+		/*
+		$.post("/M/check_login.jsp", $("#login-form").serialize())
+			.fail(function(e) {
+				alert("Error paging.");
+			})
+			.done(function(result) {
+				console.log(result);
+				console.log(result.good);
+				if (result.good == false) {
+					alert("Error Unknown user\nPlease check username or password.");
+					return;
+				}
+				else {
+					//gogo("/M/main.jsp");
+				}
+			}, "json");
+		*/
+	});
 });
 </script>
 <%@include file="/M/footer.jsp"%>
