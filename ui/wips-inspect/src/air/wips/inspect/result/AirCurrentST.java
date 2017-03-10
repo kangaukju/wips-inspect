@@ -3,13 +3,14 @@ package air.wips.inspect.result;
 public class AirCurrentST {
 	private String stamac;
 	private String bssid;
-	private String channel;
-	private String power;
+	private String ch;
+	private String pwr;
 	private String rate;
-	private String pktCount;
-	private String dataBytes;
+	private String pkt;
+	private String bytes;
 	private String tinit;
 	private String tlast;
+	
 	public String getStamac() {
 		return stamac;
 	}
@@ -22,17 +23,17 @@ public class AirCurrentST {
 	public void setBssid(String bssid) {
 		this.bssid = bssid;
 	}
-	public String getChannel() {
-		return channel;
+	public String getCh() {
+		return ch;
 	}
-	public void setChannel(String channel) {
-		this.channel = channel;
+	public void setCh(String ch) {
+		this.ch = ch;
 	}
-	public String getPower() {
-		return power;
+	public String getPwr() {
+		return pwr;
 	}
-	public void setPower(String power) {
-		this.power = power;
+	public void setPwr(String pwr) {
+		this.pwr = pwr;
 	}
 	public String getRate() {
 		return rate;
@@ -40,17 +41,17 @@ public class AirCurrentST {
 	public void setRate(String rate) {
 		this.rate = rate;
 	}
-	public String getPktCount() {
-		return pktCount;
+	public String getPkt() {
+		return pkt;
 	}
-	public void setPktCount(String pktCount) {
-		this.pktCount = pktCount;
+	public void setPkt(String pkt) {
+		this.pkt = pkt;
 	}
-	public String getDataBytes() {
-		return dataBytes;
+	public String getBytes() {
+		return bytes;
 	}
-	public void setDataBytes(String dataBytes) {
-		this.dataBytes = dataBytes;
+	public void setBytes(String bytes) {
+		this.bytes = bytes;
 	}
 	public String getTinit() {
 		return tinit;
@@ -66,8 +67,7 @@ public class AirCurrentST {
 	}
 	@Override
 	public String toString() {
-		return "AirCurrentST [stamac=" + stamac + ", bssid=" + bssid + ", channel=" + channel + ", power=" + power
-				+ ", rate=" + rate + ", pktCount=" + pktCount + ", dataBytes=" + dataBytes + ", tinit=" + tinit
-				+ ", tlast=" + tlast + "]";
-	}
+		return "AirCurrentST [stamac=" + stamac + ", bssid=" + bssid + ", ch=" + ch + ", pwr=" + pwr + ", rate=" + rate
+				+ ", pkt=" + pkt + ", bytes=" + bytes + ", tinit=" + tinit + ", tlast=" + tlast + "]";
+	}	
 }

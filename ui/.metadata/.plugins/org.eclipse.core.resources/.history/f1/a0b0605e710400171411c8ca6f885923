@@ -1,0 +1,16 @@
+package air.wips.inspect.servlet;
+
+import javax.websocket.server.ServerEndpoint;
+
+@ServerEndpoint("/current")
+public class AirCurrentWebSocket extends AirResult {
+	private Thread thread;
+	
+	
+	private class RequestParam {
+		public String state;
+		public String ifname;
+		public String channel;
+		public String reportInterval;
+	}
+}

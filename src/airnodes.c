@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include "log.h"
 #include "airnodes.h"
 #include "h80211_types.h"
 #include "common.h"
@@ -273,7 +274,7 @@ int air_packet_parse(NODES_INFO *nodes, uint8_t channel,
 	ST_INFO *sta = NULL;
 	int new_ap = 0, new_sta = 0;
 
-	nodes->cur_channel = channel;
+	//nodes->cur_channel = channel;
 	ap_hctx  = nodes->ap_hctx;
 	sta_hctx = nodes->st_hctx;
 
@@ -285,7 +286,11 @@ int air_packet_parse(NODES_INFO *nodes, uint8_t channel,
 
 	/* skip packets smaller than a 802.11 header */
 	if (caplen < 24) {
-		//printf("packet is too smaller than 24, len=%d\n", caplen);
+		cle("packet is too smaller than 24, len=%d\n", caplen);
+		goto end_parse;
+	}
+	if (pH->fc.version != 0) {
+		cle("802.11 protocol only support version 0 (but ver: %d)\n", pH->fc.version);
 		goto end_parse;
 	}
 	/* skip (uninteresting) control frames */
@@ -371,7 +376,7 @@ int air_packet_parse(NODES_INFO *nodes, uint8_t channel,
 	 */
 	if ((fromDS == 1 && toDS == 0)
 			||
-		(fromDS == 1 && toDS == 0 && mac_cmp(bssid, pH->addr2))
+		(fromDS == 0 && toDS == 0 && mac_cmp(bssid, pH->addr2))
 	) {
 		ap->power_index = (ap->power_index+1) % NB_PWR;
 		ap->power_lvl[ap->power_index] = ri->ri_power;

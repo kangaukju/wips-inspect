@@ -1,5 +1,7 @@
 package air.wips.inspect.servlet;
 
+import java.util.List;
+
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
@@ -12,20 +14,21 @@ import com.google.gson.Gson;
 import air.wips.inspect.error.GoodBad;
 import air.wips.inspect.log.D;
 import air.wips.inspect.osdep.Tools;
+import air.wips.inspect.osdep.WifiDevice;
+import air.wips.inspect.utils.ListUtil;
 
-@ServerEndpoint("/aircurrent")
+@ServerEndpoint("/wifi_search")
 public class AirCurrentWebSocket extends AirResult {
 	private Thread thread;
 	
+	
 	private class RequestParam {
 		public String state;
-		public String ifname;
 		public String channel;
-		public String refreshTime;
+		public String reportInterval;
 		@Override
 		public String toString() {
-			return "RequestParam [state=" + state + ", ifname=" + ifname + ", channel=" + channel + ", refreshTime="
-					+ refreshTime + "]";
+			return "RequestParam [state=" + state + ", channel=" + channel + ", reportInterval=" + reportInterval + "]";
 		}
 	}
 	
@@ -44,20 +47,42 @@ public class AirCurrentWebSocket extends AirResult {
 		
 		D.log(p);
 		
+		Process process = null;
+		
 		if ("start".equals(p.state)) {
 			try {
-				thread = new Thread(new AirResultReceiver(this, AirResultReceiver.AIRCURRENT_PORT));
+				// check wifi device interface
+				List<WifiDevice> wifiDevList = Tools.getWifiInterface();
+				if (ListUtil.isNull(wifiDevList)) {
+					return new Gson().toJson(new GoodBad().bad("wifi devices not enough"));
+				}
+				
+				thread = new Thread(new AirResultReceiver(this, 
+						AirResultReceiver.AIRCURRENT_PORT, 0));
+				thread.setDaemon(true);
 				thread.start();
 				
-				Tools.startAircurrent(p.ifname, p.channel, p.refreshTime);
 				
+				String currentWif = Tools.getDefaultCurrentWifiDev();
+								
+				if (currentWif == null || !WifiDevice.contains(wifiDevList, currentWif)) {
+					currentWif = wifiDevList.get(0).getIfname();
+				}
+				
+				Tools.stopAirCurrent();
+				process = Tools.startAircurrent(currentWif, p.channel, p.reportInterval);
+				if (process == null) {
+					D.log("Error! unable execute aircurrent");
+					throw new Exception("Error! unable execute aircurrent");
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
-				if (thread != null) {
-					thread.interrupt();
-					thread = null;
+				doExit();
+				if (process == null) {
+					return new Gson().toJson(new GoodBad().bad("Error! execute aircurrent"));
+				} else {
+					return new Gson().toJson(new GoodBad().bad(e));
 				}
-				return new Gson().toJson(new GoodBad().bad(e));
 			}
 		}
 		else if ("stop".equals(p.state)) {
@@ -66,14 +91,13 @@ public class AirCurrentWebSocket extends AirResult {
 		else {
 			return new Gson().toJson(new GoodBad().bad("unknown state - "+p.state));
 		}
-		
 		return new Gson().toJson(new GoodBad().good());
 	}
 	
 	@OnClose
 	public void onClose() {
-		exit = true;
 		try {
+			doExit();
 			Tools.stopAirCurrent();
 		} catch (Exception e) {
 			e.printStackTrace();

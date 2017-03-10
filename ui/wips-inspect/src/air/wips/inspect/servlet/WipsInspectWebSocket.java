@@ -136,8 +136,7 @@ public class WipsInspectWebSocket extends AirResult {
 			onClose();
 		}
 		else {
-			return new Gson().toJson(new GoodBad().bad(
-					"unknown state - "+p.state));
+			return new Gson().toJson(new GoodBad().bad("unknown state - "+p.state));
 		}
 		return new Gson().toJson(new GoodBad().good());
 	}

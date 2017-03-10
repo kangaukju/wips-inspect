@@ -1,0 +1,13 @@
+package air.wips.inspect.result;
+
+public class AirCurrentAP {
+	private String bssid;
+	private String ch;
+	private String ssid;
+	private String proto;
+	private String pwr;
+	private String sec;
+	private String tinit;
+	private String tlast;
+	
+}

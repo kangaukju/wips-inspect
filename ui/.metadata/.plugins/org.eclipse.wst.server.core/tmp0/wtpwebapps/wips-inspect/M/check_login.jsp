@@ -1,4 +1,5 @@
-<%@page import="air.wips.inspect.log.D"%><%@
+<%@page import="java.util.Date"%><%@
+page import="air.wips.inspect.log.D"%><%@
 page import="air.wips.inspect.error.GoodBad"%><%@
 page import="com.google.gson.Gson"%><%@
 page import="air.wips.inspect.Login.Admin"%><%@
@@ -8,12 +9,12 @@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
 	String username = HttpGet.get(request, "username");
 	String password = HttpGet.get(request, "password");
 	
-	HttpGet.debugRequestParameters(request);
+	//HttpGet.debugRequestParameters(request);
 	
 	try {
-		session.setAttribute(
-				"admin",
-				Admin.check(username, password));
+		Admin admin = Admin.check(username, password);
+		admin.setSessionTimestamp(new Date().getTime());
+		session.setAttribute("admin",admin);
 		response.getWriter().print(new Gson().toJson(new GoodBad().good()));
 		D.log("Login OK");
 	} catch (Exception e) {

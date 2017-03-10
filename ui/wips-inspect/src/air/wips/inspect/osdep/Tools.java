@@ -54,6 +54,14 @@ public class Tools {
 		}
 		return changed;
 	}
+
+	static public String getDefaultCurrentWifiDev() {
+		String dev = System.getProperty("CURRENT_WIFI");
+		if (StringUtil.isNull(dev)) {
+			return null;
+		}
+		return dev;
+	}
 	
 	static public String getDefaultShooterWifiDev() {
 		String dev = System.getProperty("SHOOTER_WIFI");
@@ -123,19 +131,16 @@ public class Tools {
 		ProcessUtil.processStop("wips-inspect", process);
 	}
 	
-	static public Process startAircurrent(String ifname, String channel, String refreshTime) throws Exception {
+	static public Process startAircurrent(String ifname, String channel, String reportInterval) throws Exception {
 		String[] params = {
 				"-i", ifname,
 				"-c", channel,
-				"-t", refreshTime,
+				"-t", reportInterval,
 				"-a", "0",
 				"-s", "0"
 		};
 		if (StringUtil.isNull(ifname)) {
 			throw new Exception("Unknown interface '"+ifname+"'");
-		}
-		if (isChannel(Integer.valueOf(channel)) == false) {
-			throw new Exception("Unknown channel '"+channel+"'");
 		}
 		String[] envs = {
 				"DB_HOME",

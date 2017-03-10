@@ -1,0 +1,173 @@
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<%@include file="/M/header.jsp"%>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+	<fieldset class="main_fieldset">
+		<legend>
+			<img class="head_img" src="/img/M/list_banner.svg">
+			<span>Air Current</span>
+		</legend>
+		
+		<div>
+			<img class="action_img" src="/img/M/refresh-outline.svg">
+			<select id="wifi_search_timer" style="width: 100px;">
+				<option value="10">10</option>
+				<option value="20">20</option>
+				<option value="30">30</option>
+				<option value="40">40</option>
+				<option value="50">50</option>
+				<option value="60">60</option>
+			</select>
+			
+			<img class="table_img" src="/img/M/apps.svg" style="padding-left: 10px;">
+			<select id="channel" style="width: 120px;">
+			</select>
+			<img class="action_img" src="/img/M/play4.svg" id="wifi_search_img">
+		</div>
+		
+		<fieldset class="sub_fieldset">
+			<legend>AP List</legend>
+			<table id="aplist_table" class="wifi_search_table">
+				<thead>
+					<tr>
+						<td>bssid</td>
+						<td>ch</td>
+						<td>ssid</td>
+						<td>proto</td>
+						<td>pwr</td>
+						<td>sec</td>
+						<td>tinit</td>
+						<td>tlast</td>
+					</tr>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</fieldset>
+		
+		<fieldset class="sub_fieldset">
+			<legend>STA List</legend>
+			<table id="aplist_table" class="wifi_search_table">
+				<thead>
+				</thead>
+				<tbody>
+				</tbody>
+			</table>
+		</fieldset>
+		
+	</fieldset>
+</body>
+
+<script type="text/javascript">
+var ap_list_table_xlat = {
+	tag: "tr",
+	class:"pointer",
+	children: [		
+		{tag:"td", html:"$\{bssid\}"},
+		{tag:"td", html:"$\{ch\}"},
+		{tag:"td", html:"$\{ssid\}"},
+		{tag:"td", html:"$\{proto\}"},
+		{tag:"td", html:"$\{pwr\}"},
+		{tag:"td", html:"$\{sec\}"},
+		{tag:"td", html:"$\{tinit\}"},
+		{tag:"td", html:"$\{tlast\}"},
+	]
+};
+
+var sta_list_table_xlat = {
+	tag: "tr",
+	class:"pointer",
+	children: [		
+		{tag:"td", html:"$\{stamac\}"},
+		{tag:"td", html:"$\{bssid\}"},
+		{tag:"td", html:"$\{ch\}"},
+		{tag:"td", html:"$\{pwr\}"},
+		
+		{tag:"td", html:"$\{sec\}"},
+		{tag:"td", html:"$\{tinit\}"},
+		{tag:"td", html:"$\{tlast\}"},
+	]
+};
+	
+$(document).ready(function() {
+	load_ok();
+	
+	var $channel = $("#channel");
+	var all_channel = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,36,37,38,39,40,41,42,43,44,45,46,47,48,52,53,54,55,56,57,58,59,60,64,100,104,108,112,116,120,124,128,132,136,140,149,150,152,153,157,161,165,160];
+	$.each(all_channel, function(i, v) {
+		var name = v;
+		if (v == 0) {
+			name = "All channel";
+		}
+		$("<option></option>").attr({
+			value: v,
+		}).html(name).appendTo($channel);
+	})
+	
+	var ws;
+	var host = '<%=request.getHeader("host")%>';
+	$("#wifi_search_img").click(function() {		
+		var $img = $(this);
+		ws_raise_error = false;
+		var running = ($img.attr("src") == "/img/M/play4.svg") ? false : true;
+		if (running) {
+			ws.close();
+			$img.attr("src", "/img/M/play4.svg");
+		} else {
+			ws = new WebSocket("ws://"+host+"/wifi_search");
+			/* onopen */
+			ws.onopen = function(msg) {
+				$(".wifi_search_table > tbody").empty();
+				
+				ws.send(JSON.stringify({
+					state: "start",
+					reportInterval: $("#wifi_search_timer").val(),
+					channel: $("#channel").val(),
+				}));
+				$img.attr("src", "/img/M/stop4.svg");
+			}
+			/* onmessage */
+			ws.onmessage = function(msg) {
+				if (_isnull(msg.data)) {
+					return;
+				}
+				var result = JSON.parse(msg.data);
+				if (result.good == false) {
+					pop("Error running wifi search: "+result.cause);
+					$img.attr("src", "/img/M/play4.svg");
+					ws_raise_error = true;
+					ws.close();
+					return;
+				}
+				if (result.good == true) {
+					return;
+				}
+				
+				console.log(result);
+			}
+			/* onerror */
+			ws.onerror = function(msg) {
+				$img.attr("src", "/img/M/play4.svg");
+				pop("Error running wifi search: "+msg);
+				ws_raise_error = true;
+			}
+			/* onerror */
+			ws.onclose = function() {
+				$img.attr("src", "/img/M/play4.svg");
+				if (ws_raise_error == false) {
+					pop("Finished wifi search", {type:"success"});
+				}
+			}
+		}
+	});
+});
+</script>
+<%@include file="/M/footer.jsp"%>
+</html>

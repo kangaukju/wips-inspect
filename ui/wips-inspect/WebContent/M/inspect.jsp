@@ -415,8 +415,7 @@ $(document).ready(function() {
 				ws_raise_error = true;
 			}
 			/* onerror */
-			ws.onclose = function() {
-				
+			ws.onclose = function() {				
 				$("#hidden_form").empty();
 				$(".inspect_chart").each(function(i) {
 					var config_id = $(this).attr("config_id");

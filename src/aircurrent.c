@@ -303,6 +303,7 @@ static void aircurrent_repotring(AIRCUR_G *g)
 	int len, len_be, total_len;
 	struct xml_buffer_list ap_xml_buflist;
 	struct xml_buffer_list st_xml_buflist;
+	int bytes;
 
 	hash_ctx_t *ap_hctx = g->nodes_info->ap_hctx;
 	hash_ctx_t *st_hctx = g->nodes_info->st_hctx;
@@ -312,9 +313,9 @@ static void aircurrent_repotring(AIRCUR_G *g)
 
 	if (1) {
 		static const char *xml_start = "<aircurrent>";
-		static const int xml_startlen = 12;
-		static const char *xml_end   = "</aircurrent>";
-		static const int xml_endlen = 13;
+		const int xml_startlen = strlen(xml_start);
+		static const char *xml_end = "</aircurrent>";
+		const int xml_endlen = strlen(xml_end);
 
 		if (ap_hctx->num_elements > 0) {
 			xml_buffer_list_init(&ap_xml_buflist, ap_hctx->num_elements);
@@ -327,27 +328,40 @@ static void aircurrent_repotring(AIRCUR_G *g)
 			dosomething_hash(st_hctx, &st_xml_buflist);
 		}
 
-		if ((ap_hctx->num_elements > 0) && (st_hctx->num_elements > 0)) {
+		if ((ap_hctx->num_elements > 0) || (st_hctx->num_elements > 0)) {
 			// send total length
-			total_len = ap_xml_buflist.total_len + st_xml_buflist.total_len;
+			total_len = ap_xml_buflist.total_len + st_xml_buflist.total_len +
+					xml_startlen + xml_endlen;
 			len_be = htonl(total_len);
-			aircurrent_send(&ar_sock, (uint8_t*)&len_be, sizeof(len_be));
+			bytes = aircurrent_send(&ar_sock, (uint8_t*)&len_be, sizeof(len_be));
+			if (bytes <= 0) {
+				clc("Error!!! send aircurrent data length %u (send: %d)", total_len, bytes);
+			}
 
 			// send aircurrent data
-			aircurrent_send(&ar_sock, (uint8_t*)xml_start, xml_startlen);
+			bytes = aircurrent_send(&ar_sock, (uint8_t*)xml_start, xml_startlen);
+			if (bytes <= 0) {
+				clc("Error!!! send aircurrent xml start (%s)", xml_start);
+			}
 			{
+				// send ap
 				for (i=0; i<ap_xml_buflist.buf_seq; i++) {
 					buf = ap_xml_buflist.buf[i];
 					len = ap_xml_buflist.len[i];
-					aircurrent_send(&ar_sock, buf, len);
+					bytes = aircurrent_send(&ar_sock, buf, len);
 				}
+				// send sta
 				for (i=0; i<st_xml_buflist.buf_seq; i++) {
 					buf = st_xml_buflist.buf[i];
 					len = st_xml_buflist.len[i];
-					aircurrent_send(&ar_sock, buf, len);
+					bytes = aircurrent_send(&ar_sock, buf, len);
 				}
 			}
-			aircurrent_send(&ar_sock, (uint8_t*)xml_end, xml_endlen);
+			bytes = aircurrent_send(&ar_sock, (uint8_t*)xml_end, xml_endlen);
+			if (bytes <= 0) {
+				clc("Error!!! send aircurrent xml end (%s)", xml_end);
+			}
+
 		}
 		if (ap_hctx->num_elements > 0) {
 			xml_buffer_list_free(&ap_xml_buflist);
@@ -362,7 +376,7 @@ static void aircurrent_repotring(AIRCUR_G *g)
 		dosomething_hash(ap_hctx, NULL);
 	}
 
-#if 0
+#if 1
 	printf("+++ AP reporting +++\n");
 	{
 		debug_hash2(g->nodes_info->ap_hctx);

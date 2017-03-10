@@ -4,8 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-import javax.naming.spi.ResolveResult;
-
 import air.wips.inspect.utils.CryptoUtil;
 import air.wips.inspect.utils.DateUtil;
 import sql.inspect.wips.air.DBFILE;
@@ -16,7 +14,27 @@ public class Admin {
 	private String password;
 	private String lastLogin;
 	private String expireDate;
+	private long sessionTimeout = 60 * 60 * 1000; // second
+	private long sessionTimestamp = 0;
 	
+	
+	
+	public long getSessionTimeout() {
+		return sessionTimeout;
+	}
+
+	public void setSessionTimeout(long sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
+	}
+
+	public long getSessionTimestamp() {
+		return sessionTimestamp;
+	}
+
+	public void setSessionTimestamp(long sessionTimestamp) {
+		this.sessionTimestamp = sessionTimestamp;
+	}
+
 	@Override
 	public String toString() {
 		return "Admin [username=" + username + ", password=" + password + ", lastLogin=" + lastLogin + "]";

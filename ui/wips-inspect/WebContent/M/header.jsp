@@ -5,6 +5,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql" %> 
 --%>
+<%@page import="air.wips.inspect.log.D"%>
+<%@page import="java.util.Date"%>
 <%@page import="air.wips.inspect.Login.Admin"%>
 <%@page import="air.wips.inspect.servlet.HttpGet"%>
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
@@ -67,7 +69,7 @@
 	}
 	table.tablesorter thead tr, table.tablesorter tbody tr {
 		cursor: pointer;
-		height: 35px;
+		height: 25px;
 	}
 	table.tablesorter tbody tr.selected td {
    	background: none repeat scroll 0 0 #ffa31a;
@@ -275,10 +277,18 @@
 	if (!"index.jsp".equals(curPage) && !"".equals(curPage)) {
 		if ((session == null) || (session.getAttribute("admin") == null)) {
 			response.sendRedirect("/M/index.jsp");
+			return;
 		}
 		admin = (Admin)session.getAttribute("admin");
+		long now = new Date().getTime();
+		if ((now - admin.getSessionTimestamp()) > admin.getSessionTimeout()) {
+			D.log("session timeout");
+			response.sendRedirect("/M/index.jsp");
+			return;
+		}
+		admin.setSessionTimestamp(now);
 	}
-	System.out.println(HttpGet.currentPage(request)+":"+admin);
+	//System.out.println(HttpGet.currentPage(request)+":"+admin);
 %>
 
 <% boolean debug = HttpGet.sessionBoolean(request, "debug", false); %>
@@ -344,6 +354,7 @@ function load_ok() {
 	$("body").loading('stop');
 }
 
+/*
 $(window).on('unload ',function() {
 	jQuery.ajax({
 		url: "/M/login_out.jsp",
@@ -359,6 +370,7 @@ $(window).on('unload ',function() {
 		}
 	});
 });
+*/
 
 $(function() {
 	$(".title").click(function() {

@@ -11,10 +11,10 @@ import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.websocket.RemoteEndpoint.Basic;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
@@ -50,22 +50,25 @@ public class AirResultReceiver implements Runnable {
 		this.xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 	}
 	
-	private void sendResultAirCurrent(StringBuffer sb) {
+	private void sendResultAirCurrent(String result) {
+		D.log("call sendResultAirCurrent");
 		ByteArrayInputStream input = null;
 		try {
-			input = new ByteArrayInputStream(sb.toString().getBytes());
+			input = new ByteArrayInputStream(result.getBytes());
 			Document doc = xmlBuilder.parse(input);
 			
 			List<AirCurrentAP> aplist = AirResultParse.getAircurrentAP(doc);
 			List<AirCurrentST> stlist = AirResultParse.getAircurrentST(doc);
+			List<Object> all = new ArrayList<>();
 			
-			Basic endpoint = airResult.getWebSocketSession().getBasicRemote();
-			endpoint.sendText("aplist");
-			endpoint.sendText(new Gson().toJson(aplist));
-			endpoint.sendText("stlist");
-			endpoint.sendText(new Gson().toJson(stlist));
+			all.add(aplist);
+			all.add(stlist);
+			
+			airResult.getWebSocketSession().getBasicRemote().sendText(new Gson().toJson(all));
+			
 		} catch (Exception e) {
 			e.printStackTrace();
+			System.err.println(result);
 		} finally {
 			if (input != null) try { input.close(); } catch (IOException e) {}
 		}
@@ -126,21 +129,24 @@ public class AirResultReceiver implements Runnable {
 	}
 	
 	static long loop = 0;
-	private boolean readData(SocketChannel client, StringBuffer sb) throws Exception {
+	private boolean readData(SocketChannel client) throws Exception {
 		boolean clientContinue = true;
 		int bytes = -1;
 		String decodeData;
+		ByteBuffer lenBuffer;
+		ByteBuffer dataBuffer;
 		
 		switch (port) {
-		case WIPSINSPECT_PORT:
+		case WIPSINSPECT_PORT: {
 			/*
 			 * recv length field - 4 bytes (big endian)
 			 */
-			ByteBuffer lenBuffer = ByteBuffer.allocate(4);
+			bytes = 0;
+			lenBuffer = ByteBuffer.allocate(4);
 			try {
 				while (true) {
-					bytes = client.read(lenBuffer);
-					if (bytes > 0) break;
+					bytes += client.read(lenBuffer);
+					if (bytes == 4) break;
 					continue;
 				}
 			} catch (IOException e) {
@@ -154,11 +160,12 @@ public class AirResultReceiver implements Runnable {
 			/*
 			 * recv real data - n bytes
 			 */
-			ByteBuffer dataBuffer = ByteBuffer.allocate(length);
+			bytes = 0;
+			dataBuffer = ByteBuffer.allocate(length);
 			try {
 				while (true) {
-					bytes = client.read(dataBuffer);
-					if (bytes > 0) break;
+					bytes += client.read(dataBuffer);
+					if (bytes == length) break;
 					continue;
 				}
 			} catch (IOException e) {
@@ -171,29 +178,60 @@ public class AirResultReceiver implements Runnable {
 			//D.log(decodeData);
 			
 			sendResultAirCapture(decodeData);
-			
 			break;
-			
-		case AIRCURRENT_PORT:
+		}	
+		case AIRCURRENT_PORT: {
 			/*
+			 * recv length field - 4 bytes (big endian)
+			 */
+			bytes = 0;
+			lenBuffer = ByteBuffer.allocate(4);
 			try {
-				bytes = client.read(byteBuf);
+				while (true) {
+					bytes += client.read(lenBuffer);
+					if (bytes == 4) break;
+					continue;
+				}
 			} catch (IOException e) {
-				bytes = -1; // close
-			}
-			// continue receive message
-			if (bytes >= 0) {
-				byteBuf.flip();
-				sb.append(charset.decode(byteBuf).toString());
-			}
-			// receive all message from client and closed
-			else {
 				client.close();
-				sendResultAirCurrent(sb);
 				clientContinue = false;
+				break;
 			}
-			*/
+			lenBuffer.flip();
+			int length = lenBuffer.order(ByteOrder.BIG_ENDIAN).getInt();
+			{
+				byte [] b = lenBuffer.array();
+				D.log(b.length+" / "+b[0]+"."+b[1]+"."+b[2]+"."+b[3]+".");
+				D.log(length + "   " + lenBuffer + " => " + new String(lenBuffer.array()));
+			}
+			lenBuffer.clear();
+			lenBuffer = null;
+			/*
+			 * recv real data - n bytes
+			 */			
+			bytes = 0;
+			dataBuffer = ByteBuffer.allocate(length);
+			try {
+				while (true) {
+					bytes += client.read(dataBuffer);
+					if (bytes == length) break;
+					continue;
+				}
+			} catch (IOException e) {
+				client.close();
+				clientContinue = false;
+				break;
+			}
+			D.log("bytes  ===> "+bytes);
+			dataBuffer.flip();
+			decodeData = charset.decode(dataBuffer).toString();
+			//D.log(decodeData);
+			
+			sendResultAirCurrent(decodeData);
+			dataBuffer.clear();
+			dataBuffer = null;
 			break;
+		}
 		}
 		
 		return clientContinue;
@@ -202,7 +240,6 @@ public class AirResultReceiver implements Runnable {
 	@Override
 	public void run() {
 		final int timeout = 100;
-		StringBuffer sb = null;
 		Selector selector = null;
 		SocketChannel client = null;
 		ServerSocketChannel serverChannel = null;
@@ -227,10 +264,12 @@ public class AirResultReceiver implements Runnable {
 			
 			while (!airResult.isExit()) {
 				
-				now = System.currentTimeMillis();
-				if ((now - runningStart) > maxRunningTime) {
-					D.log("listening server time over (max: "+maxRunningTime/1000+") sec");
-					return;
+				if (maxRunningTime > 0) {
+					now = System.currentTimeMillis();
+					if ((now - runningStart) > maxRunningTime) {
+						D.log("listening server time over (max: "+maxRunningTime/1000+") sec");
+						return;
+					}
 				}
 				
 				selector.select(timeout);
@@ -255,14 +294,12 @@ public class AirResultReceiver implements Runnable {
 						client.register(selector, SelectionKey.OP_READ);
 						
 						D.log("Connect: "+client.socket().getRemoteSocketAddress());
-						// create new buffer
-						sb = new StringBuffer();
 					}
 					/* read */
 					else if (selkey.isReadable()) {
 						client = (SocketChannel)selkey.channel();
 						/* clientContinue - 'false' means client process killed */
-						if (!readData(client, sb)) {
+						if (!readData(client)) {
 							return;
 						}
 					}
@@ -271,7 +308,6 @@ public class AirResultReceiver implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			sb = null;
 			if (client != null && client.isOpen()) try { client.close(); } catch (IOException e) { }
 			if (serverChannel != null) try { serverChannel.close(); } catch (IOException e) { }
 			if (selector != null) try { selector.close(); } catch (IOException e) { }
