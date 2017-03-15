@@ -66,7 +66,9 @@ static void xml_buffer_list_init(struct xml_buffer_list *xmllist, size_t size) {
 	xmllist->buf_seq = 0;
 	xmllist->total_len = 0;
 	xmllist->buf = (uint8_t**)malloc(sizeof(uint8_t*) * size);
+	memset(xmllist->buf, 0, sizeof(uint8_t*) * size);
 	xmllist->len = (int*)malloc(sizeof(int) * size);
+	memset(xmllist->len, 0, sizeof(int) * size);
 }
 
 static void xml_buffer_list_free(struct xml_buffer_list *xmllist) {
@@ -75,8 +77,9 @@ static void xml_buffer_list_free(struct xml_buffer_list *xmllist) {
 		if (xmllist->buf[i])
 			free(xmllist->buf[i]);
 	}
-	if (xmllist->len)
+	if (xmllist->len) {
 		free(xmllist->len);
+	}
 	xmllist->buf_seq = 0;
 	xmllist->total_len = 0;
 }
@@ -317,33 +320,33 @@ static void aircurrent_repotring(AIRCUR_G *g)
 		static const char *xml_end = "</aircurrent>";
 		const int xml_endlen = strlen(xml_end);
 
+		xml_buffer_list_init(&ap_xml_buflist, ap_hctx->num_elements);
 		if (ap_hctx->num_elements > 0) {
-			xml_buffer_list_init(&ap_xml_buflist, ap_hctx->num_elements);
 			ap_hctx->op->hash_dosomething = aircurrent_xml_aplist_report;
 			dosomething_hash(ap_hctx, &ap_xml_buflist);
 		}
+		xml_buffer_list_init(&st_xml_buflist, st_hctx->num_elements);
 		if (st_hctx->num_elements > 0) {
-			xml_buffer_list_init(&st_xml_buflist, st_hctx->num_elements);
 			st_hctx->op->hash_dosomething = aircurrent_xml_stlist_report;
 			dosomething_hash(st_hctx, &st_xml_buflist);
 		}
 
 		if ((ap_hctx->num_elements > 0) || (st_hctx->num_elements > 0)) {
-			// send total length
-			total_len = ap_xml_buflist.total_len + st_xml_buflist.total_len +
-					xml_startlen + xml_endlen;
-			len_be = htonl(total_len);
-			bytes = aircurrent_send(&ar_sock, (uint8_t*)&len_be, sizeof(len_be));
-			if (bytes <= 0) {
-				clc("Error!!! send aircurrent data length %u (send: %d)", total_len, bytes);
-			}
-
-			// send aircurrent data
-			bytes = aircurrent_send(&ar_sock, (uint8_t*)xml_start, xml_startlen);
-			if (bytes <= 0) {
-				clc("Error!!! send aircurrent xml start (%s)", xml_start);
-			}
-			{
+			do {
+				// send total length
+				total_len = ap_xml_buflist.total_len + st_xml_buflist.total_len + xml_startlen + xml_endlen;
+				len_be = htonl(total_len);
+				bytes = aircurrent_send(&ar_sock, (uint8_t*)&len_be, sizeof(len_be));
+				if (bytes <= 0) {
+					clc("Error!!! send aircurrent data length %u (send: %d)", total_len, bytes);
+					break;
+				}
+				// send aircurrent data
+				bytes = aircurrent_send(&ar_sock, (uint8_t*)xml_start, xml_startlen);
+				if (bytes <= 0) {
+					clc("Error!!! send aircurrent xml start (%s)", xml_start);
+					break;
+				}
 				// send ap
 				for (i=0; i<ap_xml_buflist.buf_seq; i++) {
 					buf = ap_xml_buflist.buf[i];
@@ -356,12 +359,13 @@ static void aircurrent_repotring(AIRCUR_G *g)
 					len = st_xml_buflist.len[i];
 					bytes = aircurrent_send(&ar_sock, buf, len);
 				}
+				bytes = aircurrent_send(&ar_sock, (uint8_t*)xml_end, xml_endlen);
+				if (bytes <= 0) {
+					clc("Error!!! send aircurrent xml end (%s)", xml_end);
+					break;
+				}
 			}
-			bytes = aircurrent_send(&ar_sock, (uint8_t*)xml_end, xml_endlen);
-			if (bytes <= 0) {
-				clc("Error!!! send aircurrent xml end (%s)", xml_end);
-			}
-
+			while (0);
 		}
 		if (ap_hctx->num_elements > 0) {
 			xml_buffer_list_free(&ap_xml_buflist);
