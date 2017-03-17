@@ -568,12 +568,17 @@ $(document).ready(function() {
 			success: function(result) {
 				if (result.good == false) {
 					pop("Error loading for config: "+result.cause);
+					load_ok();
 					return;
 				}
 				$("#config_id").val(result.id);
 				$("#config_name").val(result.name);
-				build_config_list("shooter", result.shooterXmlAirConfList);
-				build_config_list("capture", result.captureXmlAirConfList);
+				if (_defined_(result.shooterXmlAirConfList)) {
+					build_config_list("shooter", result.shooterXmlAirConfList);
+				}
+				if (_defined_(result.captureXmlAirConfList)) {
+					build_config_list("capture", result.captureXmlAirConfList);
+				}
 				
 				load_ok();
 			},

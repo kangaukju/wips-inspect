@@ -103,13 +103,14 @@ public class Tools {
 	
 	static public Process startWipsInspect(
 			String shooterWif, String captureWif, 
-			String profileId, String timer) throws Exception 
+			String profileId, String timer, String savePath) throws Exception 
 	{
 		String[] params = {
 				"-s", shooterWif,
 				"-c", captureWif,
 				"-p", profileId,
-				"-t", timer
+				"-t", timer,
+				"-w", savePath
 		};
 		String[] envs = {
 				"DB_HOME",

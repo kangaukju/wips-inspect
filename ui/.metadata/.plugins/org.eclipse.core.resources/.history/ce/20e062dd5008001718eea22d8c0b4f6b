@@ -1,0 +1,36 @@
+package test;
+
+import java.io.BufferedReader;
+import java.io.PrintStream;
+
+import com.example.tutorial.AddressBookProtos.Person;
+import com.example.tutorial.AddressBookProtos.Person.PhoneType;
+
+public class AddressBookTest {
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+		Person kaka = 
+				Person.newBuilder()
+				.setId(0)
+				.setName("kaka")
+				.setEmail("kinow@naver.com")
+				.addPhone(
+						Person.PhoneNumber.newBuilder()
+						.setNumber("010-7239-0421")
+						.setType(PhoneType.HOME))
+				.build();
+		
+		System.out.println(kaka);
+		System.out.println(kaka.isInitialized());
+	}
+
+	
+	class AddPerson {
+		static Person PromptForAddress(BufferedReader stdin, PrintStream stdout) {
+			Person.Builder person = Person.newBuilder();
+			Person p = person;
+		}
+	}
+}

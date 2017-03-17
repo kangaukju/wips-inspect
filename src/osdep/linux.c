@@ -631,6 +631,7 @@ static int linux_read(struct wif *wi, unsigned char *buf, int count, struct rx_i
 		memset(ri, 0, sizeof(*ri));
 	}
 
+	//printf("arptype = %d\n", dev->arptype_in);
 	if (dev->arptype_in == ARPHRD_IEEE80211_PRISM) {
 		/* skip the prism header */
 		if (tmpbuf[7] == 0x40) {
@@ -764,6 +765,7 @@ static int linux_read(struct wif *wi, unsigned char *buf, int count, struct rx_i
 				}
 
 				if (*iterator.this_arg & IEEE80211_RADIOTAP_F_BADFCS) {
+					printf("bad fcs\n");
 					return (0);
 				}
 

@@ -44,6 +44,7 @@ void usage(int argc, char** argv)
 	printf("\t -c <capture ifname> : capture interface name\n");
 	printf("\t -t <timer>          : shooter/capture time second (default: 0 is infinite)\n");
 	printf("\t -p <profile id>     : profile id\n");
+	printf("\t -w <save dir name>  : save directory name for inspect result\n");
 	printf("\t -d                  : debug\n");
 	printf("\t -h -?               : help\n");
 	printf("\n");
@@ -78,7 +79,7 @@ void sighandler(int signum)
 	do_exit = 1;
 }
 
-static int airresult_open()
+static int airresult_sock_open()
 {
 	int csock;
 
@@ -90,17 +91,16 @@ static int airresult_open()
 	return csock;
 }
 
-static void airresult_close(int *csock)
+static void airresult_sock_close(int *csock)
 {
 	if (!csock) return;
-
 	if (*csock > 0) {
 		close(*csock);
 	}
 	*csock = -1;
 }
 
-static int airresult_send(int *csock, uint8_t *data, size_t len)
+static int airresult_sock_send(int *csock, uint8_t *data, ssize_t len)
 {
 	struct timeval tv;
 	int retry = 5;
@@ -109,7 +109,7 @@ static int airresult_send(int *csock, uint8_t *data, size_t len)
 	if (!csock) return -1;
 
 	if (*csock < 0) {
-		*csock = airresult_open();
+		*csock = airresult_sock_open();
 		if (*csock < 0) return -1;
 	}
 
@@ -129,6 +129,8 @@ static int airresult_send(int *csock, uint8_t *data, size_t len)
 
 static unsigned long result_xid = 0;
 static int ar_sock = -1;
+static int ar_file = -1;
+static char *save_directory = NULL;
 void result_data_handler(AIRCAP_G *g, void *data)
 {
 	struct aircap_data *result = (struct aircap_data*)data;
@@ -178,14 +180,23 @@ void result_data_handler(AIRCAP_G *g, void *data)
 	outxml_len = strlen(outxml);
 	if (outxml_len > 0) {
 		len_be = htonl(outxml_len);
-		bytes = airresult_send(&ar_sock, (uint8_t*)&len_be, sizeof(len_be));
+		bytes = airresult_sock_send(&ar_sock, (uint8_t*)&len_be, sizeof(len_be));
 		if (bytes <= 0) {
-			clc("Error!!! send airresult data length %u (send: %d)", outxml_len, bytes);
+			clc("Error!!! send airresult socket send data length %u (send: %d)", outxml_len, bytes);
 		}
-		bytes = airresult_send(&ar_sock, (uint8_t*)outxml, outxml_len);
+		bytes = airresult_sock_send(&ar_sock, (uint8_t*)outxml, outxml_len);
 		if (bytes <= 0) {
-			clc("Error!!! send airresult data (send: %d)", bytes);
+			clc("Error!!! send airresult socket send data (send: %d)", bytes);
 		}
+
+		// write airresult xml file
+		if (g->xml_fp) {
+			bytes = fwrite(outxml, outxml_len, 1, g->xml_fp);
+			if (bytes <= 0) {
+				clc("Error!!! send airresult write xml data (send: %d)", bytes);
+			}
+		}
+
 		cld("%s\n", outxml);
 	}
 	free(outxml);
@@ -241,7 +252,7 @@ int main(int argc, char *argv[])
 	airshoot_g_init(&shooter_g);
 	aircap_g_init(&capture_g);
 
-	while ((opt = getopt(argc, argv, "s:c:p:t:vdh?")) != -1) {
+	while ((opt = getopt(argc, argv, "s:c:p:t:w:vdh?")) != -1) {
 		switch (opt)
 		{
 		case 'p':
@@ -258,6 +269,9 @@ int main(int argc, char *argv[])
 			shooter_g.shooter_timer = atoi(optarg);
 			//  여기서 capture 타이머를 설정하지 않고 shooter가 완료된 후 capture를 종료하도록 한다.
 //			capture_g.capture_timer = atoi(optarg);
+			break;
+		case 'w':
+			save_directory = strdup(optarg);
 			break;
 		case 'd':
 			set_debug();
@@ -351,6 +365,10 @@ int main(int argc, char *argv[])
 		goto cleanup;
 	}
 
+	if (save_directory) {
+		mkdir_r(save_directory);
+	}
+
 	for (cur = sqlairconf; cur; cur = cur->next) {
 		// capture할 airconf 설정을 불러온다 (shooter에 대한 capture도 포함한다.)
 		SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->capturexml);
@@ -362,19 +380,17 @@ int main(int argc, char *argv[])
 		dwell_coordination(capture_g.conf, &capture_g.dwell_list);
 
 		// pcap 파일 디렉토리 생성 위치
-		SNP(capture_g.pcap_file, "%s/%s/%s/", env.PCAP_HOME, cur->profileid, cur->configid);
-		if (mkdir_r(capture_g.pcap_file)) {
-			clc("Error!!! can't create pcap directory - %s (%s)\n", capture_g.pcap_file, strerror(errno));
-		} else {
-			//  initialize pcap - pcap file open
-			SNP(capture_g.pcap_file, "%s/%s/%s/%ld.pcap",
-					env.PCAP_HOME,
-					cur->profileid,
-					cur->configid,
-					time(NULL));
+		if (save_directory) {
+			SNP(capture_g.pcap_file, "%s/%s.pcap", save_directory, cur->configid);
 			capture_g.pcap_fp = new_pcap_file(capture_g.pcap_file);
 			if (!capture_g.pcap_fp) {
 				clc("Error!!! initialize pcap file - %s\n", capture_g.pcap_file);
+			}
+
+			SNP(capture_g.xml_file, "%s/%s.xml", save_directory, cur->configid);
+			capture_g.xml_fp = fopen(capture_g.xml_file, "w+");
+			if (!capture_g.xml_fp) {
+				clc("Error!!! initialize xml file - %s\n", capture_g.xml_file);
 			}
 		}
 
@@ -403,9 +419,15 @@ int main(int argc, char *argv[])
 		pthread_join(shooter_tid, NULL);
 
 		// close pcap
-		fclose(capture_g.pcap_fp);
-		capture_g.pcap_fp = NULL;
-
+		if (capture_g.pcap_fp) {
+			fclose(capture_g.pcap_fp);
+			capture_g.pcap_fp = NULL;
+		}
+		// close xml
+		if (capture_g.xml_fp) {
+			fclose(capture_g.xml_fp);
+			capture_g.xml_fp = NULL;
+		}
 		// airconf 설정 메모리 해제
 		airconf_free(capture_g.conf);
 		capture_g.conf = NULL;
@@ -421,6 +443,7 @@ cleanup:
 	sqlairconf_free(sqlairconf);
 	airshoot_g_free(&shooter_g);
 	aircap_g_free(&capture_g);
-	airresult_close(&ar_sock);
+	airresult_sock_close(&ar_sock);
+	if (save_directory) free(save_directory);
 	return 0;
 }

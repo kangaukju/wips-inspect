@@ -1,0 +1,40 @@
+package sql.inspect.wips.air;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import air.wips.inspect.conf.XmlAirConf;
+
+public class History {
+	private String profileId;
+	private String timestamp;
+	private String savepath;
+	
+	public static void del(String profileId) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql;
+		try {
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			conn.setAutoCommit(false);
+			sql = "delete from inspect_history where profile_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			pstmt.executeUpdate();
+			pstmt.close();
+			
+			sql = "delete from profile_config_ref where config_id=?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, configId);
+			pstmt.executeUpdate();
+			
+			XmlAirConf.deleteAirConf(configId);
+			
+			conn.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+	}
+}

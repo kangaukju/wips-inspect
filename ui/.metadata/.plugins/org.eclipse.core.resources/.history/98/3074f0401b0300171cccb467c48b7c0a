@@ -1,8 +1,0 @@
-<%@page import="air.wips.inspect.servlet.HttpGet"%><%@
-page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%
-	
-	HttpGet.debugRequestParameterValues(request);
-
-	String [] chartImg = HttpGet.vals(request, "chart_img");
-	String [] configIds = HttpGet.vals(request, "config_id");
-%>

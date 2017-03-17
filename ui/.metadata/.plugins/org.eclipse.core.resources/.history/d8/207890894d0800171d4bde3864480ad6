@@ -1,0 +1,12 @@
+package test;
+
+import test.VoiceOuterClass.Voice;
+
+public class VoiceTest {
+
+	public static void main(String[] args) {
+		
+		VoiceOuterClass voc = new VoiceOuterClass();
+	}
+
+}

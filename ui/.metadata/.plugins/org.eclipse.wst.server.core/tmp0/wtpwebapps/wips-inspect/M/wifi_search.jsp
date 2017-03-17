@@ -85,7 +85,7 @@ table.tablesorter thead tr, table.tablesorter tbody tr {
 <script type="text/javascript">
 var ap_list_table_xlat = {
 	tag: "tr",
-	class:"pointer",
+//	class:"pointer",
 	children: [		
 		{tag:"td", html:"$\{bssid\}"},
 		{tag:"td", html:"$\{ch\}"},
@@ -101,7 +101,7 @@ var ap_list_table_xlat = {
 
 var st_list_table_xlat = {
 	tag: "tr",
-	class:"pointer",
+//	class:"pointer",
 	children: [		
 		{tag:"td", html:"$\{stamac\}"},
 		{tag:"td", html:"$\{bssid\}"},

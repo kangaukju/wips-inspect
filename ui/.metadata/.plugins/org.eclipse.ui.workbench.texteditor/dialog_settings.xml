@@ -6,20 +6,20 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="sec" key="selection"/>
+		<item value="rs =" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="sec"/>
-			<item value="sort"/>
-			<item value="isread"/>
-			<item value="sendResultAirCurrent("/>
-			<item value="sendResultAirCurrent"/>
-			<item value="html"/>
-			<item value="ap_list_table_xlat"/>
-			<item value="aplist"/>
+			<item value="rs ="/>
+			<item value="getlist"/>
+			<item value="get("/>
+			<item value="Shooter_"/>
+			<item value="shooter"/>
+			<item value="Shooter"/>
+			<item value="save"/>
+			<item value="InspectHistory"/>
 		</list>
 		<list key="replacehistory">
 		</list>

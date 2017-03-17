@@ -521,13 +521,18 @@ public class XmlAirConf {
 	}
 	
 	synchronized public static List<XmlAirConf> loadAirConfList(String filename) throws Exception {
+		return loadAirConfList(XmlAirConfEnv.path(), filename);
+	}
+	
+	synchronized public static List<XmlAirConf> loadAirConfList(String directory, String filename) throws Exception {
 		List<XmlAirConf> airConfList = new ArrayList<>();
 		String path;
 		try {
 			if (StringUtil.isNull(filename)) {
 				return null;
 			}
-			path = XmlAirConfEnv.path(filename);
+			//path = XmlAirConfEnv.path(filename);
+			path = directory + "/" + filename;
 			File airConfFile = new File(path);
 			if (!airConfFile.exists()) {
 				throw new Exception("airconf file not found - "+path);

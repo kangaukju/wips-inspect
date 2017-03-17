@@ -1,0 +1,12 @@
+package air.wips.inspect.history;
+
+public class InspectHistory {
+	private static final String HISTORY_HOME = System.getProperty("catalina.home") + "/history";
+	
+	public static final String path() {
+		return HISTORY_HOME;
+	}
+	public static final String path(long directory) {
+		return HISTORY_HOME+"/"+directory;
+	}
+}

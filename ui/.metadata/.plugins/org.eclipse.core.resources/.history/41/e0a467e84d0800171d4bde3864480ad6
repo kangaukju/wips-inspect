@@ -1,0 +1,22 @@
+package test;
+
+import test.VoiceOuterClass.Voice;
+
+public class VoiceTest {
+
+	public static void main(String[] args) {
+		
+		
+		Voice voice = Voice
+				.newBuilder()
+				.setName("kaka")
+				.setPath("/home/kaka")
+				.build();
+		
+		System.out.println(voice);
+		
+		System.out.println(voice.isInitialized());
+		
+	}
+
+}

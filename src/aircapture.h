@@ -48,6 +48,8 @@ typedef struct AIRCAP_G {
 	struct dwell_list dwell_list;
 	FILE *pcap_fp;
 	char pcap_file[128];
+	FILE *xml_fp;
+	char xml_file[128];
 } AIRCAP_G;
 
 struct aircap_summary {

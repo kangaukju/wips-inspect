@@ -1,0 +1,113 @@
+package air.wips.inspect.servlet;
+
+import java.util.List;
+
+import javax.websocket.OnClose;
+import javax.websocket.OnError;
+import javax.websocket.OnMessage;
+import javax.websocket.OnOpen;
+import javax.websocket.Session;
+import javax.websocket.server.ServerEndpoint;
+
+import com.google.gson.Gson;
+
+import air.wips.inspect.error.GoodBad;
+import air.wips.inspect.log.D;
+import air.wips.inspect.osdep.Tools;
+import air.wips.inspect.osdep.WifiDevice;
+import air.wips.inspect.utils.ListUtil;
+
+@ServerEndpoint("/wifi_search")
+public class AirCurrentWebSocket extends AirResult {
+	private Thread thread;
+	
+	
+	private class RequestParam {
+		public String state;
+		public String channel;
+		public String reportInterval;
+		@Override
+		public String toString() {
+			return "RequestParam [state=" + state + ", channel=" + channel + ", reportInterval=" + reportInterval + "]";
+		}
+	}
+	
+	public AirCurrentWebSocket() {
+		this.thread = null;
+	}
+	
+	@OnOpen
+	public void onOpen(Session session) {
+		this.webSocketSession = session;
+	}
+	
+	@OnMessage
+	public String onMessage(String msg) {
+		RequestParam p = new Gson().fromJson(msg, RequestParam.class);
+		
+		D.log(p);
+		
+		Process process = null;
+		
+		if ("start".equals(p.state)) {
+			try {
+				// check wifi device interface
+				List<WifiDevice> wifiDevList = Tools.getWifiInterface();
+				if (ListUtil.isNull(wifiDevList)) {
+					return new Gson().toJson(new GoodBad().bad("wifi devices not enough"));
+				}
+				
+				thread = new Thread(new AirResultReceiver(this, 
+						AirResultReceiver.AIRCURRENT_PORT, 0));
+				thread.setDaemon(true);
+				thread.start();
+				
+				
+				String currentWif = Tools.getDefaultCurrentWifiDev();
+								
+				if (currentWif == null || !WifiDevice.contains(wifiDevList, currentWif)) {
+					currentWif = wifiDevList.get(0).getIfname();
+				}
+				
+				Tools.stopAirCurrent();
+				process = Tools.startAircurrent(currentWif, p.channel, p.reportInterval);
+				if (process == null) {
+					D.log("Error! unable execute aircurrent");
+					throw new Exception("Error! unable execute aircurrent");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				doExit();
+				if (process == null) {
+					return new Gson().toJson(new GoodBad().bad("Error! execute aircurrent "));
+				} else {
+					return new Gson().toJson(new GoodBad().bad(e));
+				}
+			}
+		}
+		else if ("stop".equals(p.state)) {
+			onClose();
+		}
+		else {
+			return new Gson().toJson(new GoodBad().bad("unknown state - "+p.state));
+		}
+		return new Gson().toJson(new GoodBad().good());
+	}
+	
+	@OnClose
+	public void onClose() {
+		try {
+			doExit();
+			Tools.stopAirCurrent();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@OnError
+	public String onError(Throwable e) {
+		e.printStackTrace();
+		onClose();
+		return e.getMessage();
+	}
+}

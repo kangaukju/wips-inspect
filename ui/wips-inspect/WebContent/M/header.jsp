@@ -86,7 +86,7 @@
 		vertical-align: middle;
 	}
 	input[type=text], input[type=password], select {
-	    width: 40%;
+	    width: 90%;
 	    padding: 3px 5px;
 	    display: inline-block;
 	    border: 1px solid #ccc;

@@ -1057,6 +1057,7 @@ int mkdir_r(const char* dir)
 
 	for (p = strchr(dir+1, '/'); p; p = strchr(p+1, '/')) {
 		*p = '\0';
+		//printf("dir = %s\n", dir);
 		if (mkdir(dir, 0755) == -1) {
 			if (errno != EEXIST) {
 				*p = '/';
@@ -1064,6 +1065,12 @@ int mkdir_r(const char* dir)
 			}
 		}
 		*p = '/';
+	}
+	//printf("dir = %s\n", dir);
+	if (mkdir(dir, 0755) == -1) {
+		if (errno != EEXIST) {
+			return -1;
+		}
 	}
 	return 0;
 }

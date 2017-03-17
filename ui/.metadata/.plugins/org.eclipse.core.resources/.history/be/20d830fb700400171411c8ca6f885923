@@ -1,9 +1,0 @@
-package air.wips.inspect.servlet;
-
-public class AirCurrentWebSocket extends AirResult {
-	private Thread thread;
-	
-	
-	
-
-}

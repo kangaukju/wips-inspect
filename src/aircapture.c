@@ -670,13 +670,13 @@ static void aircap_matching_confs(AIRCAP_G *g, uint8_t *capbuf, int caplen, stru
 			memcpy(&result.ri, ri, sizeof(struct rx_info));
 
 			aircap_summary(capbuf, caplen, &result.summary);
-
-			if (conf->pcap && g->pcap_fp) {
+#if 1
+			if (/*conf->pcap &&*/ g->pcap_fp) {
 				if (!write_pcap_file(g->pcap_fp, capbuf, caplen, ri)) {
 					fflush(g->pcap_fp);
 				}
 			}
-
+#endif
 			// run result hander
 			handler(g, (void*)&result);
 		}
