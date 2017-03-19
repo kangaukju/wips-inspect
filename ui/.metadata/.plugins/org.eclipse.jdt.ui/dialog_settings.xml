@@ -47,9 +47,9 @@
 		<item value="197" key="DIALOG_Y_ORIGIN"/>
 	</section>
 	<section name="DialogBounds_GenerateToStringDialog">
-		<item value="463" key="DIALOG_WIDTH"/>
-		<item value="1|Noto Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
-		<item value="758" key="DIALOG_HEIGHT"/>
+		<item value="504" key="DIALOG_WIDTH"/>
+		<item value="1|나눔고딕|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="691" key="DIALOG_HEIGHT"/>
 		<item value="409" key="DIALOG_X_ORIGIN"/>
 		<item value="195" key="DIALOG_Y_ORIGIN"/>
 	</section>

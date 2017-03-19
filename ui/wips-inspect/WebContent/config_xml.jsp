@@ -1,14 +1,16 @@
-<%@page import="air.wips.inspect.utils.StringUtil"%>
-<%@page import="sql.inspect.wips.air.Config"%><%@
+<%@page import="air.wips.inspect.utils.StringUtil"%><%@
+page import="sql.inspect.wips.air.Config"%><%@
 page import="com.google.gson.Gson"%><%@
 page import="air.wips.inspect.error.GoodBad"%><%@
 page import="air.wips.inspect.servlet.HttpGet"%><%@
 page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%><%!
+
 	class ConfigXML {
 		private String capture;
 		private String shooter;
 	};
 %><%
+
 	String configId = HttpGet.get(request, "config_id");
 	try {
 		if (StringUtil.isNull(configId)) {

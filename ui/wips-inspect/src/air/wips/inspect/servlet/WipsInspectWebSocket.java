@@ -11,14 +11,11 @@ import javax.websocket.server.ServerEndpoint;
 
 import com.google.gson.Gson;
 
-import air.wips.inspect.conf.XmlAirConf;
-import air.wips.inspect.conf.XmlAirConfEnv;
 import air.wips.inspect.error.GoodBad;
 import air.wips.inspect.history.InspectHistory;
 import air.wips.inspect.log.D;
 import air.wips.inspect.osdep.Tools;
 import air.wips.inspect.osdep.WifiDevice;
-import air.wips.inspect.utils.FileUtil;
 import air.wips.inspect.utils.ListUtil;
 import air.wips.inspect.utils.ProcessUtil;
 import air.wips.inspect.utils.StringUtil;
@@ -61,10 +58,12 @@ public class WipsInspectWebSocket extends AirResult {
 			try {
 				// check wifi device interface
 				List<WifiDevice> wifiDevList = Tools.getWifiInterface();
+				/*
 				if (ListUtil.isNull(wifiDevList) || wifiDevList.size() < 2) {
 					return new Gson().toJson(new GoodBad().bad(
 							"wifi devices not enough (at least: 2)"));
 				}
+				*/
 				
 				// check profile
 				Profile profile = Profile.getById(p.profileId, false);
@@ -77,17 +76,19 @@ public class WipsInspectWebSocket extends AirResult {
 							String.format("empty config of [%s] profile", p.profileId)));
 				}				
 				for (Config conf : profile.getConfigList()) {
-					if (StringUtil.isNull(conf.getShooterxml())) {
-						return new Gson().toJson(new GoodBad().bad(
-								String.format("shooter empty [%s:%s] config of [%s:%s] profile", 
-										conf.getId(), conf.getName(), 
-										profile.getId(), profile.getName())));
-					}
-					if (StringUtil.isNull(conf.getCapturexml())) {
-						return new Gson().toJson(new GoodBad().bad(
-								String.format("capture empty [%s:%s] config of [%s:%s] profile", 
-										conf.getId(), conf.getName(), 
-										profile.getId(), profile.getName())));						
+					if (StringUtil.isNull(conf.getShooterxml()) && StringUtil.isNull(conf.getCapturexml())) {
+						if (StringUtil.isNull(conf.getShooterxml())) {
+							return new Gson().toJson(new GoodBad().bad(
+									String.format("shooter empty [%s:%s] config of [%s:%s] profile", 
+											conf.getId(), conf.getName(), 
+											profile.getId(), profile.getName())));
+						}
+						if (StringUtil.isNull(conf.getCapturexml())) {
+							return new Gson().toJson(new GoodBad().bad(
+									String.format("capture empty [%s:%s] config of [%s:%s] profile", 
+											conf.getId(), conf.getName(), 
+											profile.getId(), profile.getName())));						
+						}
 					}
 				}
 				
@@ -122,33 +123,22 @@ public class WipsInspectWebSocket extends AirResult {
 					D.log("unable run wips-inspect tool");
 					doExit();
 					if (process == null) {
-						D.log("Error! unable execute wips-inspect");
+						D.log("Error! unable execute wips-inspect 1");
 						return new Gson().toJson(new GoodBad().bad("Error! unable execute wips-inspect"));
 					} else {
+						D.log("Error! unable execute wips-inspect 2");
 						String errorTxt = ProcessUtil.getProcessError(process);
-						D.log(errorTxt);
-						return new Gson().toJson(new GoodBad().bad(StringUtil.str2Html(errorTxt)));
+						if (StringUtil.isNull(errorTxt)) {
+							return new Gson().toJson(new GoodBad().bad("Error! unable execute wips-inspect"));
+						} else {
+							D.log(errorTxt);
+							return new Gson().toJson(new GoodBad().bad(StringUtil.str2Html(errorTxt)));
+						}
 					}
 				}
 				
-				///////////////////////////////////////////////
-				// save result
-				///////////////////////////////////////////////
-				
-				// copy capture/shooter xml config
-				for (Config c : profile.getConfigList()) {
-					{
-						String from = XmlAirConfEnv.path(XmlAirConf.captureFilename(c.getId()));
-						String to = savePath + "/" + XmlAirConf.captureFilename(c.getId());
-						FileUtil.copy(from, to);
-					}{
-						String from = XmlAirConfEnv.path(XmlAirConf.shooterFilename(c.getId()));
-						String to = savePath + "/" + XmlAirConf.shooterFilename(c.getId());
-						FileUtil.copy(from, to);						
-					}
-				}
-				
-				History.add(p.profileId, now+"");
+				/* history */
+				History.add(p.profileId, String.valueOf(now));
 				
 			} catch (Exception e) {
 				e.printStackTrace();

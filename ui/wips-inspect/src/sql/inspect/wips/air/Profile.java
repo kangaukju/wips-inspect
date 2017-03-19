@@ -71,6 +71,7 @@ public class Profile {
 			pstmt.setString(1, profileId);
 			pstmt.executeUpdate();
 			pstmt.close();
+			pstmt = null;
 			
 			sql = "delete from profile_config_ref where profile_id=?";
 			pstmt = conn.prepareStatement(sql);
@@ -79,6 +80,7 @@ public class Profile {
 			conn.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			try { conn.rollback(); } catch (Exception e1) { e1.printStackTrace(); }
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
 		}
@@ -217,31 +219,8 @@ public class Profile {
 	public static String newProfileId() {
 		return PROFILE_ID_PREFIX + System.currentTimeMillis();
 	}
-	/*
-	public static String newProfileId() {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		String newId = "P"+System.currentTimeMillis();
-		
-		try {
-			String sql = "select max(id) + 1 from profile";
-			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
-			pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			if (rs != null && rs.next()) {
-				newId = rs.getString(1);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			SQLite3Connection.sqlClose(conn, pstmt, rs);
-		}
-		return newId;
-	}
-	*/
 	
-	public static List<Profile> getAll() {
+	public static List<Profile> getAll(boolean loadAirConf) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -258,6 +237,10 @@ public class Profile {
 				p.name = rs.getString("name");
 				p.updated = rs.getString("updated");
 				p.created = rs.getString("created");
+				if (loadAirConf) {
+					p.configList = getConfig(p.id, loadAirConf);
+					p.configListNames = getConfigListNames(p.configList);
+				}
 				list.add(p);
 			}
 		} catch (Exception e) {
@@ -269,7 +252,7 @@ public class Profile {
 	}
 	
 	static private String getConfigListNames(List<Config> list) {
-		String names = "";
+		StringBuffer names = new StringBuffer();
 		int i = 0;
 		
 		if (ListUtil.isNull(list)) {
@@ -277,21 +260,12 @@ public class Profile {
 		}
 		for (Config c : list) {
 			if (i != 0) {
-				names += ",";
+				names.append(",");
 			}
-			names += c.getName();
+			names.append(c.getName());
 			i++;
 		}
-		return names;
-	}
-	
-	public static List<Profile> getAllWithConfig(boolean loadAirConf) {
-		List<Profile> list = getAll();
-		for (Profile p : list) {
-			p.configList = getConfig(p.id, loadAirConf);
-			p.configListNames = getConfigListNames(p.configList);
-		}
-		return list;
+		return names.toString();
 	}
 	
 	public static List<Profile> getByName(String name, boolean loadAirConf) {

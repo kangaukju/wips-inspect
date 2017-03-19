@@ -1092,3 +1092,10 @@ int write_cur_pid(const char* pname)
 	}
 	return 0;
 }
+
+int is_null_str(const char* str) {
+	if (str == NULL || str[0] == 0) {
+		return 1;
+	}
+	return 0;
+}

@@ -9,6 +9,7 @@ import java.util.List;
 import air.wips.inspect.conf.XmlAirConf;
 import air.wips.inspect.utils.DateUtil;
 import air.wips.inspect.utils.ListUtil;
+import air.wips.inspect.utils.StringUtil;
 
 public class Config {
 	private final static String CONFIG_ID_PREFIX = "C_";
@@ -105,6 +106,7 @@ public class Config {
 			pstmt.setString(1, configId);
 			pstmt.executeUpdate();
 			pstmt.close();
+			pstmt = null;
 			
 			sql = "delete from profile_config_ref where config_id=?";
 			pstmt = conn.prepareStatement(sql);
@@ -116,6 +118,7 @@ public class Config {
 			conn.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			try { conn.rollback(); } catch (Exception e1) { e1.printStackTrace(); }
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
 		}
@@ -161,25 +164,28 @@ public class Config {
 			String namesql = "";
 			String capturesql = "";
 			String shootersql = "";
-			if (config.name != null)
+			if (config.name != null) {
 				namesql = ",name=?";
-			if (config.capturexml != null)
+			}
+			if (config.capturexml != null) {
 				capturesql = ",capturexml=?";
-			if (config.shooterxml != null)
+			}
+			if (config.shooterxml != null) {
 				shootersql = ",shooterxml=?";
-			
+			}
 			sql = "update config set updated=?"+namesql+capturesql+shootersql+" where id=?";
-			
-			
 			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(idx++, now); config.updated = now;
-			if (config.name != null)
+			if (config.name != null) {
 				pstmt.setString(idx++, config.name);
-			if (config.capturexml != null)
+			}
+			if (config.capturexml != null) {
 				pstmt.setString(idx++, config.capturexml);
-			if (config.shooterxml != null)
-				pstmt.setString(idx++, config.shooterxml);			
+			}
+			if (config.shooterxml != null) {
+				pstmt.setString(idx++, config.shooterxml);
+			}
 			pstmt.setString(idx++, config.id);
 			pstmt.executeUpdate();
 		} catch (Exception e) {
@@ -187,22 +193,6 @@ public class Config {
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
 		}
-	}
-	
-	public static void update(long id) {
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		try {
-			String sql = "delete from config where id=?";
-			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setLong(1, id);
-			pstmt.executeUpdate();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			SQLite3Connection.sqlClose(conn, pstmt);
-		}		
 	}
 	
 	public static String getCaptureXML(final String configId) {
@@ -238,28 +228,31 @@ public class Config {
 				c.capturexml = rs.getString("capturexml");
 				c.shooterxml = rs.getString("shooterxml");
 				c.updated = rs.getString("updated");
-				c.created = rs.getString("created");				
+				c.created = rs.getString("created");
+				c.captureAirConfDescs = "";
+				c.captureXmlAirConfList = null;
+				c.shooterAirConfDescs = "";
+				c.shooterXmlAirConfList = null;
 				if (loadAirConf) {
-					try {
-						String captureFilename = XmlAirConf.captureFilename(c.id);
-						c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
-						c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
-					} catch (Exception e) {
-						c.captureAirConfDescs = "";
-						c.captureXmlAirConfList = null;
-						e.printStackTrace();
+					if (!StringUtil.isNull(c.capturexml)) {
+						try {
+							String captureFilename = XmlAirConf.captureFilename(c.id);
+							c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
+							c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-					try {
-						String shooterFilename = XmlAirConf.shooterFilename(c.id);
-						c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
-						c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
-					} catch (Exception e) {
-						c.shooterAirConfDescs = "";
-						c.shooterXmlAirConfList = null;
-						e.printStackTrace();
+					if (!StringUtil.isNull(c.shooterxml)) {
+						try {
+							String shooterFilename = XmlAirConf.shooterFilename(c.id);
+							c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
+							c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
-				
 				list.add(c);
 			}
 		} catch (Exception e) {
@@ -290,24 +283,28 @@ public class Config {
 				c.shooterxml = rs.getString("shooterxml");
 				c.updated = rs.getString("updated");
 				c.created = rs.getString("created");
+				c.captureXmlAirConfList = null;
+				c.captureAirConfDescs = "";
+				c.shooterXmlAirConfList = null;
+				c.shooterAirConfDescs = "";
 				if (loadAirConf) {
-					try {
-						String captureFilename = XmlAirConf.captureFilename(c.id);
-						c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
-						c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
-					} catch (Exception e) {
-						c.captureXmlAirConfList = null;
-						c.captureAirConfDescs = "";
-						e.printStackTrace();
+					if (!StringUtil.isNull(c.capturexml)) {
+						try {
+							String captureFilename = XmlAirConf.captureFilename(c.id);
+							c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
+							c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-					try {
-						String shooterFilename = XmlAirConf.shooterFilename(c.id);
-						c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
-						c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
-					} catch (Exception e) {
-						c.shooterXmlAirConfList = null;
-						c.shooterAirConfDescs = "";
-						e.printStackTrace();
+					if (!StringUtil.isNull(c.shooterxml)) {
+						try {
+							String shooterFilename = XmlAirConf.shooterFilename(c.id);
+							c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
+							c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -338,24 +335,28 @@ public class Config {
 				c.shooterxml = rs.getString("shooterxml");
 				c.updated = rs.getString("updated");
 				c.created = rs.getString("created");
+				c.captureXmlAirConfList = null;
+				c.captureAirConfDescs = "";
+				c.shooterXmlAirConfList = null;
+				c.shooterAirConfDescs = "";
 				if (loadAirConf) {
-					try {
-						String captureFilename = XmlAirConf.captureFilename(c.id);
-						c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
-						c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
-					} catch (Exception e) {
-						c.captureXmlAirConfList = null;
-						c.captureAirConfDescs = "";
-						e.printStackTrace();
+					if (!StringUtil.isNull(c.capturexml)) {
+						try {
+							String captureFilename = XmlAirConf.captureFilename(c.id);
+							c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
+							c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-					try {
-						String shooterFilename = XmlAirConf.shooterFilename(c.id);
-						c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
-						c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
-					} catch (Exception e) {
-						c.shooterXmlAirConfList = null;
-						c.shooterAirConfDescs = "";
-						e.printStackTrace();
+					if (!StringUtil.isNull(c.shooterxml)) {
+						try {
+							String shooterFilename = XmlAirConf.shooterFilename(c.id);
+							c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
+							c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 				list.add(c);
@@ -393,24 +394,28 @@ public class Config {
 				c.shooterxml = rs.getString("shooterxml");
 				c.updated = rs.getString("updated");
 				c.created = rs.getString("created");
+				c.captureXmlAirConfList = null;
+				c.captureAirConfDescs = "";
+				c.shooterXmlAirConfList = null;
+				c.shooterAirConfDescs = "";
 				if (loadAirConf) {
-					try {
-						String captureFilename = XmlAirConf.captureFilename(c.id);
-						c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
-						c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
-					} catch (Exception e) {
-						c.captureXmlAirConfList = null;
-						c.captureAirConfDescs = "";
-						e.printStackTrace();
+					if (!StringUtil.isNull(c.capturexml)) {
+						try {
+							String captureFilename = XmlAirConf.captureFilename(c.id);
+							c.captureXmlAirConfList = XmlAirConf.loadAirConfList(captureFilename);
+							c.captureAirConfDescs = getAirConfDescs(c.captureXmlAirConfList);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
-					try {
-						String shooterFilename = XmlAirConf.shooterFilename(c.id);
-						c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
-						c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
-					} catch (Exception e) {
-						c.shooterXmlAirConfList = null;
-						c.shooterAirConfDescs = "";
-						e.printStackTrace();
+					if (!StringUtil.isNull(c.shooterxml)) {
+						try {
+							String shooterFilename = XmlAirConf.shooterFilename(c.id);
+							c.shooterXmlAirConfList = XmlAirConf.loadAirConfList(shooterFilename);
+							c.shooterAirConfDescs = getAirConfDescs(c.shooterXmlAirConfList);
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 					}
 				}
 				list.add(c);

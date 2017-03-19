@@ -7,3 +7,28 @@
 1489739953557	Copy file
 1489740006174	Delete element
 1489740026305	Copy file
+1489798590476	Rename local variable 'result'
+1489799979617	Delete element
+1489800006265	Delete element
+1489800147553	Move 'get_config.jsp' to 'M'
+1489800176826	Move 'del_config.jsp' to 'M'
+1489803127775	Move 'get_selected_config.jsp' to 'M'
+1489803422442	Move 'del_profile.jsp' to 'M'
+1489803688748	Move 'wifidriver_json.jsp' to 'M'
+1489803762763	Move 'config_xml.jsp' to 'M'
+1489803984053	Delete element
+1489804046389	Move 'get_profile.jsp' to 'M'
+1489804070946	Delete element
+1489804082866	Delete element
+1489804101879	Delete element
+1489804167373	Delete element
+1489804171094	Delete element
+1489804179666	Delete element
+1489804188319	Delete element
+1489804207362	Delete element
+1489804215834	Delete element
+1489804224771	Delete elements
+1489804235008	Move 26 resources to 'WebContent'
+1489804238132	Delete element
+1489804673969	Move 94 resources to 'img'
+1489804679545	Delete element

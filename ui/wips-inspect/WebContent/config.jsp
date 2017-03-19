@@ -1,835 +1,599 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="air.wips.inspect.servlet.HttpGet"%>
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<style type="text/css">
-	input[type=button] {
-		cursor: pointer;
-	}
-	.config_table {
-		width: 100%;
-	}
-	.split {
-		width: 10px;
-	}
-	.pointer {
-		cursor: pointer;
-	}
-	/*
-	#config_table tbody tr:hover td {
-        background: none repeat scroll 0 0 #FFCF8B;
-        color: #000000;
-    }
-    */
-    #config_table tbody tr.selected td {
-        background: none repeat scroll 0 0 #FFCF8B;
-        color: #000000;
-    }
-	</style>
+<meta charset="UTF-8">
+<%@include file="header.jsp"%>
+<style type="text/css">
+#tabs {
+	padding-left: 0px;
+	margin-top: 10px;
+	background: none;
+	border-width: 0px;
+} 
+#tabs .ui-tabs-nav { 
+	padding-left: 0px;
+	background: transparent;
+}
+#tabs img {
+	vertical-align: middle;
+}
+#tabs .ui-tabs-active {
+	background-color: #407bbf;
+	border-width: 0px;
+}
+</style>
 </head>
 <body>
 	<fieldset class="main_fieldset">
-		<legend>All Config List</legend>
-		<table>
+		<legend id="config_fieldset">
+			<img class="head_img" src="/imgedit_banner.svg">
+			<span>New Config</span>
+		</legend>
+		<form id="config_form" method="post">
+			<div>
+				<input type="hidden" name="config_id" id="config_id">
+				<input type="text" name="config_name" id="config_name">
+				<img class="action_img" src="/img/upload.svg" id="save_config">
+				<a id="config_xml_link" href='#config_xml_modal'>
+					<img class='action_img' src='/img/file-xml2.svg'>
+				</a>
+			</div>		
+		
+			<div id="tabs" class="tab_header">
+				<ul>
+					<li>
+						<a href="#shooter">
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							Shooter
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<img src="/img/add2.svg" class="table_img add_config_img" target="shooter">
+						</a>
+					</li>
+					<li>
+						<a href="#capture">
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							Capture
+							&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+							<img src="/img/add2.svg" class="table_img add_config_img" target="capture">
+						</a>
+					</li>
+				</ul>
+				<div id="shooter">
+				</div>
+				<div id="capture">
+				</div>
+			</div>
+		</form>
+	</fieldset>
+
+	<%-- sample tag html --%>
+	<table id="sample_tag" class="hidden">
+		<thead></thead>
+		<tbody>
 			<tr>
-				<td align="right">
-					<a href="#" class="btn btn-inline btn-small btn-success" id="new_config"><span>New</span></a>
-					<a href="#" class="btn btn-inline btn-small btn-warning" id="modify_config"><span>Modify</span></a>
-					<a href="#" class="btn btn-inline btn-small btn-danger" id="delete_config"><span>Delete</span></a>
+				<td></td>
+				<td align="right"><img src="/img/trash.svg" class="table_img del_tag_img"></td>
+			</tr>
+			<tr>
+				<td>id</td>
+				<td><input type="text" name="tag_id"></td>
+			</tr>
+			<tr>
+				<td>val</td>
+				<td><input type="text" name="tag_value"></td>
+			</tr>
+			<tr>
+				<td>type</td>
+				<td>
+					<select name="tag_type">
+						<option value="string">string</option>
+						<option value="hex">hex</option>
+					</select>
 				</td>
 			</tr>
-		</table>
-		<table id="config_table" class="table">
-			<thead>
+			<tr>
+				<td>len</td>
+				<td><input type="text" name="tag_length"></td>
+			</tr>
+		</tbody>
+	</table>
+
+	<%-- sample config html --%>
+	<fieldset id="sample_config" class="sub_fieldset sample_config hidden">
+		<legend>Config</legend>
+		<img class="table_img del_config_img" src="/img/trash.svg" align="right">
+		<input type="hidden" name="target">
+		<input type="hidden" name="tags">
+		<table align="center">
+			<thead></thead>
+			<tbody>
 				<tr>
-					<th>id</th>
-					<th>name</th>
-					<th>capture</th>
-					<th>shooter</th>
-					<th>created</th>
-					<th>updated</th>
+					<td width="100px;">enable</td>
+					<td>
+						<select name="enable">
+							<option value="1">enable</option>
+							<option value="0">disable</option>
+						</select>
+					</td>
 				</tr>
-			</thead>
-			<tbody></tbody>
+				<tr>
+					<td>desc</td>
+					<td><input type="text" name="desc"></td>
+				</tr>
+				<tr>
+					<td>dwell (msec)</td>
+					<td><input type="text" name="dwell"></td>
+				</tr>
+				<tr>
+					<td>channel</td>
+					<td><input type="text" name="channel"></td>
+				</tr>
+				<tr>
+					<td>frame</td>
+					<td>
+						<select name="frame" data-placeholder="Choose a Frame Type..." class="frametype">
+							<option value=''>Not set</option>
+							<optgroup label='Management Frames'>
+								<option value='00'>Association Request</option>
+								<option value='01'>Association Response</option>
+								<option value='02'>Reassociation Request</option>
+								<option value='03'>Reassociation Response</option>
+								<option value='04'>Probe Request</option>
+								<option value='05'>Probe Response</option>
+								<option value='08'>Beacon</option>
+								<option value='09'>ATIM</option>
+								<option value='0a'>Disassociation</option>
+								<option value='0b'>Authentication</option>
+								<option value='0c'>Deauthentication</option>
+								<option value='0d'>Action</option>
+							</optgroup>
+							<optgroup label='Control Frames'>
+								<option value='18'>Block Ack Request</option>
+								<option value='19'>Block Ack</option>
+								<option value='1a'>PS-Poll</option>
+								<option value='1b'>RTS</option>
+								<option value='1c'>CTS</option>
+								<option value='1d'>ACK</option>
+								<option value='1e'>CF End</option>
+								<option value='1f'>CF End Ack</option>
+							</optgroup>
+							<optgroup label='Data Frames'>
+								<option value='20'>Data</option>
+								<option value='21'>Data Ack</option>
+								<option value='22'>Data Poll</option>
+								<option value='23'>Data Ack Poll</option>
+								<option value='24'>NULL</option>
+								<option value='25'>ACK</option>
+								<option value='26'>Poll</option>
+								<option value='27'>Ack Poll</option>
+								<option value='28'>Qos Data</option>
+								<option value='29'>Qos Data Ack</option>
+								<option value='2a'>Qos Data Poll</option>
+								<option value='2b'>Qos Data Ack Poll</option>
+								<option value='2c'>Qos NULL</option>
+								<option value='2e'>Qos Poll</option>
+								<option value='2f'>Qos Ack</option>
+							</optgroup>
+						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>ds</td>
+						<td>
+							<select name="ds">
+								<option value="">Not Set</option>
+								<option value="00">ADHOC (management)</option>
+								<option value="10">From DS</option>
+								<option value="01">To DS</option>
+								<option value="11">WDS</option>
+							</select>
+						</td>
+				</tr>
+				<tr>
+					<td>addr</td>
+					<td>
+						<select name="address" class="address">
+							<option value="">Not set</option>
+							<option value="any_addr">ANY</option>
+							<option value="apsta">AP/STA</option>
+							<option value="addr1">ADDRESS 1</option>
+							<option value="addr2">ADDRESS 2</option>
+							<option value="addr3">ADDRESS 3</option>
+							<option value="addr4">ADDRESS 4</option>
+						</select>
+						<div class="addr addr1">
+							<table>
+								<tr>
+									<td>da</td>
+									<td><input type="text" name="addr1_da"></td>
+								</tr>
+							</table>
+						</div>
+						<div class="addr addr2">
+							<table>
+								<tr>
+									<td>da</td>
+									<td><input type="text" name="addr2_da"></td>
+								</tr>
+								<tr>
+									<td>sa</td>
+									<td><input type="text" name="addr2_sa"></td>
+								</tr>
+							</table>
+						</div>
+						<div class="addr addr3">
+							<table>
+								<tr>
+									<td>bssid</td>
+									<td><input type="text" name="addr3_bssid"></td>
+								</tr>
+								<tr>
+									<td>da</td>
+									<td><input type="text" name="addr3_da"></td>
+								</tr>
+								<tr>
+									<td>sa</td>
+									<td><input type="text" name="addr3_sa"></td>
+								</tr>
+							</table>
+						</div>
+						<div class="addr addr4">
+							<table>
+								<tr>
+									<td>da</td>
+									<td><input type="text" name="addr4_da"></td>
+								</tr>
+								<tr>
+									<td>sa</td>
+									<td><input type="text" name="addr4_sa"></td>
+								</tr>
+								<tr>
+									<td>ta</td>
+									<td><input type="text" name="addr4_ta"></td>
+								</tr>
+								<tr>
+									<td>ra</td>
+									<td><input type="text" name="addr4_ra"></td>
+								</tr>
+							</table>
+						</div>
+						<div class="addr apsta">
+							<table>
+								<tr>
+									<td>ap</td>
+									<td><input type="text" name="ap"></td>
+								</tr>
+								<tr>
+									<td>sta</td>
+									<td><input type="text" name="sta"></td>
+								</tr>
+							</table>
+						</div>
+						<div class="addr any_addr">
+							<table>
+								<tr>
+									<td>any</td>
+									<td><input type="text" name="any_addr"></td>
+								</tr>
+							</table>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td valign="top">tag <img src="/img/plus.svg" class="table_img add_tag_img"></td>
+					<td>
+						<div class="tag_div"></div>
+					</td>
+				</tr>
+			</tbody>
 		</table>
 	</fieldset>
 	
-	<table class="config_table">
-		<tr>
-			<th width="50%"></th>
-			<th width="50%"></th>
-		</tr>
-		<tr>
-			<td></td>
-			<td align="right">
-				<a href="#" class="btn btn-inline btn-small" id="clear_config"><span>Clear Config</span></a>
-			</td>
-		</tr>
-		<tr valign="top">
-			<td>
-				<fieldset class="shooter config main_fieldset">
-					<legend>Shooter Config</legend>
-					<form id="shooter_form" class="config_form">
-						<table id="shooter">
-							<thead>
-							</thead>
-							<tbody>
-								<tr>
-									<td width="30%">enable</td>
-									<td width="70%">
-										<select id="shooter_enable" name="shooter_enable">
-											<option value="1">enable</option>
-											<option value="0">disable</option>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td>desc</td>
-									<td>
-										<input type="hidden" id="shooter_id" name="shooter_id">
-										<input type="hidden" id="shooter_name" name="shooter_name">
-										<input type="hidden" id="shooter_xml" name="shooter_xml">
-										<input type="text" id="shooter_desc" name="shooter_desc">
-									</td>
-								</tr>
-								<%--
-								<tr>
-									<td>key</td>
-									<td><input type="text" id="shooter_key" name="shooter_key"></td>
-								</tr>
-								--%>
-								<tr>
-									<td>dwell (msec)</td>
-									<td><input type="text" id="shooter_dwell" name="shooter_dwell"></td>
-								</tr>
-								<%--
-								<tr>
-									<td>delay</td>
-									<td><input type="text" id="shooter_delay" name="shooter_delay"></td>
-								</tr>
-								--%>
-								<tr>
-									<td>channel</td>
-									<td><input type="text" id="shooter_channel" name="shooter_channel"></td>
-								</tr>
-								<tr>
-									<td>frame type</td>
-									<td>
-										<select data-placeholder="Choose a Frame Type..." class="frametype" id="shooter_frametype" name="shooter_frametype"></select>
-									</td>
-								</tr>
-								<tr>
-									<td>ds</td>
-									<td>
-										<select id="shooter_ds" name="shooter_ds">
-											<option value="">Not set</option>
-											<option value="00">ADHOC (management)</option>
-											<option value="10">From DS</option>
-											<option value="01">To DS</option>
-											<option value="11">WDS</option>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td>addr</td>
-									<td>
-										<select id="shooter_address" name="shooter_address">
-											<option value="">Not set</option>
-											<option value="any_addr">Any</option>
-											<option value="apsta">AP / STA</option>
-											<option value="addr1">Address-1</option>
-											<option value="addr2">Address-2</option>
-											<option value="addr3">Address-3</option>
-											<option value="addr4">Address-4</option>
-										</select>
-										<div class="addr shooter_addr1">
-											<table>
-												<tr>
-													<td>da</td>
-													<td><input type="text" id="shooter_addr1_da" name="shooter_addr1_da"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr shooter_addr2">
-											<table>
-												<tr>
-													<td>da</td>
-													<td><input type="text" id="shooter_addr2_da" name="shooter_addr2_da"></td>
-												</tr>
-												<tr>
-													<td>sa</td>
-													<td><input type="text" id="shooter_addr2_sa" name="shooter_addr2_sa"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr shooter_addr3">
-											<table>
-												<tr>
-													<td>bssid</td>
-													<td><input type="text" id="shooter_addr3_bssid" name="shooter_addr3_bssid"></td>
-												</tr>
-												<tr>
-													<td>da</td>
-													<td><input type="text" id="shooter_addr3_da" name="shooter_addr3_da"></td>
-												</tr>
-												<tr>
-													<td>sa</td>
-													<td><input type="text" id="shooter_addr3_sa" name="shooter_addr3_sa"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr shooter_addr4">
-											<table>
-												<tr>
-													<td>da</td>
-													<td><input type="text" id="shooter_addr4_da" name="shooter_addr4_da"></td>
-												</tr>
-												<tr>
-													<td>sa</td>
-													<td><input type="text" id="shooter_addr4_sa" name="shooter_addr4_sa"></td>
-												</tr>
-												<tr>
-													<td>ta</td>
-													<td><input type="text" id="shooter_addr4_ta" name="shooter_addr4_ta"></td>
-												</tr>
-												<tr>
-													<td>ra</td>
-													<td><input type="text" id="shooter_addr4_ra" name="shooter_addr4_ra"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr shooter_apsta">
-											<table>
-												<tr>
-													<td>ap</td>
-													<td><input type="text" id="shooter_ap" name="shooter_ap"></td>
-												</tr>
-												<tr>
-													<td>sta</td>
-													<td><input type="text"id="shooter_sta" name="shooter_sta"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr shooter_any_addr">
-											<table>
-												<tr>
-													<td>any</td>
-													<td><input type="text" id="shooter_any_addr" name="shooter_any_addr"></td>
-												</tr>
-											</table>
-										</div>
-									</td>
-								</tr>
-								<tr valign="top">
-									<td>tag 
-										<img src="img/gree_add.png" class="gree_add_img" id="shooter_taglist_add_button">
-									</td>
-									<td>
-										<table id="shooter_taglist_table" class="table">
-											<tbody></tbody>
-										</table>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</form>
-				</fieldset>
-			</td>
-			<td>
-				<fieldset class="capture config main_fieldset">
-					<legend>Capture Config</legend>
-					<form id="capture_form" class="config_form">
-						<table id="capture">
-							<thead>
-							</thead>
-							<tbody>
-								<tr>
-								<tr>
-									<td width="30%">enable</td>
-									<td width="70%">
-										<select id="capture_enable" name="capture_enable">
-											<option value="1">enable</option>
-											<option value="0">disable</option>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td>desc</td>
-									<td>
-										<input type="hidden" id="capture_id" name="capture_id">
-										<input type="hidden" id="capture_name" name="capture_name">
-										<input type="hidden" id="capture_xml" name="capture_xml">
-										<input type="text" id="capture_desc" name="capture_desc">
-									</td>
-								</tr>
-								<%--
-								<tr>
-									<td>key</td>
-									<td><input type="text" id="capture_key" name="capture_key"></td>
-								</tr>
-								--%>
-								<tr>
-									<td>dwell (msec)</td>
-									<td><input type="text" id="capture_dwell" name="capture_dwell"></td>
-								</tr>
-								<%--
-								<tr>
-									<td>delay</td>
-									<td><input type="text" id="capture_delay" name="capture_delay"></td>
-								</tr>
-								--%>
-								<tr>
-									<td>channel</td>
-									<td><input type="text" id="capture_channel" name="capture_channel"></td>
-								</tr>
-								<tr>
-									<td>frame type</td>
-									<td>
-										<select data-placeholder="Choose a Frame Type..." class="frametype" id="capture_frametype" name="capture_frametype"></select>
-									</td>
-								</tr>
-								<tr>
-									<td>ds</td>
-									<td>
-										<select id="capture_ds" name="capture_ds">
-											<option value="">Not Set</option>
-											<option value="00">ADHOC (management)</option>
-											<option value="10">From DS</option>
-											<option value="01">To DS</option>
-											<option value="11">WDS</option>
-										</select>
-									</td>
-								</tr>
-								<tr>
-									<td>addr</td>
-									<td>
-										<select id="capture_address" name="capture_address">
-											<option value="">Not set</option>
-											<option value="any_addr">Any</option>
-											<option value="apsta">AP / STA</option>
-											<option value="addr1">Address-1</option>
-											<option value="addr2">Address-2</option>
-											<option value="addr3">Address-3</option>
-											<option value="addr4">Address-4</option>
-										</select>
-										<div class="addr capture_addr1">
-											<table>
-												<tr>
-													<td>da</td>
-													<td><input type="text" id="capture_addr1_da" name="capture_addr1_da"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr capture_addr2">
-											<table>
-												<tr>
-													<td>da</td>
-													<td><input type="text" id="capture_addr2_da" name="capture_addr2_da"></td>
-												</tr>
-												<tr>
-													<td>sa</td>
-													<td><input type="text" id="capture_addr2_sa" name="capture_addr2_sa"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr capture_addr3">
-											<table>
-												<tr>
-													<td>bssid</td>
-													<td><input type="text" id="capture_addr3_bssid" name="capture_addr3_bssid"></td>
-												</tr>
-												<tr>
-													<td>da</td>
-													<td><input type="text" id="capture_addr3_da" name="capture_addr3_da"></td>
-												</tr>
-												<tr>
-													<td>sa</td>
-													<td><input type="text" id="capture_addr3_sa" name="capture_addr3_sa"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr capture_addr4">
-											<table>
-												<tr>
-													<td>da</td>
-													<td><input type="text" id="capture_addr4_da" name="capture_addr4_da"></td>
-												</tr>
-												<tr>
-													<td>sa</td>
-													<td><input type="text" id="capture_addr4_sa" name="capture_addr4_sa"></td>
-												</tr>
-												<tr>
-													<td>ta</td>
-													<td><input type="text" id="capture_addr4_ta" name="capture_addr4_ta"></td>
-												</tr>
-												<tr>
-													<td>ra</td>
-													<td><input type="text" id="capture_addr4_ra" name="capture_addr4_ra"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr capture_apsta">
-											<table>
-												<tr>
-													<td>ap</td>
-													<td><input type="text" id="capture_ap" name="capture_ap"></td>
-												</tr>
-												<tr>
-													<td>sta</td>
-													<td><input type="text"id="capture_sta" name="capture_sta"></td>
-												</tr>
-											</table>
-										</div>
-										<div class="addr capture_any_addr">
-											<table>
-												<tr>
-													<td>any</td>
-													<td><input type="text" id="capture_any_addr" name="capture_any_addr"></td>
-												</tr>
-											</table>
-										</div>
-									</td>
-								</tr>
-								<tr valign="top">
-									<td>tag
-										<img src="img/gree_add.png" class="gree_add_img" id="capture_taglist_add_button">										
-									</td>
-									<td>
-										<table id="capture_taglist_table" class="table">
-											<tbody></tbody>
-										</table>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</form>
-				</fieldset>
-			</td>
-		</tr>
-	</table>
-
-	<div id="new_config_dialog_contain">
-		<div id="new_config_dialog" title="new config" style="display: none;">
-			<form class="config_form">
-					<label for="new_config_name">name</label>
-					<input type="text" name="new_config_name" id="new_config_name">
-			</form>
+	<div id="config_xml_modal">
+		<div style="width: 100%; text-align: center;">
+			<img src="/img/close.svg" id="btn-close-modal" class="close-config_xml_modal" style="cursor: pointer; width:30px;">
+		</div>
+		<div id="config_xml_tabs" class="modal-content tab_header" style="background-color:rgba(0,0,0,0); border-color:rgba(0,0,0,0);">
+			<ul style="background-color:rgba(0,0,0,0); border-color:rgba(0,0,0,0);">
+				<li>
+					<a href="#shooter_xml">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						Shooter
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</a>
+				</li>
+				<li>
+					<a href="#capture_xml">
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+						Capture
+						&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					</a>
+				</li>
+			</ul>
+			<div id="shooter_xml">
+			</div>
+			<div id="capture_xml">
+			</div>
 		</div>
 	</div>
+	
 </body>
 
 <script type="text/javascript">
+var config_id = '<%= HttpGet.get(request, "config_id", "")%>';
 
-var config_xlat = {
-		tag: "tr",
-		id: "$\{id\}",
-		name: "$\{name\}",
-		class:"pointer",
-		children: [
-			{"tag":"td", "html":"$\{id\}"},
-			{"tag":"td", "html":"<input type='text' value='$\{name\}' class='config_name pointer' style='background-color:#ddd'>"},
-			{"tag":"td", "html":"$\{capturexml\}", "class":"capture_xml"},
-			{"tag":"td", "html":"$\{shooterxml\}", "class":"shooter_xml"},
-			{"tag":"td", "html":"$\{created\}"},
-			{"tag":"td", "html":"$\{updated\}"},
-		]
-};
-
-function fill_config_data(to, result) {
-//	console.log(result);
-	_val(to, "enable", result.enable).change();
-	_val(to, "desc", result.desc);
-	_val(to, "key", result.key);	
-	_val(to, "dwell", result.dwell);
-//	_val(to, "delay", result.delay);
-	_val(to, "channel", result.channel);
-//	_val(to, "type", result.type);
-//	_val(to, "subtype", result.subtype);
-	_val(to, "frametype", result.type+""+parseInt(result.subtype).toString(16));
-	_id(to, "frametype").trigger("chosen:updated");
-	
-	if (!_isnull(result.fromds) && !_isnull(result.tods)) {
-		_val(to, "ds", result.fromds+""+result.tods).change();
-	}
-	
-	var addrtype;
-	switch (_int(result.addrCount)) {
-	case 1:
-		_val(to, "addr1_da", result.da);
-		addrtype = "addr1";
-		break;
-	case 2:
-		_val(to, "addr2_da", result.da);
-		_val(to, "addr2_sa", result.sa);
-		addrtype = "addr2";
-		break;
-	case 3:
-		_val(to, "addr3_bssid", result.bssid);
-		_val(to, "addr3_da", result.da);
-		_val(to, "addr3_sa", result.sa);
-		addrtype = "addr3";
-		break;
-	case 4:
-		_val(to, "addr4_ra", result.ra);
-		_val(to, "addr4_ta", result.ta);
-		_val(to, "addr4_da", result.da);
-		_val(to, "addr4_sa", result.sa);
-		addrtype = "addr4";
-		break;
-	default:
-		_val(to, "any_addr", result.anyAddr);
-		_val(to, "ap", result.ap);
-		_val(to, "sta", result.sta);
-		if (!_isnull(result.anyAddr)) {
-			addrtype = "any_addr";	
-		} else if (!_isnull(result.ap) || !_isnull(result.sta)) {
-			addrtype = "apsta";
-		} else {
-			addrtype = "";
-		}
-	}
-	_val(to, "address", addrtype).change();
-	
-	if (!_isnull(result.taglist)) {
-		var tag;
-		for (var i=0; i<result.taglist.length; i++) {
-			tag = result.taglist[i];
-			append_taglist(_id(to, "taglist_table > tbody:last"), to, tag.id, tag.len, tag.data, tag.type);
-		}
-	}
-	
-}
-
-function request_config_data(to, id, from) {
-	jQuery.ajax({
-		url: "get_xml_airconf.jsp?"+to+"_id="+id,
-		cache: false,
-		beforeSend: function() {
-			_id(to, "form")[0].reset();
-			$("#"+to+"_taglist_table > tbody").empty();
-		},
-		dataType: "json",
-		success: function(result) {
-			_val(to, "id", id);
-			_val(to, "name", from.attr("name"));
-			_val(to, "xml", from.find(_class_str(to, "xml")).html());
-			
-			if (result.good == false) {
-				alert("request_config_data: "+result.cause);
-				return;
-			}
-			
-			fill_config_data(to, result);
-		},
-		error: function(e) {
-			ajax_err_handle(e);
-		}
-	});
-}
-
-function load_all_config() {
-	jQuery.ajax({
-		url: "get_config.jsp",
-		cache: false,
-		beforeSend: function() {
-			$("#config_table > tbody").empty();
-		},
-		dataType: "json",
-		success: function(result) {
-			if (result.good == false) {
-				alert("load_all_config: "+result.cause);
-				return;
-			}
-			
-			$("#config_table > tbody").html(json2html.transform(result, config_xlat));
-
-			$("#config_table").tablesorter({
-				widgets: ["zebra", "filter", "stickyHeaders"],
-				headers: {
-					1: {
-						sorter:'inputs'
-					}
-				}
-			}).trigger("update");
-			
-			$("#config_table > tbody > tr").removeClass('selected');
-			$("#config_table > tbody > tr").click(function(e) {
-				request_config_data("capture", this.id, $(this));
-				request_config_data("shooter", this.id, $(this));
-			
-				$("#config_table > tbody > tr").removeClass('selected');
-				$(this).toggleClass('selected');	
-			});
-			
-			// enable selectbox
-			init_enable_change_event("capture");
-			init_enable_change_event("shooter");
-			// address selectbox
-			init_addr_change_event("capture");
-			init_addr_change_event("shooter");
-			init_config_addr("capture");
-			init_config_addr("shooter");
-		},
-		error: function(e) {
-			ajax_err_handle(e);
-		}
-	});
-}
-
-function init_enable_change_event(to) {
-	$(_id(to, "enable")).change(function() {
-		var is_enable = $(this).val();
-		if (is_enable == "1") {
-			$("#"+to+"_form :input").css("background-color", "#FFF");
-		} else {			
-			$("#"+to+"_form :input").css("background-color", "#ddd");
-		}
-		$("#"+to+"_enable").css("background-color", "#FFF");
-	});
-}
-
-function init_addr_change_event(to) {
-	$(_id(to, "address")).change(function() {
-		var addr_type = $(this).val();
-		$("."+to+" .addr").hide();
-		if (addr_type == "any_addr") {
-			$("."+to+" ."+to+"_any_addr").show();
-		} else if (addr_type == "apsta") {
-			$("."+to+" ."+to+"_apsta").show();
-		} else if (addr_type == "addr1") {
-			$("."+to+" ."+to+"_addr1").show();
-		} else if (addr_type == "addr2") {
-			$("."+to+" ."+to+"_addr2").show();
-		} else if (addr_type == "addr3") {
-			$("."+to+" ."+to+"_addr3").show();
-		} else if (addr_type == "addr4") {
-			$("."+to+" ."+to+"_addr4").show();
-		}
-	});
-}
-
-function init_config_addr(to) {
-	$("."+to+" .addr").hide();
-	$(_id(to, "address")).change();
-}
-
-function bind_del_taglist_click_event() {
-	$(".del_taglist").click(function() {
-		var th = $(this).parent();
-		var tr = th.parent();
-		var thead = tr.parent();
-		var table = thead.parent();
-		table.remove();
-	});
-}
-
-function append_taglist($parent, to, id, len, data, type) {
-	var _id_val = "";
-	var _len_val = "";
-	var _data_val = "";
-	var _type_string_selected = "";
-	var _type_hex_selected = "";
-	
-	if (!_isnull(id)) {
-		_id_val = "value='"+id+"'";
-	}
-	if (!_isnull(len)) {
-		_len_val = "value='"+len+"'";
-	}
-	if (!_isnull(data)) {
-		_data_val = "value='"+data+"'";
-	}
-	if (!_isnull(type)) {
-		if ("hex" == type) {
-			_type_hex_selected = "selected='selected'";
-		} else {
-			_type_string_selected = "selected='selected'";
-		}
-	}
-	var _id = 
-		"<tr>"+
-			"<td>id</td>"+
-			"<td><input type='text' name='"+to+"_tag_id' "+_id_val+"></td>"+
-		"</tr>";
-	var _len = 
-		"<tr>"+
-			"<td>len</td>"+
-			"<td><input type='text' name='"+to+"_tag_len' "+_len_val+"></td>"+
-		"</tr>";
-	var _val = 
-		"<tr>"+
-			"<td>value</td>"+
-			"<td><input type='text' name='"+to+"_tag_data' "+_data_val+"></td>"+
-		"</tr>";
-	var _type = 
-		"<tr>"+
-			"<td>value_type</td>"+
-			"<td>"+
-				"<select name='"+to+"_tag_type'>" +
-				   "<option value='string' "+_type_string_selected+">string</option>"+
-				   "<option value='hex' "+_type_hex_selected+">hex</option>"+
-			   "</select>"+
-			"</td>"+
-		"</tr>";
-	var _table =
-				"<table>"+
-					"<thead></thead>"+
-					"<tbody>"+
-						"<tr>"+
-							"<td></td>"+
-							
-							"<td align='right'><img src='img/red_remove.png' class='red_remove_img del_taglist' id='capture_taglist_add_button'></td>"+
-						"</tr>"+					
-						_id + _len + _val + _type +
-					"</tbody>"+
-				"</table>";
-//	console.log($parent);
-//	console.log(_table);
-	$parent.append(_table);
-//	$(this).parents().find(".taglist > tbody:last").append(table);
-	bind_del_taglist_click_event();
-}
-
-function clear_config() {
-	$("#shooter_form")[0].reset();
-	$("#capture_form")[0].reset();
-	
-	// taglist table
-	$("#shooter_taglist_table > tbody").empty();
-	$("#capture_taglist_table > tbody").empty();
-	
-	// ds
-	$("#shooter_ds").val("").change();
-	$("#capture_ds").val("").change();
-	
-	// address
-	$("#shooter_address").val("").change();
-	$("#capture_address").val("").change();
-	
-	// address
-	$("#shooter_frametype").val("").trigger("chosen:updated");
-	$("#capture_frametype").val("").trigger("chosen:updated");
-	
-	$("#shooter_enable").val("1").change();
-	$("#capture_enable").val("1").change();
-}
-
-$(document).ready(function() {
-	
-	$.tablesorter.addParser({
-		id: 'inputs',
-		is: function(s) {
-			return false;
-		},
-		format: function(s, table, cell) {
-			return $('input', cell).val();
-		},
-		type: 'text'
-	});
-    
-	$(".table").tablesorter({
-		widgets: ["zebra", "filter", "stickyHeaders"],
-		headers: {
-			1: {
-				sorter:'inputs'
-			}
-		}
-	}).trigger("update");
+function bind_add_tag() {
+	// tag 설정 추가
+	$(".add_tag_img").click(function() {
+		var c = $("#sample_tag").clone(true);
+		c.find("input").val("");
+		var $p2 = pN($(this), 2);
+		var $p5 = pN($(this), 5);
 		
-	make_frametype_selectbox($(".frametype"));
-	$(".frametype").chosen({disable_search_threshold:2});
+		var tags = $p5.find("input[name=tags]");
+		tags.val(parseInt(tags.val()) + 1);
+		
+		var $t = $p2.find(".tag_div");
+		c.css({display:'none'});
+		c.prependTo($t).show("slow");
+		c.removeClass("hidden");
+	});
+}
+
+function bind_del_tag() {
+	$(".del_tag_img").click(function() {
+		var $p10 = pN($(this), 10);
+		var tags = $p10.find("input[name=tags]");
+		tags.val(parseInt(tags.val()) - 1);
+		
+		var $p4 = pN($(this), 4);
+		$p4.hide("slow", function() { $p4.remove(); });
+	});
+}
+
+function bind_add_config() {
+	// config 설정 추가
+	$(".add_config_img").click(function() {
+		var c = $("#sample_config").clone(true);
+		c.find(".addr").hide();
+		c.find("input").val("");
+		c.find(".tag_div").empty();
+		var t = $(this).attr("target");
+		c.css({display:'none'});
+		// shooter or capture 종류 구분
+		c.find("input[name=target]").val(t);
+		c.find("input[name=tags]").val("0");
+		c.prependTo($("#"+t)).slideDown("slow");
+		c.removeClass("hidden");
+	});
+}
+
+function bind_del_config() {
+	$(".del_config_img").click(function() {
+		var $p1 = pN($(this), 1);
+		$p1.slideUp("slow", function() { $p1.remove(); });
+	});
+}
+
+function bind_change_address() {
+	$(".address").change(function() {
+		var $p1 = pN($(this), 1);
+		
+		$p1.find(".addr").hide();
+		
+		var type = $(this).val();
+		if (type == "any_addr") {
+			$p1.find(".any_addr").show();
+		} else if (type == "apsta") {
+			$p1.find(".apsta").show();
+		} else if (type == "addr1") {
+			$p1.find(".addr1").show();
+		} else if (type == "addr2") {
+			$p1.find(".addr2").show();
+		} else if (type == "addr3") {
+			$p1.find(".addr3").show();
+		} else if (type == "addr4") {
+			$p1.find(".addr4").show();
+		}
+	});
+}
+
+function bind_all() {
+	bind_add_tag(); // 태그 추가 핸들러 연결
+	bind_del_tag(); // 태그 삭제 핸들러 연결
+	bind_add_config(); // 설정 추가 핸들러 연결
+	bind_del_config(); // 설정 삭제 핸들러 연결
+	bind_change_address(); // address 종류 변경 이벤트 핸들러 연결
+}
+
+function build_config_list(target, list) {
+	$.each(list, function(i, v){
+		var c = $("#sample_config").clone(true);
+		c.removeClass("hidden");
+		c.find("input").val("");
+		// shooter or capture 종류 구분
+		c.find("input[name=target]").val(target);
+		c.find("select[name=enable]").val(v.enable).change();
+		c.find("input[name=desc]").val(v.desc);
+		c.find("input[name=dwell]").val(v.dwell);
+		c.find("input[name=channel]").val(v.channel);
+		if (!_isnull(v.type) && !_isnull(v.subtype)) {
+			var frame = v.type+""+parseInt(v.subtype).toString(16);
+			c.find("select[name=frame]").val(frame).change();
+		}
+		if (!_isnull(v.fromds) && !_isnull(v.tods)) {
+			var ds = v.fromds+""+v.tods;
+			c.find("select[name=ds]").val(ds).change();
+		}
+		var addrtype = "";
+		switch (_int(v.addrCount)) {
+		case 1:
+			c.find("input[name=addr1_da]").val(v.da);
+			addrtype = "addr1";
+			break;
+		case 2:
+			c.find("input[name=addr2_da]").val(v.da);
+			c.find("input[name=addr2_sa]").val(v.sa);
+			addrtype = "addr2";
+			break;
+		case 3:
+			c.find("input[name=addr3_bssid]").val(v.bssid);
+			c.find("input[name=addr3_da]").val(v.da);
+			c.find("input[name=addr3_sa]").val(v.sa);
+			addrtype = "addr3";
+			break;
+		case 4:
+			c.find("input[name=addr4_ra]").val(v.ra);
+			c.find("input[name=addr4_ta]").val(v.ta);
+			c.find("input[name=addr4_da]").val(v.da);
+			c.find("input[name=addr4_sa]").val(v.sa);
+			addrtype = "addr4";
+			break;
+		default:
+			if (!_isnull(v.anyAddr)) {
+				c.find("input[name=any_addr]").val(v.anyAddr);
+				addrtype = "any_addr";	
+			}
+			if (!_isnull(v.ap)) {
+				c.find("input[name=ap]").val(v.ap);
+				addrtype = "apsta";
+			}
+			if (!_isnull(v.sta)) {
+				c.find("input[name=sta]").val(v.sta);
+				addrtype = "apsta";
+			}
+		}
+		c.find("select[name=address]").val(addrtype).change();
+		
+		var tag_div = c.find(".tag_div");
+		tag_div.empty();
+		c.find("input[name=tags]").val("0");
+		if (!_isnull(v.taglist)) {
+			c.find("input[name=tags]").val(v.taglist.length);
+			$.each(v.taglist, function(k, t) {
+				var ct = $("#sample_tag").clone(true);
+				ct.removeClass("hidden");
+				ct.find("input").val("");
+				ct.find("input[name=tag_id]").val(t.id);
+				ct.find("input[name=tag_length]").val(t.len);
+				ct.find("input[name=tag_value]").val(t.data);
+				ct.find("select[name=tag_type]").val(t.type);
+				tag_div.append(ct);
+			});
+		}
+		
+		c.appendTo($("#"+target));
+	});
+}
+$(document).ready(function() {
+	$("#tabs").tabs();
+	$(".addr").hide();
 	
-	load_all_config();
+	bind_all();
 	
-	$("#new_config_dialog").dialog({
-		autoOpen: false,
-		height: 160,
-		width: 280,
-		modal: true,
-		buttons: {
-			"new": function(){
-				$.post("set_config.jsp", $(".config_form").serialize()).done(function(result) {
-					result = jQuery.parseJSON(result);
-					$("#new_config_name").val("");
+	$("#save_config").click(function() {
+		var $config_name = $("#config_name");
+		if ($config_name.val() == "") {
+			pop("missing config name...", {
+				focus: $config_name,
+			});
+			return;
+		}
+		
+		$("#config_form input[name=tag_id]").each(function() {
+			if ($(this).val() == "") {
+				var $p10 = pN($(this), 10);
+				var t = $p10.find("input[name=target]").val();
+				var s = (t == "shooter") ? 0 : 1
+				$("#tabs").tabs("option", "active", s);
+				$(this).focus();
+			}
+		});
+		
+		$.post("add_config.jsp", $("#config_form").serialize())
+			.done(function(result) {
+				if (result.good == false) {
+					pop("Error register config: "+result.cause);
+					return;
+				} else {
+					pop("success registered config: "+$("#config_name").val(), {
+						page: "config_list.jsp",
+						type: "success",
+					});
+				}
+		}, "json");
+	});
+		
+	$("#config_xml_link").animatedModal({
+		modalTarget: 'config_xml_modal',
+		animatedIn: 'lightSpeedIn',
+		animatedOut: 'bounceOutDown',
+		beforeOpen: function() {
+			var config_id = $("#config_id").val();
+			jQuery.ajax({
+				url: "config_xml.jsp",
+				data: { 'config_id': config_id },
+				cache: false,
+				dataType: "json",
+				success: function(result) {
 					if (result.good == false) {
-						alert("new_config_dialog: "+result.cause);
-						$("#new_config_dialog").dialog("close");						
+						pop("Error loading for config XML.\n"+result.cause);
 						return;
 					}
-					load_all_config();
-					$("#new_config_dialog").dialog("close");					
-				});
-			},
-			"cancel": function() {
-				$("#new_config_dialog").dialog("close");
-				$("#new_config_name").val("");				
-			},
+					$("#config_xml_tabs").tabs();
+					$("#shooter_xml").html(result.shooter);
+					$("#capture_xml").html(result.capture);
+				},
+				error: function(e) {
+					//ajax_err_handle(e);
+					pop("Error loading for config XML.\nplease retry...");
+				}
+			});
 		},
-		appendTo: "#new_config_dialog_contain",
 	});
 	
-	$("#new_config").click(function() {
-		$("#new_config_dialog").dialog("open");
-	});
-
-	$("#capture_taglist_add_button").click(function() {
-		append_taglist($("#capture_taglist_table > tbody:last"), "capture");
-	});
-	
-	$("#shooter_taglist_add_button").click(function() {
-		append_taglist($("#shooter_taglist_table > tbody:last"), "shooter");
-	});
-	
-	$("#modify_config").click(function(e) {		
-		if (_isnull($(".selected"))) {
-			alert("Please select config for modify");
-			return;
-		}
-		var org_config_name = $(".selected").attr("name");
-		var changed_config_name = $(".selected .config_name").val();
-		var config_name_msg = "";
-		var change_config_name_param = "";
-		if (org_config_name != changed_config_name) {
-			config_name_msg = "\nchange config name ["+org_config_name+"] -> ["+changed_config_name+"]";
-			change_config_name_param = "?change_config_name="+changed_config_name;
-		}
+	if (config_id != '') {
+		$("#config_fieldset span").html("Edit Config");
 		
-		if (!confirm("Are you sure modify ["+$("#capture_name").val()+"] config ?"+config_name_msg)) {
-			return;
-		}
-		
-		$.post("set_config.jsp"+change_config_name_param, $(".config_form").serialize()).done(function(result) {
-			result = jQuery.parseJSON(result);
-			if (result.good == false) {
-				alert("modify_config: "+result.cause);
-				return;
+		jQuery.ajax({
+			url: "get_config.jsp",
+			data: {
+				id: config_id,
+				detail: true,
+			},
+			cache: false,
+			dataType: "json",
+			success: function(result) {
+				if (result.good == false) {
+					pop("Error loading for config: "+result.cause);
+					load_ok();
+					return;
+				}
+				$("#config_id").val(result.id);
+				$("#config_name").val(result.name);
+				if (_defined_(result.shooterXmlAirConfList)) {
+					build_config_list("shooter", result.shooterXmlAirConfList);
+				}
+				if (_defined_(result.captureXmlAirConfList)) {
+					build_config_list("capture", result.captureXmlAirConfList);
+				}
+				
+				load_ok();
+			},
+			error: function(e) {
+				load_ok();
+				//ajax_err_handle(e);
+				pop("Error loading for config.\nplease retry...");
 			}
-			load_all_config();
 		});
-	});
-	
-	$("#delete_config").click(function(e) {
-		if (_isnull($(".selected"))) {
-			alert("Please select config for delete");
-			return;
-		}
-		if (!confirm("Are you sure delete ["+$("#capture_name").val()+"] config ?")) {
-			return;
-		}
-		$.post("del_config.jsp", $(".config_form").serialize()).done(function(result) {
-			result = jQuery.parseJSON(result);
-			if (result.good == false) {
-				return;
-			}
-			load_all_config();
-		});
-	});
-	
-	$("#clear_config").click(function() {
-		clear_config();
-	});
-	
+	}
+	else {
+		$("#config_xml_link").addClass("hidden");
+		load_ok();
+	}
 });
-	</script>
+</script>
+<%@include file="footer.jsp"%>
 </html>

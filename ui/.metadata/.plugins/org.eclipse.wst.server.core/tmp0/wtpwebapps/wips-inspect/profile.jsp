@@ -1,420 +1,241 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page import="air.wips.inspect.servlet.HttpGet"%>
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">	
-	<style type="text/css">
-	#all_config_table tbody tr.selected td {
-		background: none repeat scroll 0 0 #FFCF8B;
-		color: #000000;
-	}    
-	#selected_config_table tbody tr:hover td {
-		background: none repeat scroll 0 0 #FFCF8B;
-		color: #000000;
-	}
-	.pointer {
-		cursor: pointer;
-	}
-	.new_profile {
-		width: 100%;
-		margin-bottom: 10px;
-	}
-	.ui-widget, .ui-widget .ui-widget {                
-		font-size: 12px !important;
-	}
-	</style>
+<meta charset="UTF-8">
+<%@include file="header.jsp"%>
+<style type="text/css">
+
+</style>
 </head>
 <body>
-	<fieldset id="profile_fieldset_select" class="tree main_fieldset">
-		<legend>All Profile List</legend>
-		<div>
-			<select data-placeholder="Choose Profile..." id="profile_select"></select>
-		</div>
-	</fieldset>
-	
-	<fieldset id="profile_fieldset_jstree" class="tree main_fieldset">
-		<legend>All Profile List</legend>
-		<table>
-			<tr>
-				<td align="left">
-					<a href="#" class="btn btn-inline btn-mini" id="jstree_expand"><span>Expand</span></a> 
-					<a href="#" class="btn btn-inline btn-mini" id="jstree_collapse"><span>Collapse</span></a>
-				</td>
-			</tr>
-		</table>
-		<!-- <div style="overflow:scroll; overflow-x: hidden; height:150px;"> -->
-		<div>
-			<div id="profile_tree">
-			</div>
-		</div>
-		<div class="new_profile" align="right">
-			name <input type="text" id="add_profile_text" style="width: 200px;">
-			<a href="#" class="btn btn-inline btn-mini btn-success" id="add_profile_button"><span>New Profile</span></a>
-			<a href="#" class="btn btn-inline btn-mini btn-danger" id="delete"><span>Delete</span></a>
-		</div>
-		<fieldset class="selected_config sub_fieldset">
-			<legend id="select_config_legend">Selected config</legend>
-			<table id="selected_config_table" class="table">
+	<fieldset class="main_fieldset_r">
+		<legend id="profile_fieldset_r">
+			<img class="head_img" src="/img/edit_banner.svg">
+			<span>New Profile</span>			
+		</legend>
+		<form id="profile_form" method="post">					
+			<div>
+				<input type="hidden" name="profile_id" id="profile_id">
+				<input type="text" name="profile_name" id="profile_name">
+				<img class="action_img" src="/img/upload.svg" id="save_profile">
+			</div>			
+		
+			<fieldset id="selected_config_list" class="sub_fieldset_r">
+				<legend>Selected Config List</legend>
+				<table id="selected_config_list_table" class="list_table tablesorter_r">
+					<thead>
+						<tr>
+							<th width="20px;"></th>
+							<th>name</th>
+							<th>capture</th>
+							<th>shooter</th>
+							<th>updated</th>
+							<th></th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</fieldset>
+		</form>
+		
+		<fieldset id="non_selected_config_list" class="sub_fieldset_r">
+			<legend>Non Selected Config List</legend>
+			<table id="non_selected_config_list_table" class="list_table tablesorter_r">
 				<thead>
 					<tr>
-						<th>id</th>
+						<th width="20px;"></th>
 						<th>name</th>
-						<th data-sorter="false">capture</th>
-						<th data-sorter="false">shooter</th>
-						<th data-sorter="false">created</th>
-						<th data-sorter="false">updated</th>
+						<th>capture</th>
+						<th>shooter</th>
+						<th>updated</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody></tbody>
 			</table>
 		</fieldset>
-	</fieldset>
-
-	<fieldset class="all_config main_fieldset">
-		<legend>All Config List</legend>
-		<table>
-			<tr>
-				<td align="right">
-					<a href="#" class="btn btn-inline btn-mini btn-success" id="add_config_button"><span>Add Config</span></a>
-				</td>
-			</tr>
-		</table>
-		<table id="all_config_table" class="table">		
-			<thead>
-				<tr>
-					<th>id</th>
-					<th>name</th>
-					<th data-sorter="false">capture</th>
-					<th data-sorter="false">shooter</th>
-					<th data-sorter="false">created</th>
-					<th data-sorter="false">updated</th>
-				</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
+		
 	</fieldset>
 </body>
-
 <script type="text/javascript">
+var profile_id = '<%= HttpGet.get(request, "profile_id", "")%>';
 
-var profile_select_xlat = {
-		tag: "option",
-		html: "$\{name\}",
-		value: "$\{id\}",
-};
-
-var config_xlat = {
+var non_selected_config_list_table_xlat = {
 		tag: "tr",
 		id: "$\{id\}",
-		name: "$\{name\}",
 		class:"pointer",
 		children: [
-			{"tag":"td", "html":"$\{id\}"},
-			{"tag":"td", "html":"$\{name\}"},
-			{"tag":"td", "html":"$\{capturexml\}", "class":"capture_xml"},
-			{"tag":"td", "html":"$\{shooterxml\}", "class":"shooter_xml"},
-			{"tag":"td", "html":"$\{created\}"},
-			{"tag":"td", "html":"$\{updated\}"},
+			{tag:"td", html:"<img class='config_check_img table_img' src='/img/menu.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{captureAirConfDescs\}"},
+			{tag:"td", html:"$\{shooterAirConfDescs\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<img class='profile_add_img table_img' src='/img/plus.svg' id='$\{id\}'>"},
+			{tag:"input", value:"$\{id\}", type:"hidden", name:"config_id"},
 		]
 };
 
-function load_selected_config(config_id) {
+var selected_config_list_table_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		class:"pointer",
+		children: [
+			{tag:"td", html:"<img class='config_check_img table_img' src='/img/menu.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{captureAirConfDescs\}"},
+			{tag:"td", html:"$\{shooterAirConfDescs\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<img class='profile_del_img table_img' src='/img/trash.svg' id='$\{id\}'>"},
+			{tag:"input", value:"$\{id\}", type:"hidden", name:"config_id"},
+		]
+};
+
+function load_config_list(profile_id, selected) {
+	var $t;
+	var xlat;
+		
+	if (selected) {
+		$t = $("#selected_config_list_table");
+		xlat = selected_config_list_table_xlat;
+	} else {
+		$t = $("#non_selected_config_list_table");
+		xlat = non_selected_config_list_table_xlat;
+	}
+	
 	jQuery.ajax({
-		url: "get_config.jsp",
-		data: {id: config_id},
-		cache: false,
-		beforeSend: function() {
-			$("#selected_config_table > tbody").empty();
-		},
-		dataType: "json",
-		success: function(result) {
-			if (result.good == false) {
-				alert(result.cause);
-				return;
-			}
-			
-			$("#select_config_legend").html("Selected Config ["+result.name+"]");
-			
-			$("#selected_config_table > tbody").html(json2html.transform(result, config_xlat));
-
-			$("#selected_config_table").tablesorter({
-				widgets: ['zebra'],
-			}).trigger("update");
-		},
-		error: function(e) {
-			ajax_err_handle(e);
-		}
-	});
-}
-
-function load_selected_profile(profile_id) {
-	jQuery.ajax({
-		url: "get_profile.jsp",
-		data: {id: profile_id},
-		cache: false,
-		beforeSend: function() {
-			$("#selected_config_table > tbody").empty();
-		},
-		dataType: "json",
-		success: function(result) {
-			if (result.good == false) {
-				alert(result.cause);
-				return;
-			}
-			
-			$("#select_config_legend").html("Selected Profile ["+result.name+"]");
-			
-			$("#selected_config_table > tbody").html(json2html.transform(result.configList, config_xlat));
-
-			$("#selected_config_table").tablesorter({
-				widgets: ['zebra'],
-			}).trigger("update");
-		},
-		error: function(e) {
-			ajax_err_handle(e);
-		}
-	});
-}
-
-function load_all_config() {
-	jQuery.ajax({
-		url: "get_config.jsp",
-		cache: false,
-		beforeSend: function() {
-			$("#all_config_table > tbody").empty();
-		},
-		dataType: "json",
-		success: function(result) {
-			if (result.good == false) {
-				alert(result.cause);
-				return;
-			}
-			
-			$("#all_config_table > tbody").html(json2html.transform(result, config_xlat));
-
-			$("#all_config_table").tablesorter({
-				widgets: ['zebra'],
-			}).trigger("update");
-			
-			$("#all_config_table tr").on('click', function(evt) {        
-				$(this).toggleClass('selected'); 
-			});
-		},
-		error: function(e) {
-			ajax_err_handle(e);
-		}
-	});
-}
-
-function load_profile() {
-	jQuery.ajax({
-		url: "get_profile.jsp",
-		cache: false,
-		dataType: "json",
-		success: function(result) {
-			if (result.good == false) {
-				alert("load_profile: "+result.cause);
-				return;
-			}
-			
-			/* profile list to select box */
-			if (1) {
-				$("#profile_select").html(json2html.transform(result, profile_select_xlat));
-				$("#profile_select").change();
-			} else {
-				$("#profile_fieldset_select").hide();
-			}
-			
-			/* profile list to jstree */
-			if (1) {
-				var id = 0;
-				var data = [];
-				$.each(result, function(i, profile){
-					data.push({
-						id: "p_"+profile.id,
-						parent: '#',
-						text: profile.name,
-					});
-					$.each(profile.configList, function(k, config){
-						data.push({
-							id: "c_"+profile.id+"_"+config.id,
-							text: config.name,
-							parent: "p_"+profile.id,
-						});
-					});
-				});
-				
-				$("#profile_tree").jstree("destroy").jstree({
-					plugins: ["themes","html_data","ui","crrm","search","types","hotkeys","contextmenu"],
-			   		themes: {'theme' : 'default', 'dots' : false, 'icons' : true},
-					search : {'case_insensitive' : true},
-					core: {
-						data: data,
-					},
-					contextmenu: {
-						"items" : {}
-					},
-				})
-				.bind('loaded.jstree', function(event, data){
-		            //트리 로딩 롼료 이벤트
-					$("#profile_tree").jstree("open_all");
-				})
-				.bind('select_node.jstree', function(event, data){
-					//노드 선택 이벤트
-					var profile_id = extract_profile_id(data.selected[0]);
-					var config_id = extract_config_id(data.selected[0]);
-					if (config_id != "") {
-						load_selected_config(config_id)
-					} else if (profile_id != "") {
-						load_selected_profile(profile_id);
-					}
-				})
-			} else {
-				$("#profile_fieldset_jstree").hide();
-			}
-		},
-		error: function(e) {
-			ajax_err_handle(e);
-		}
-	});
-}
-
-function add_profile(name) {
-	jQuery.ajax({
-		url: "set_profile.jsp",
-		data: {name: name},
-		cache: false,
-		dataType: "json",
-		success: function(result) {
-			if (result.good == false) {
-				alert(result.cause);
-				return;
-			}
-			load_profile();
-			$("#add_profile_text").val("");
-		},
-		error: function(e) {
-			ajax_err_handle(e);
-		}
-	});
-}
-
-function delete_profile_config(profile_id, config_id, reload) {	
-	jQuery.ajax({
-		url: "del_profile.jsp",
-		data: { 
+		url: "get_selected_config.jsp",
+		data: {
+			detail: 'true',
+			selected: selected,
 			profile_id: profile_id,
-			config_id: config_id,
 		},
 		cache: false,
+		beforeSend: function() {
+			$t.find("tbody").empty();
+		},
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				alert(result.cause);
+				pop("Error loading for config list: "+result.cause);
 				return;
 			}
-			if (reload) {
-				load_profile();
-			}
+			$t.find("tbody").html(
+				json2html.transform(result, xlat)
+			);
+			$t.tablesorter({
+				headers: {
+					0: {sorter: false},
+					2: {sorter: false},
+					3: {sorter: false},
+					5: {sorter: false},
+				}
+			}).trigger("update");
+			
+			bind_add_config_to_profile();
+			bind_del_config_to_profile();
+			
+			load_ok();
 		},
 		error: function(e) {
-			ajax_err_handle(e);
+			load_ok();
+			//ajax_err_handle(e);
+			pop("Error loading for config.\nplease retry...");
 		}
 	});
 }
+
+function bind_del_config_to_profile() {	
+	$(".profile_del_img").click(function() {
+		$(this).attr("src", "/img/plus.svg");
+		$(this).removeClass("profile_del_img");
+		$(this).addClass("profile_add_img");
+		
+		$("#non_selected_config_list_table").append(pN($(this), 2).remove());
+		
+		bind_add_config_to_profile();
+	});
+}
+
+function bind_add_config_to_profile() {
+	$(".profile_add_img").click(function() {
+		$(this).attr("src", "/img/trash.svg");
+		$(this).removeClass("profile_add_img");
+		$(this).addClass("profile_del_img");
+		
+		$("#selected_config_list_table").append(pN($(this), 2).remove());
+		
+		bind_del_config_to_profile();
+	});
+}
+
+$("#save_profile").click(function() {
+	var $profile_name = $("#profile_name");
+	if ($profile_name.val() == "") {
+		pop("missing profile name...", {
+			focus: $profile_name,
+		});
+		return;
+	}
+	
+	$.post("add_profile.jsp", $("#profile_form").serialize())
+		.done(function(result) {
+			if (result.good == false) {
+				pop("Error register profile: "+result.cause);
+				return;
+			}
+			else {
+				pop("success registered profile: "+$("#profile_name").val(), {
+					page: "profile_list.jsp",
+					type: "success",
+				});
+			}
+		}, "json");
+});
 
 $(document).ready(function() {
-	$(".table").tablesorter({
-		widgets: ['zebra'],
-	}).trigger("update");
 	
-	/* profile list */
-	load_profile();
-	
-	load_all_config();
-	
-	$("#delete").click(function() {
-		var node = $('#profile_tree').jstree('get_selected');
-		if (_isnull(node)) {
-			alert("please select the profile or config");
-			return;
-		}
+	if (profile_id != '') {
+		$("#profile_fieldset span").html("Edit Profile");
 		
-		if (!confirm("Are you sure delete profile or config ?")) {
-			return;
-		}
-				
-		for (var i=0; i<node.length; i++) {
-			var profile_id = extract_profile_id(node[i]);
-			var config_id = extract_config_id(node[i]);
-			var reload = (i == node.length-1);
-			delete_profile_config(profile_id, config_id, reload);
-		}		
-	});
-	
-	$("#add_profile_button").click(function() {
-		var profile_name = $("#add_profile_text").val();
-		if (profile_name != "") {
-			add_profile(profile_name);
-		}
-	});
-	
-	$("#add_config_button").click(function() {
-		var configs = $("#all_config_table .selected");
-		if (configs.length == 0) {
-			alert("please select the config you want to add to profile");
-			return;
-		}
-		var profile_id = $('#profile_tree').jstree('get_selected');
-//		if (profile_id == null || profile_id == undefined || profile_id.length == 0) {
-		if (_isnull(profile_id)) {
-			alert("please select the profile you want to add to config");
-			return;
-		}
-		
-		profile_id = extract_profile_id(profile_id[0]);
-		if (profile_id == "") {
-			alert("please select the profile you want to add to config");
-			return;
-		}
-		
-		var params = "?profile_id="+profile_id;
-		for (var i=0; i<configs.length; i++) {
-			params += "&config_id="+configs[i].id;
-		}		
 		jQuery.ajax({
-			url: "set_profile.jsp"+params,
+			url: "get_profile.jsp",
+			data: {
+				id: profile_id,
+				detail: true,
+			},
 			cache: false,
 			dataType: "json",
 			success: function(result) {
 				if (result.good == false) {
-					alert(result.cause);
+					pop("Error loading for profile: "+result.cause);
 					return;
 				}
-				
-				load_profile();
-				$("#add_profile_text").val("");				
-				$("#all_config_table tr").removeClass('selected');
+				$("#profile_id").val(result.id);
+				$("#profile_name").val(result.name);
 			},
 			error: function(e) {
 				ajax_err_handle(e);
 			}
 		});
-//		console.log(configs);
-	});
+		
+
+		load_config_list(profile_id, true);
+		load_config_list(profile_id, false);
+	} else {
+		load_config_list(profile_id, false);
+	}
 	
-	$("#jstree_collapse").click(function(){
-		$("#profile_tree").jstree("close_all");
-	});
-	
-	$("#jstree_expand").click(function(){
-		$("#profile_tree").jstree("open_all");
-	});
-	
-	$("#profile_select").change(function() {
-		var profile_id = $("#profile_select option:selected").val();
-		load_selected_profile(profile_id);
+	$(".list_table").tablesorter({
+		headers: {
+			0: {sorter: false},
+			2: {sorter: false},
+			3: {sorter: false},
+			5: {sorter: false},
+		}
 	});
 });
 </script>
+<%@include file="footer.jsp"%>
 </html>

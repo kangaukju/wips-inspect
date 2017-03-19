@@ -10,7 +10,7 @@
 	</section>
 	<section name="RefactoringStatusDialog">
 		<item value="802" key="DIALOG_WIDTH"/>
-		<item value="1|Noto Sans|9.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
-		<item value="485" key="DIALOG_HEIGHT"/>
+		<item value="1|나눔고딕|10.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
+		<item value="477" key="DIALOG_HEIGHT"/>
 	</section>
 </section>

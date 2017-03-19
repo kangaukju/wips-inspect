@@ -129,7 +129,6 @@ static int airresult_sock_send(int *csock, uint8_t *data, ssize_t len)
 
 static unsigned long result_xid = 0;
 static int ar_sock = -1;
-static int ar_file = -1;
 static char *save_directory = NULL;
 void result_data_handler(AIRCAP_G *g, void *data)
 {
@@ -193,7 +192,7 @@ void result_data_handler(AIRCAP_G *g, void *data)
 		if (g->xml_fp) {
 			bytes = fwrite(outxml, outxml_len, 1, g->xml_fp);
 			if (bytes <= 0) {
-				clc("Error!!! send airresult write xml data (send: %d)", bytes);
+				clc("Error!!! write airresult xml data (write: %d)", bytes);
 			}
 		}
 
@@ -250,7 +249,7 @@ int main(int argc, char *argv[])
 
 	// initialize global config
 	airshoot_g_init(&shooter_g);
-	aircap_g_init(&capture_g);
+	aircap_g_init  (&capture_g);
 
 	while ((opt = getopt(argc, argv, "s:c:p:t:w:vdh?")) != -1) {
 		switch (opt)
@@ -332,24 +331,29 @@ int main(int argc, char *argv[])
 
 	for (cur = sqlairconf; cur; cur = cur->next) {
 		// test capture airconf
-		SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->capturexml);
-		conf = airconf_from_file(xmlconf, capture_g.debug);
-		if (!conf) {
-			clc("Error!!! load '%s' of profile: %s\n", cur->capturexml, cur->profileid);
+		if (!is_null_str(cur->capturexml)) {
+			SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->capturexml);
+			conf = airconf_from_file(xmlconf, capture_g.debug);
+			if (!conf) {
+				clc("Error!!! load capture '%s' of profile: %s\n", cur->capturexml, cur->profileid);
+				airconf_free(conf);
+				goto cleanup;
+			}
 			airconf_free(conf);
-			goto cleanup;
 		}
-		airconf_free(conf);
 
 		// test shooter airconf
-		SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->shooterxml);
-		conf = airconf_from_file(xmlconf, shooter_g.debug);
-		if (!conf) {
-			clc("Error!!! load '%s' of profile: %s\n", cur->shooterxml, cur->profileid);
+		printf("--- %d %c\n", is_null_str(cur->shooterxml), cur->shooterxml[0]);
+		if (!is_null_str(cur->shooterxml)) {
+			SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->shooterxml);
+			conf = airconf_from_file(xmlconf, shooter_g.debug);
+			if (!conf) {
+				clc("Error!!! load shooter '%s' of profile: %s\n", cur->shooterxml, cur->profileid);
+				airconf_free(conf);
+				goto cleanup;
+			}
 			airconf_free(conf);
-			goto cleanup;
 		}
-		airconf_free(conf);
 	}
 
 	if (setuid(getuid()) == -1) {
@@ -370,27 +374,46 @@ int main(int argc, char *argv[])
 	}
 
 	for (cur = sqlairconf; cur; cur = cur->next) {
+		struct airconf *last = NULL;
 		// capture할 airconf 설정을 불러온다 (shooter에 대한 capture도 포함한다.)
-		SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->capturexml);
-		capture_g.conf = airconf_from_file(xmlconf, 0);
-		SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->shooterxml);
-		airconf_last(capture_g.conf)->next = airconf_from_file(xmlconf, 0);
+		if (!is_null_str(cur->capturexml)) {
+			SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->capturexml);
+			last = airconf_last(capture_g.conf);
+			if (last == NULL) {
+				capture_g.conf = airconf_from_file(xmlconf, 0);
+			} else {
+				last->next = airconf_from_file(xmlconf, 0);
+			}
+		}
+		if (!is_null_str(cur->shooterxml)) {
+			SNP(xmlconf, "%s/%s", env.CONF_HOME, cur->shooterxml);
+			last = airconf_last(capture_g.conf);
+			if (last == NULL) {
+				capture_g.conf = airconf_from_file(xmlconf, 0);
+			} else {
+				last->next = airconf_from_file(xmlconf, 0);
+			}
+		}
 
 		// capture에 다중 채널인 경우 max dwell 시간을 채널별로 보정한다
 		dwell_coordination(capture_g.conf, &capture_g.dwell_list);
 
-		// pcap 파일 디렉토리 생성 위치
 		if (save_directory) {
+			// save pcap file
 			SNP(capture_g.pcap_file, "%s/%s.pcap", save_directory, cur->configid);
 			capture_g.pcap_fp = new_pcap_file(capture_g.pcap_file);
 			if (!capture_g.pcap_fp) {
 				clc("Error!!! initialize pcap file - %s\n", capture_g.pcap_file);
 			}
 
+			// save xml file
 			SNP(capture_g.xml_file, "%s/%s.xml", save_directory, cur->configid);
 			capture_g.xml_fp = fopen(capture_g.xml_file, "w+");
 			if (!capture_g.xml_fp) {
 				clc("Error!!! initialize xml file - %s\n", capture_g.xml_file);
+			}
+			if (fwrite("<aircaptures>", strlen("<aircaptures>"), 1, capture_g.xml_fp) <= 0) {
+				clc("Error!!! write airresult xml start with <aircaptures>");
 			}
 		}
 
@@ -424,6 +447,9 @@ int main(int argc, char *argv[])
 			capture_g.pcap_fp = NULL;
 		}
 		// close xml
+		if (fwrite("</aircaptures>", strlen("</aircaptures>"), 1, capture_g.xml_fp) <= 0) {
+			clc("Error!!! write airresult xml start end </aircaptures>");
+		}
 		if (capture_g.xml_fp) {
 			fclose(capture_g.xml_fp);
 			capture_g.xml_fp = NULL;

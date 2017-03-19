@@ -4,10 +4,12 @@ import java.io.File;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import air.wips.inspect.conf.XmlAirConf;
 import air.wips.inspect.history.InspectHistory;
-import air.wips.inspect.utils.DateUtil;
 import air.wips.inspect.utils.FileUtil;
 
 public class History {
@@ -15,7 +17,15 @@ public class History {
 	private String timestamp;
 	private String savepath;
 	private Profile profile;
+	private Map<String, String> inspectXmlLogMap;
+	private Map<String, String> inspectPcapLogMap;
 	
+	@Override
+	public String toString() {
+		return "History [profileId=" + profileId + ", timestamp=" + timestamp + ", savepath=" + savepath + ", profile="
+				+ profile + ", inspectXmlLogMap=" + inspectXmlLogMap + ", inspectPcapLogMap=" + inspectPcapLogMap + "]";
+	}
+
 	public static void del(String profileId) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
@@ -32,10 +42,10 @@ public class History {
 			if (historyDir.exists()) {
 				historyDir.delete();
 			}
-			
 			conn.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			try { conn.rollback(); } catch (Exception e1) {}
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
 		}
@@ -58,10 +68,10 @@ public class History {
 			if (historyDir.exists()) {
 				historyDir.delete();
 			}
-			
 			conn.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			try { conn.rollback(); } catch (Exception e1) {}
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
 		}
@@ -74,24 +84,32 @@ public class History {
 		try {
 			String sql = "insert into inspect_history (profile_id, timestamp, savepath) values (?,?,?)";
 			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, profileId);
 			pstmt.setString(2, timestamp);
 			pstmt.setString(3, InspectHistory.path(profileId+"/"+timestamp));
 			pstmt.executeUpdate();
+			
+			// create history directory
+			File historyDir = new File(InspectHistory.path(profileId+"/"+timestamp));
+			if (!historyDir.exists()) {
+				historyDir.mkdirs();
+			}
+			conn.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
+			try { conn.rollback(); } catch (Exception e1) {}
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
 		}
 	}
 	
-	public static History get(String profileId, String timestamp) {
+	public static History get(String profileId, String timestamp, boolean loadLog) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		History history = new History();
-		String [] xmls;
+		History history = null;
 		
 		try {
 			String sql = "select * from inspect_history where profile_id=? and timestamp=?";
@@ -101,27 +119,151 @@ public class History {
 			pstmt.setString(2, timestamp);
 			rs = pstmt.executeQuery();
 			if (rs.next()) {
+				history = new History();
 				history.profileId = profileId;
 				history.timestamp = timestamp;
-				history.savepath = rs.getString("savepath");
+				history.savepath = rs.getString("savepath");				
+				history.profile = Profile.getById(profileId, true);
 				
-				history.profile = Profile.getById(profileId, false);
-				
-				
-				
-				xmls = FileUtil.scanFile(history.savepath, "capture_C_.*");
-				if (xmls != null && xmls.length > 0) {
-					for (String xml : xmls) {
-						XmlAirConf.loadAirConfList(history.savepath, xml);
+				if (loadLog) {
+					// load aircapture result xml
+					String [] xmls = FileUtil.scanFile(history.savepath, "^C_.*.xml$");
+					if (xmls != null) {
+						history.inspectXmlLogMap = new HashMap<>();
+						for (String xml : xmls) {
+							history.inspectXmlLogMap.put(
+									xml.substring(0, xml.length()-4), 
+									FileUtil.getContent(history.savepath+"/"+xml));
+						}
+					}
+					// load aircapture result pcap filename
+					String [] pcaps = FileUtil.scanFile(history.savepath, "^C_.*.pcap$");
+					if (pcaps != null) {
+						history.inspectPcapLogMap = new HashMap<>();
+						for (String pcap : pcaps) {
+							history.inspectPcapLogMap.put(
+									pcap.substring(0, pcap.length()-5),
+									history.savepath+"/"+pcap);
+						}
 					}
 				}
-				
-				// XmlAirConf.loadAirConf(filename)
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+		return history;
+	}
+	
+	public static List<History> get(String profileId, boolean loadLog) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<History> list = new ArrayList<>();
+		
+		try {
+			String sql = "select * from inspect_history where profile_id=?";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, profileId);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				History history = new History();
+				history.profileId = profileId;
+				history.timestamp = rs.getString("timestamp");
+				history.savepath = rs.getString("savepath");				
+				history.profile = Profile.getById(profileId, true);
+				
+				if (loadLog) {
+					// load aircapture result xml
+					String [] xmls = FileUtil.scanFile(history.savepath, "^C_.*.xml$");
+					if (xmls != null) {
+						history.inspectXmlLogMap = new HashMap<>();
+						for (String xml : xmls) {
+							history.inspectXmlLogMap.put(
+									xml.substring(0, xml.length()-4), 
+									FileUtil.getContent(history.savepath+"/"+xml));
+						}
+					}
+					// load aircapture result pcap filename
+					String [] pcaps = FileUtil.scanFile(history.savepath, "^C_.*.pcap$");
+					if (pcaps != null) {
+						history.inspectPcapLogMap = new HashMap<>();
+						for (String pcap : pcaps) {
+							history.inspectPcapLogMap.put(
+									pcap.substring(0, pcap.length()-5),
+									history.savepath+"/"+pcap);
+						}
+					}
+				}
+				
+				list.add(history);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+		return list;
+	}
+	
+	public static List<History> getAll(boolean loadLog) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		List<History> list = new ArrayList<>();
+		
+		try {
+			String sql = "select * from inspect_history";
+			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
+			pstmt = conn.prepareStatement(sql);
+			rs = pstmt.executeQuery();
+			while (rs.next()) {
+				History history = new History();
+				history.profileId = rs.getString("profile_id");
+				history.timestamp = rs.getString("timestamp");
+				history.savepath = rs.getString("savepath");				
+				history.profile = Profile.getById(history.profileId, true);
+				
+				if (loadLog) {
+					// load aircapture result xml
+					String [] xmls = FileUtil.scanFile(history.savepath, "^C_.*.xml$");
+					if (xmls != null) {
+						history.inspectXmlLogMap = new HashMap<>();
+						for (String xml : xmls) {
+							history.inspectXmlLogMap.put(
+									xml.substring(0, xml.length()-4), 
+									FileUtil.getContent(history.savepath+"/"+xml));
+						}
+					}
+					// load aircapture result pcap filename
+					String [] pcaps = FileUtil.scanFile(history.savepath, "^C_.*.pcap$");
+					if (pcaps != null) {
+						history.inspectPcapLogMap = new HashMap<>();
+						for (String pcap : pcaps) {
+							history.inspectPcapLogMap.put(
+									pcap.substring(0, pcap.length()-5),
+									history.savepath+"/"+pcap);
+						}
+					}
+				}
+				
+				list.add(history);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+		return list;
+	}
+	
+	public static void main(String [] args) {
+		System.setProperty("catalina.home", "/home/kinow/git/wips-inspect/tomcat");
+		List<History> list = History.getAll(false);
+		for (History h : list) {
+			System.out.println(h);
 		}
 	}
 }

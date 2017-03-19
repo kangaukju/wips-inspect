@@ -234,5 +234,6 @@ char* read_file_content(const char* filename);
 
 int mkdir_r(const char* dir);
 int write_cur_pid(const char* pname);
+int is_null_str(const char* str);
 
 #endif

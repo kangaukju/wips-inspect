@@ -15,13 +15,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.websocket.RemoteEndpoint.Basic;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import com.google.gson.Gson;
 
@@ -30,7 +28,6 @@ import air.wips.inspect.log.D;
 import air.wips.inspect.result.AirCaptureResult;
 import air.wips.inspect.result.AirCurrentAP;
 import air.wips.inspect.result.AirCurrentST;
-import air.wips.inspect.utils.StringUtil;
 
 
 public class AirResultReceiver implements Runnable {
@@ -43,15 +40,18 @@ public class AirResultReceiver implements Runnable {
 	private DocumentBuilder xmlBuilder;
 	private static Charset charset = Charset.defaultCharset();
 
-	public AirResultReceiver(AirResult airResult, int port, long maxRunningTime) throws Exception {		
-		this.airResult = airResult;		
+	public AirResultReceiver(AirResult airResult, int port, long maxRunningTime) {		
+		this.airResult = airResult;
 		this.maxRunningTime = maxRunningTime * 1000; // sec -> msec
 		this.port = port;
-		this.xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		try {
+			this.xmlBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void sendResultAirCurrent(String result) {
-		D.log("call sendResultAirCurrent");
 		ByteArrayInputStream input = null;
 		try {
 			input = new ByteArrayInputStream(result.getBytes());
@@ -74,58 +74,11 @@ public class AirResultReceiver implements Runnable {
 		}
 	}
 		
-	private void sendResultAirCapture(String result) {
-		ByteArrayInputStream input = null;
-		try {
-			input = new ByteArrayInputStream(result.getBytes());
-			Document doc = xmlBuilder.parse(input);
-			
-			NodeList resultnode = doc.getElementsByTagName("result");
-			if (resultnode.getLength() == 1) {
-				Node node = resultnode.item(0);
-				NamedNodeMap attrs = node.getAttributes();
-				
-				AirCaptureResult rs = new AirCaptureResult();
-				rs.setProfile(AirResultParse.getNodeValue(attrs, "profile", ""));
-				rs.setConf   (AirResultParse.getNodeValue(attrs, "conf", ""));
-				rs.setKey    (AirResultParse.getNodeValue(attrs, "key", ""));
-				rs.setXid    (AirResultParse.getNodeValue(attrs, "xid", ""));
-				rs.setSec    (AirResultParse.getNodeValue(attrs, "sec", ""));
-				rs.setUsec   (AirResultParse.getNodeValue(attrs, "usec", ""));
-				rs.setElapsed(AirResultParse.getNodeValue(attrs, "elapsed", ""));
-				rs.setPwr    (AirResultParse.getNodeValue(attrs, "pwr", ""));
-				rs.setType   (AirResultParse.getNodeValue(attrs, "type", ""));
-				rs.setSubtype(AirResultParse.getNodeValue(attrs, "subtype", ""));
-				rs.setAddr1  (AirResultParse.getNodeValue(attrs, "addr1", ""));
-				rs.setAddr2  (AirResultParse.getNodeValue(attrs, "addr2", ""));
-				rs.setAddr3  (AirResultParse.getNodeValue(attrs, "addr3", ""));
-				rs.setAddr4  (AirResultParse.getNodeValue(attrs, "addr4", ""));
-				rs.setDs     (AirResultParse.getNodeValue(attrs, "ds", ""));
-				rs.setSeq    (AirResultParse.getNodeValue(attrs, "seq", ""));
-				
-				if (StringUtil.isNull(rs.getProfile())) {
-					throw new Exception("empty profile of aircapture result");
-				}
-				if (StringUtil.isNull(rs.getConf())) {
-					throw new Exception("empty config of aircapture result");
-				}				
-				if (StringUtil.isNull(rs.getKey())) {
-					throw new Exception("empty key of aircapture result");
-				}
-				if (StringUtil.isNull(rs.getXid())) {
-					throw new Exception("empty xid of aircapture result");
-				}
-				
-				Inspector.getInstance().appendAirCaptureResult(rs);
-				
-				airResult.getWebSocketSession().getBasicRemote().sendText(new Gson().toJson(rs));
-			}			
-		} catch (Exception e) {
-			D.log(result);
-			e.printStackTrace();
-		} finally {
-			if (input != null) try { input.close(); } catch (IOException e) {}
-		}
+	private void sendResultAirCapture(String result) throws Exception {
+		Basic remote = airResult.getWebSocketSession().getBasicRemote();
+		AirCaptureResult rs = AirCaptureResult.valueOf(result);
+		Inspector.getInstance().appendAirCaptureResult(rs);		
+		remote.sendText(new Gson().toJson(rs));
 	}
 	
 	static long loop = 0;
@@ -199,11 +152,6 @@ public class AirResultReceiver implements Runnable {
 			}
 			lenBuffer.flip();
 			int length = lenBuffer.order(ByteOrder.BIG_ENDIAN).getInt();
-			{
-				byte [] b = lenBuffer.array();
-				D.log(b.length+" / "+b[0]+"."+b[1]+"."+b[2]+"."+b[3]+".");
-				D.log(length + "   " + lenBuffer + " => " + new String(lenBuffer.array()));
-			}
 			lenBuffer.clear();
 			lenBuffer = null;
 			/*
@@ -222,7 +170,6 @@ public class AirResultReceiver implements Runnable {
 				clientContinue = false;
 				break;
 			}
-			D.log("bytes  ===> "+bytes);
 			dataBuffer.flip();
 			decodeData = charset.decode(dataBuffer).toString();
 			//D.log(decodeData);

@@ -1,7 +1,0 @@
-package sql.inspect.wips.air;
-
-public class History {
-	private String profileId;
-	private String timestamp;
-	private String savepath;
-}

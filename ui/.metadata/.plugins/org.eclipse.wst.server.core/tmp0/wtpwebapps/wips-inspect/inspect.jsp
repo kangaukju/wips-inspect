@@ -1,37 +1,22 @@
-<%@page import="air.wips.inspect.osdep.Tools"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="utf-8">
-	<style type="text/css">
-	.color_over_table tbody tr:hover td {
-		background: none repeat scroll 0 0 #FFCF8B;
-		color: #000000;
-		cursor: pointer;
-    }
-	.inspect_progress_label {
-		position: absolute;
-		left: 50%;
-		top: 4px;
-		font-weight: bold;
-		text-shadow: 1px 1px 0 #fff;
-	}
-	</style>
+<meta charset="UTF-8">
+<%@include file="header.jsp"%>
+<style type="text/css">
+
+</style>
 </head>
 <body>
-
-	<fieldset id="profile_fieldset_select" class="tree main_fieldset">
-		<legend>All Profile List</legend>
-		<div>
-			<select data-placeholder="Choose Profile..." id="profile_select"></select>
-		</div>
-	</fieldset>
-		
 	<fieldset class="main_fieldset">
-		<legend id="select_config_legend">Inspect Process</legend>
+		<legend>
+			<img class="head_img" src="/img/list_banner.svg">
+			<span>Profile List</span>
+		</legend>
+		
 		<div>
-			<img src="img/timer.svg" class="input_img">
+			<img class="action_img" src="/img/clock.svg">
 			<select id="inspect_timer" style="width: 100px;">
 				<option value="5">5</option>
 				<option value="10">10</option>
@@ -40,142 +25,125 @@
 				<option value="25">25</option>
 				<option value="30">30</option>
 			</select>
-			<a href="#" class="btn btn-inline btn-small btn-primary" id="inspect_run_button"><span>start</span></a>
+			<img class="action_img" src="/img/play4.svg" id="inspect_run_img">
+			<img class="action_img" src="/img/save.png" id="inspect_save_img">
 		</div>
-
-		<table id="selected_config_table" class="color_over_table">		
+		
+		<table id="profile_list_table" class="tablesorter">
 			<thead>
 				<tr>
-					<th>id</th>
+					<th width="20px;"></th>
+					<th>name</th>
+					<th>selected configs</th>
+					<th>updated</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</fieldset>
+	
+	<fieldset class="main_fieldset">
+		<legend>Config List</legend>
+		<table id="config_list_table">
+			<thead>
+				<tr>
+					<th width="20px;"></th>
 					<th>name</th>
 					<th>capture</th>
 					<th>shooter</th>
-					<th>created</th>
 					<th>updated</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
-		</table>	
+		</table>
 	</fieldset>
 	
 	<fieldset class="main_fieldset">
-		<legend id="inspect_results_legend">Inspect Results</legend>
+		<legend id="inspect_results_legend">
+			<img class="head_img" src="/img/radio.svg">
+			Inspect Results
+		</legend>
 		<div id="inspect_results_div">
 		</div>
 	</fieldset>
 	
-	<div id="detail_log_dialog">
-	</div>
-
-	<div id="detail_analyze_dialog">
-	</div>
-		
+	<fieldset id="sample_inspect" class="sub_fieldset hidden">
+		<legend></legend>
+		<table style="width: 100%;">
+			<tr>
+				<td>progressbar</td>
+			</tr>
+			<tr>
+				<td>
+					<img config_id="" class="icon_img detail_log_img" align="left" src="/img/list2.svg" target="inspect_log_table_"/>
+					<img config_id="" class="icon_img detail_ana_img" align="left" src="/img/ana.png" />
+					<img config_id="" class="icon_img wireshark_img"  align="left" src="/img/wireshark.png" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="overflow-x: hidden; height: 100px;" id="inspect_log_div_" class="inspect_log_div">
+						<table id="inspect_log_table_" class="inspect_log_table color_over_table tablesorter">
+							<thead>
+								<tr>
+									<th>xid</th>
+									<th>elapsed</th>
+									<th>pwr</th>
+									<th>subtype</th>
+									<th>ds</th>
+									<th>addr1</th>
+									<th>addr2</th>
+									<th>addr3</th>
+									<th>addr4</th>
+									<th>seq</th>
+								</tr>
+							</thead>
+							<tbody></tbody>
+						</table>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="inspect_chart" id="inspect_chart_"></div>
+				</td>
+			</tr>
+		</table>
+	</fieldset>
+	
+	<form id="hidden_form" method="post">
+	</form>
 </body>
+
 <script type="text/javascript">
-
-var profile_select_xlat = {
-		tag: "option",
-		html: "$\{name\}",
-		value: "$\{id\}",
-};
-
-/**
-*
-*/
-var config_xlat = {
+var profile_list_table_xlat = {
 		tag: "tr",
-		children: [
-			{tag:"td", html:"$\{id\}"},
-			{tag:"td", html:"$\{name\}"},
-			{tag:"td", html:"$\{capturexml\}", "class":"capture_xml"},
-			{tag:"td", html:"$\{shooterxml\}", "class":"shooter_xml"},
-			{tag:"td", html:"$\{created\}"},
-			{tag:"td", html:"$\{updated\}"},
-		]
-};
-
-/**
-*
-*/
-var detail_log_xlat = {
-		tag: "tr",
-		children: [
-			{tag:"td", html:"$\{xid\}"},
-			{tag:"td", html:"$\{elapsed\}"},
-			{tag:"td", html:"$\{pwr\}"},
-			{tag:"td", html:get_framesubtype_string("$\{type\}", "$\{subtype\}")},
-			{tag:"td", html:get_ds_string("$\{ds\}", ("$\{ds\}" == 2))},
-			{tag:"td", html:"$\{addr1\}"},
-			{tag:"td", html:"$\{addr2\}"},
-			{tag:"td", html:"$\{addr3\}"},
-			{tag:"td", html:"$\{addr4\}"},
-			{tag:"td", html:"$\{seq\}"},
-		]
-};
-
-/**
-*
-*/
-var inspect_results_xlat = {
-		tag: "fieldset",
 		id: "$\{id\}",
-		class:"sub_fieldset",
+		class:"pointer",
 		children: [
-			{tag:"legend", html:"$\{name\}"},
-			{tag:"table",  html:inspect_results_table_html("$\{id\}")},
+			{tag:"td", html:"<img class='profile_check_img hidden table_img' src='/img/profile.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{configListNames\}"},
+			{tag:"td", html:"$\{updated\}"},
+			{tag:"td", html:"<img class='profile_log_img table_img' src='/img/Graph-Magnifier.svg' id='$\{id\}'>"},
 		]
 };
 
-/**
-*
-*/
-function inspect_results_table_html(id) {
-	var height = 100;
-	var html = 
-	"<tr>"+
-		"<td>progressbar</td>"+
-	"</tr>"+
-	"<tr>"+
-		"<td>"+
-			"<img class='icon_img detail_log_img' align='left' src='img/list2.svg' config_id='"+id+"' target='inspect_log_table_"+id+"' />"+
-			"<img class='icon_img detail_ana_img' align='left' src='img/ana.png'   config_id='"+id+"'/>"+
-			"<img class='icon_img wireshark_img'  align='left' src='img/wireshark.png' />"+
-		"</td>"+
-	"</tr>"+
-	"<tr>"+
-		"<td>"+
-			"<div id='inspect_log_div_"+id+"' style='height: "+height+"px; overflow-x: hidden;'>"+
-				"<table id='inspect_log_table_"+id+"' class='inspect_log_table color_over_table'>"+
-					"<thead>"+
-						"<tr>"+
-							"<th>xid</th>"+
-							"<th>elapsed</th>"+
-							"<th>pwr</th>"+
-							"<th>subtype</th>"+
-							"<th>ds</th>"+
-							"<th>addr1</th>"+
-							"<th>addr2</th>"+
-							"<th>addr3</th>"+
-							"<th>addr4</th>"+
-							"<th>seq</th>"+
-						"</tr>"+
-					"</thead>"+
-					"<tbody></tbody>"+
-				"</table>"+
-			"</div>"+
-		"</td>"+
-	"</tr>"+
-	"<tr>"+
-		"<td>"+
-			"<div class='inspect_chart' id='inspect_chart_"+id+"' config='"+id+"'></div>"+
-		"</td>"+
-	"</tr>";
-	return html;
-}
+var config_list_table_xlat = {
+		tag: "tr",
+		id: "$\{id\}",
+		class:"pointer",
+		children: [
+			{tag:"td", html:"<img class='config_check_img table_img' src='/img/menu.svg' id='img_$\{id\}'>"},
+			{tag:"td", html:"$\{name\}"},
+			{tag:"td", html:"$\{captureAirConfDescs\}"},
+			{tag:"td", html:"$\{shooterAirConfDescs\}"},
+			{tag:"td", html:"$\{updated\}"},			
+			{tag:"input", value:"$\{id\}", type:"hidden", name:"config_id"},
+		]
+};
 
-/**
-*
-*/
 function get_inspect_log_table_html(data) {
 	var html = 
 	"<tr>"+
@@ -193,355 +161,302 @@ function get_inspect_log_table_html(data) {
 	return html;
 }
 
-/**
-*
-*/
-function load_selected_profile(profile_id) {
+function load_config_list(profile_id) {
+	var $t = $("#config_list_table");
+	var xlat = config_list_table_xlat;
+	
 	jQuery.ajax({
-		url: "get_profile.jsp",
-		data: {id: profile_id},
+		url: "get_selected_config.jsp",
+		data: {
+			detail: 'true',
+			selected: 'true',
+			profile_id: profile_id,
+		},
 		cache: false,
 		beforeSend: function() {
-			$("#selected_config_table > tbody").empty();
+			$t.find("tbody").empty();
 		},
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				alert("load_selected_profile: "+result.cause);
+				pop("Error loading for config list: "+result.cause);
 				return;
-			}
-			$("#select_config_legend").html("Inspect Process ["+result.name+"]");			
-			$("#selected_config_table > tbody").html(json2html.transform(result.configList, config_xlat));
-			$("#selected_config_table").tablesorter({widgets: ["zebra"]}).trigger("update");
-			$("#inspect_results_div")
-			.html(json2html.transform(result.configList, inspect_results_xlat));
+			}			
+			$t.find("tbody").html(
+				json2html.transform(result, xlat)
+			);
+			$t.tablesorter({
+				headers: {
+					0: {sorter: false},
+					2: {sorter: false},
+					3: {sorter: false},
+					5: {sorter: false},
+				}
+			}).trigger("update");
 			
-			/* detail log table popup */
-			bind_detail_log();
-			/* furture */
-			bind_detail_ana();
+			$("#inspect_results_div").empty();
+			inspect_config_keys = {};
+			$.each(result, function(i, v) {
+				var c = $("#sample_inspect").clone(true);
+				c.find("legend").html(v.name);			
+				c.find(".detail_log_img").attr("config_id", v.id);
+				c.find(".detail_log_img").attr("target", "inspect_log_table_"+v.id);
+				c.find(".detail_ana_img").attr("config_id", v.id);
+				c.find(".wireshark_img").attr("config_id", v.id);
+				c.find(".inspect_log_div").attr("id", "inspect_log_div_"+v.id);
+				c.find(".inspect_log_table").attr("id", "inspect_log_table_"+v.id);
+				c.find(".inspect_log_table").tablesorter();
+				c.find(".inspect_chart").attr("id", "inspect_chart_"+v.id);
+				c.find(".inspect_chart").attr("config_id", v.id);
+				c.removeClass("hidden");
+				c.appendTo($("#inspect_results_div"));
+				
+				/* mapping config key to config desc */
+				inspect_config_keys[v.id] = {};
+				$.each(v.captureXmlAirConfList, function(ii, vv) {
+					inspect_config_keys[v.id][vv.key] = vv.desc;
+				});
+				$.each(v.shooterXmlAirConfList, function(ii, vv) {
+					inspect_config_keys[v.id][vv.key] = vv.desc;
+				});
+			});
 		},
 		error: function(e) {
-			ajax_err_handle(e);
+			//ajax_err_handle(e);
+			pop("Error loading for config.\nplease retry...");
 		}
 	});
 }
 
-/**
-*
-*/
-function load_profile() {
+function load_profile_list() {
 	jQuery.ajax({
 		url: "get_profile.jsp",
+		data: {detail: 'true'},
 		cache: false,
+		beforeSend: function() {
+			$("#profile_list_table > tbody").empty();
+		},
 		dataType: "json",
 		success: function(result) {
 			if (result.good == false) {
-				alert("load_profile: "+result.cause);
+				pop("Error loading for profile list: "+result.cause);
 				return;
 			}
-			/* profile list to select box */
-			$("#profile_select").html(json2html.transform(result, profile_select_xlat));
-			$("#profile_select").change();
-		},
-		error: function(e) {
-			ajax_err_handle(e);
-		}
-	});
-}
-
-/**
-*
-*/
-function load_wifidev() {
-	jQuery.ajax({
-		url: "wifidriver_json.jsp",
-		cache: false,
-		dataType: "json",
-		success: function(result) {
-			if (result.good == false) {
-				alert("load_wifidev: "+result.cause);
-				return;
-			}
-			/* complete */
-		},
-		error: function(e) {
-			alert("load_wifidev: "+e.responseText);  
-		}
-	});
-}	
-
-/**
-*
-*/
-function inspect_process_table(id, name, progress, progress_label) {
-	return
-	"<td>"+id+"</td>"+
-	"<td>"+name+"</td>"+
-	"<td>"+
-		"<div id='"+progress+"'>"+
-			"<div id='"+progress_label+"'>Ready...</div>"+
-		"</div>"+
-	"</td>"+
-	"<td></td>";
-}
-
-function bind_detail_ana() {
-	$(".detail_ana_img").each(function() {
-		$(this).click(function() {
-			var config_id = $(this).attr("config_id");
-
-			console.log(config_id);
-			
-			jQuery.ajax({
-				url: "inspect_analyze.jsp",
-				data: {config_id: config_id},
-				cache: false,
-				beforeSend: function() {
-				},
-				dataType: "json",
-				success: function(result) {
-					if (result.good == false) {
-						alert("detail_ana_log: "+result.cause);
-						return;
-					}
-					$("#detail_analyze_dialog").empty();
-					var title = $("#"+config_id).children("legend").text();
-					$("#detail_analyze_dialog").dialog("option", "title", title);
-					
-					for (var a in result) {
-						if (a.name == "BusyTimeInspection") {
-							alert(a.name);
-							
-							/*
-							$("<div>",{
-								id: title+"_"+config_id,
-							}).appendTo($("#detail_analyze_dialog"));
-							
-							var c = c3.generate({
-								bindto: title+"_"+config_id,
-								data: {
-									columns: 
-								},
-							});
-							*/	
-						}
-					}
-					$("#detail_analyze_dialog").dialog("open");
-				},
-				error: function(e) {
-					ajax_err_handle(e);
+			$("#profile_list_table > tbody").html(
+				json2html.transform(result, profile_list_table_xlat)
+			);
+			$("#profile_list_table").tablesorter({
+				headers: {
+					0: {sorter: false},
+					2: {sorter: false},
+					4: {sorter: false},
 				}
+			}).trigger("update");
+			$("#profile_list_table > tbody > tr").click(function(e) {
+				$("#profile_list_table > tbody > tr").removeClass('selected');				
+				$(this).toggleClass('selected');
+				$(".profile_check_img").addClass('hidden');
+				$("#img_"+$(this).attr("id")).toggleClass('hidden');
+				
+				load_config_list($(this).attr("id"));
 			});
-		});
+			$(".profile_log_img").click(function() {
+				gogo("history_list.jsp?profile_id="+$(this).attr("id"));
+			});
+		},
+		error: function(e) {
+			//ajax_err_handle(e);
+			pop("Error loading for profile.\nplease retry...");
+		}
 	});
 }
 
-/**
-*
-*/
-function bind_detail_log() {
-	$(".detail_log_img").each(function() {
-		$(this).click(function() {			
-			var config_id = $(this).attr("config_id");
-			var title = $("#"+config_id).children("legend").text();
-			$("#detail_log_dialog").dialog("option", "title", title);
-			$("#detail_log_dialog").dialog("option", "target", $(this).attr("target"));
-			$("#detail_log_dialog").dialog("open");	
-		});
-	});
-}
-
+var inspect_config_keys = {};
 var inspect_charts = {};
 var inspect_refresh_times = {};
-var inspect_render_time = 1000; // msec
+var inspect_render_time = 500; // msec
+var ws_raise_error;
+var ws;
+var host = '<%=request.getHeader("host")%>';
 
 $(document).ready(function() {
-	$(".table").tablesorter({widgets: ["zebra"]});
-	
-	/* Wi-Fi Driver load result */
-	load_wifidev();
-	
-	/* profile list */
-	load_profile();
-	
-	/* */
-	$("#detail_analyze_dialog").dialog({
-		autoOpen: false,
-		modal: true,
-		show: {
-			effect: "blind",
-			duration: 100
-		},
-		hide: {
-			effect: "explode",
-			duration: 100
-		},
-		width: "90%",
-		height: "500"
+	load_profile_list();
+
+	$("#profile_list_table").tablesorter({
+		headers: {
+			0: {sorter: false},
+			2: {sorter: false},
+			4: {sorter: false},
+		}
+	});
+	$("#config_list_table").tablesorter({
+		headers: {
+			0: {sorter: false},
+			2: {sorter: false},
+			3: {sorter: false},
+			5: {sorter: false},
+		}
 	});
 	
-	/*  */
-	$("#detail_log_dialog").dialog({
-		autoOpen: false,
-		modal: true,
-		open: function(event, ui) {
-			/*
-		    var t = $(this).parent(), w = window;
-		    t.offset({
-		    	top: (w.height() / 2) - (t.height() / 2),
-		    	left: (w.width() / 2) - (t.width() / 2)
-		    });
-		    */
-			
-			$("#detail_log_dialog").empty();
-			var table = $("#detail_log_dialog").dialog("option", "target");
-			var new_table = $("#"+table).clone().prependTo($("#detail_log_dialog"));
-			new_table.tablesorter({widgets: ["zebra"]}).trigger("update");
-		},
-		show: {
-			effect: "blind",
-			duration: 100
-		},
-		hide: {
-			effect: "explode",
-			duration: 100
-		},
-		width: "90%",
-		height: "300"
+	$("#inspect_save_img").click(function() {
+		$.post("save_inspect.jsp", $("#hidden_form").serialize())
+			.done(function(result) {
+				if (result.good == false) {
+					pop("Error register profile: "+result.cause);
+					return;
+				}
+				else {
+					pop("success saved inspect result", {
+						type: "success",
+					});
+				}
+			}, "json");
 	});
 	
-	/* inspect web socket */	
-	var ws;
-	var host = '<%=request.getHeader("host")%>';
-	$("#inspect_run_button").click(function() {
-		var status = $(this).find("span").html();
-		
-		/* start inspect */
-		if ("start" == status) {
-			var profile_id = $("#profile_select option:selected").val();
-			if (_isnull(profile_id)) {
-				alert("please select the profile you want to inspect");
+	$("#inspect_run_img").click(function() {
+		var $img = $(this);
+		ws_raise_error = false;
+		var running = ($img.attr("src") == "/img/play4.svg") ? false : true;
+		if (running) {
+			ws.close();
+			$img.attr("src", "/img/play4.svg");
+		} else {
+			var profile_id = $("#profile_list_table > tbody .selected").attr("id");
+			if (!_defined_(profile_id)) {
 				return;
 			}
 			
-			//ws = new WebSocket("ws://localhost:8080/wips-inspect/inspect");
-			var url = "ws://"+host+"/inspect";
-			ws = new WebSocket(url);
+			ws = new WebSocket("ws://"+host+"/inspect");
+			/* onopen */
 			ws.onopen = function(msg) {
-				$("#inspect_run_button").find("span").html("stop");
-				$(".inspect_log_table > tbody").empty();				
-				// clear child div
-				for (var div in inspect_charts) {
-					inspect_charts[div].empty();
-				}
+				// for clear config list data
+				load_config_list(profile_id);
+				
+				$.each(inspect_charts, function(i, v){
+					v.empty();
+				});
+				$(".inspect_log_table > tbody").empty();
+				
 				inspect_charts = {};
-				inspect_refresh_times = {0: 0, 1:0};
+				inspect_refresh_times = {0:0, 1:0};
 				
-				/* prepare chart drawing */
-				/*
-				if (0) {
-					var max_sec = parseInt($("#inspect_timer").val()) + 2;
-					$(".inspect_chart").each(function(i){
-						var id = $(this).attr("config");
-						inspect_charts[id] 
-							= inspectChart.generate("inspect_chart_"+id, {
-									items: ["shooter", "capture"],
-									max_sec: max_sec,
-								});
-					});
-				}
-				*/
-				
-				var params = {
+				ws.send(JSON.stringify({
 					state: "start",
 					timer: $("#inspect_timer").val(),
 					profileId: profile_id
-				};
-				ws.send(JSON.stringify(params));
+				}));
+				$img.attr("src", "/img/stop4.svg");
 			}
-			ws.onmessage = function(msg){
-				if (!_isnull(msg.data)) {
-					var result = JSON.parse(msg.data);
-					if (result.good == false) {
-						alert("inspect websocket: "+result.cause);
-						$(this).find("span").html("start");
-						ws.close();
-						return;
-					}
-					if (result.good == true) {
-						return;
-					}
+			/* onmessage */
+			ws.onmessage = function(msg) {
+				if (_isnull(msg.data)) {
+					return;
+				}
+				var result = JSON.parse(msg.data);
+				if (result.good == false) {
+					pop("Error running inspect: "+result.cause);
+					$img.attr("src", "/img/play4.svg");
+					ws_raise_error = true;
+					ws.close();
+					return;
+				}
+				if (result.good == true) {
+					return;
+				}
+				/* dynamic logging table */
+				if (0) {
+					$("#inspect_log_table_"+result.conf+" > tbody:last")
+						.append(get_inspect_log_table_html(result));						
+					$("#inspect_log_table_"+result.conf)
+						.tablesorter({widgets: ["zebra"]})
+						.trigger("update");
 					
-					// append capture data to log-table
-					if (1) {
-						$("#inspect_log_table_"+result.conf+" > tbody:last").append(get_inspect_log_table_html(result));						
-						$("#inspect_log_table_"+result.conf).tablesorter({widgets: ["zebra"]}).trigger("update");
-						
-						/* for scroll inspect log table */
-						var _div = $("#inspect_log_div_"+result.conf);
-						_div.scrollTop(_div[0].scrollHeight);
-					}
-					
-					/* dynamic char drawing */
-					if (1) {
-						// append capture data to chart
-						if (inspect_charts[result.conf] == undefined) {
-							var max_sec = parseInt($("#inspect_timer").val()) + 2;
-							inspect_charts[result.conf] 
-								= inspectChart.generate("inspect_chart_"+result.conf, {
-										items: ["shooter", "capture"],
+					/* for scroll inspect log table */
+					var scroll_div = $("#inspect_log_div_"+result.conf);
+					scroll_div.scrollTop(scroll_div[0].scrollHeight);
+				}
+				/* dynamic char drawing */
+				if (1) {
+					// append capture data to chart
+					if (!_defined_(inspect_charts[result.conf])) {
+						var items = new Array();
+						$.each(inspect_config_keys[result.conf], function(i, v) {
+							items.push(v);
+						});
+						//console.log(items);
+						var max_sec = parseInt($("#inspect_timer").val()) + 2;
+						inspect_charts[result.conf] 
+							= inspectChart.generate(
+									"inspect_chart_"+result.conf, {
+										items: items,
 										max_sec: max_sec,
-									});
+									}
+								);
+					}
+					// capture or shooter result
+					var x = result.elapsed;
+					var y = result.pwr;
+					var now = new Date().getTime();
+					
+					var item = inspect_config_keys[result.conf][result.key];
+					if (_defined_(item)) {
+						inspect_charts[result.conf].push(item, x, y, false);
+						if (now - inspect_refresh_times[0] > inspect_render_time) {
+							//console.log(result);
+							inspect_refresh_times[0] = now;
+							inspect_charts[result.conf].refresh(item);
 						}
-						// capture or shooter result
-						var x = result.elapsed;
-						var y = result.pwr;
-						var now = new Date().getTime();
-						if (result.key == 1) {
-							// capture chart
-							inspect_charts[result.conf].push("capture", x, y, false);
-							if (now - inspect_refresh_times[0] > inspect_render_time) {
-								inspect_refresh_times[0] = now;
-								inspect_charts[result.conf].refresh("capture");
-							}
-						} else if (result.key == 2) {
-							// shooter chart
-							inspect_charts[result.conf].push("shooter", x, y, false);
-							if (now - inspect_refresh_times[1] > inspect_render_time) {
-								inspect_refresh_times[1] = now;
-								inspect_charts[result.conf].refresh("shooter");
-							}
-						}						
 					}
 				}
 			}
+			/* onerror */
 			ws.onerror = function(msg) {
-				$("#inspect_run_button").find("span").html("start");
-				if (_isnull(msg) || "error" == msg.type) {
-					alert("wins-inspect not running.");
+				$img.attr("src", "/img/play4.svg");
+				pop("Error running inspect: "+msg);
+				ws_raise_error = true;
+			}
+			/* onerror */
+			ws.onclose = function() {
+				$("#hidden_form").empty();
+				/*
+				$(".inspect_chart").each(function(i) {
+					var config_id = $(this).attr("config_id");
+					if (_defined_(config_id)) {
+						html2canvas($(this).find("svg"), {
+							onrendered: function(canvas) {
+								var png = canvas.toDataURL("image/png", 1.0);
+								$("<input></input>").attr({
+									type: "hidden",
+									name: "chart_img",
+									value: png,
+								}).appendTo($("#hidden_form"));
+								
+								$("<input></input>").attr({
+									type: "hidden",
+									name: "config_id",
+									value: config_id,
+								}).appendTo($("#hidden_form"));
+							}
+						});
+					}
+				});
+				$("<input></input>").attr({
+					type: "hidden",
+					name: "profile_id",
+					value: $("#profile_list_table > tbody .selected").attr("id"),
+				}).appendTo($("#hidden_form"));
+				*/
+				
+				$img.attr("src", "/img/play4.svg");
+				if (ws_raise_error == false) {
+					pop("Finished inspect", {type:"success"});
 				}
 			}
-			ws.onclose = function() {				
-				$("#inspect_run_button").find("span").html("start");
-				for (var conf in inspect_charts) {
-					inspect_charts[conf].refresh("capture");
-					inspect_charts[conf].refresh("shooter");
-				}
-			}
-		}
-		/* stop inspect */
-		else if ("stop" == status) {
-			$(this).find("span").html("start");
-			ws.close();
 		}
 	});
 	
-	$("#profile_select").change(function() {
-		var profile_id = $("#profile_select option:selected").val();
-		load_selected_profile(profile_id);
-	});
+	load_ok();
 });
-
 </script>
+<%@include file="footer.jsp"%>
 </html>

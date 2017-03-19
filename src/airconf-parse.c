@@ -1101,6 +1101,7 @@ struct airconf* airconf_sort(struct airconf* head)
 struct airconf* airconf_last(struct airconf *conf) {
 	struct airconf* cur = NULL;
 
+	if (conf == NULL) return NULL;
 	for (cur = conf; cur->next; cur = cur->next) ;
 	return cur;
 }
@@ -1279,10 +1280,15 @@ struct sqlairconf* sqlairconf_load(const char *dbfile, const char *profileid)
 
 	while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
 		conf = (struct sqlairconf *)malloc(sizeof(struct sqlairconf));
+		memset(conf, 0, sizeof(struct sqlairconf));
 		SNP(conf->profileid, "%s", profileid);
 		SNP(conf->configid, "%s", sqlite3_column_text(stmt, 0));
-		SNP(conf->capturexml, "%s", sqlite3_column_text(stmt, 1));
-		SNP(conf->shooterxml, "%s", sqlite3_column_text(stmt, 2));
+		if (sqlite3_column_type(stmt, 1) != SQLITE_NULL) {
+			SNP(conf->capturexml, "%s", sqlite3_column_text(stmt, 1));
+		}
+		if (sqlite3_column_type(stmt, 2) != SQLITE_NULL) {
+			SNP(conf->shooterxml, "%s", sqlite3_column_text(stmt, 2));
+		}
 		conf->next = NULL;
 		if (!head) {
 			head = conf;
