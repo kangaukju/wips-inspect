@@ -12,7 +12,7 @@
 <body>
 	<fieldset class="main_fieldset_r">
 		<legend id="profile_fieldset_r">
-			<img class="head_img" src="/img/edit_banner.svg">
+			<img class="head_img" src="/img/profiles.png">
 			<span>New Profile</span>			
 		</legend>
 		<form id="profile_form" method="post">					

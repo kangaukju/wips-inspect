@@ -8,6 +8,8 @@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
 	String timestamp = HttpGet.get(request, "timestamp");
 	boolean detail = HttpGet.getBoolean(request, "detail", false);
 	
+	//HttpGet.debugRequestParameters(request);
+	
 	try {
 		if (profileId != null && timestamp != null) {
 			response.getWriter().print(new Gson().toJson(History.get(profileId, timestamp, detail)));

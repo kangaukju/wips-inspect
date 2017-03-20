@@ -28,10 +28,10 @@
 <body>
 	<fieldset class="main_fieldset">
 		<legend id="config_fieldset">
-			<img class="head_img" src="/imgedit_banner.svg">
+			<img class="head_img" src="/img/configs.png">
 			<span>New Config</span>
 		</legend>
-		<form id="config_form" method="post">
+		<form id="config_form" method="post">		
 			<div>
 				<input type="hidden" name="config_id" id="config_id">
 				<input type="text" name="config_name" id="config_name">

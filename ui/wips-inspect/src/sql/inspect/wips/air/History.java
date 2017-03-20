@@ -5,25 +5,46 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import org.json.JSONException;
+import org.json.XML;
 
 import air.wips.inspect.history.InspectHistory;
 import air.wips.inspect.utils.FileUtil;
 
 public class History {
 	private String profileId;
+	private String runTimer;
 	private String timestamp;
 	private String savepath;
 	private Profile profile;
-	private Map<String, String> inspectXmlLogMap;
-	private Map<String, String> inspectPcapLogMap;
+	private List<InspectXmlLog> inspectXmlLogList;
+	private List<InspectPcapLog> inspectPcapLogList;
+	
+	static class InspectXmlLog {
+		private Config config;
+		private String xmlLog;
+		public InspectXmlLog(Config config, String xmlLog) {
+			this.config = config;
+			this.xmlLog = xmlLog;
+		}
+	}
+	
+	static class InspectPcapLog {
+		private Config config;
+		private String PcapFilepath;
+		public InspectPcapLog(Config config, String pcapFilepath) {
+			this.config = config;
+			PcapFilepath = pcapFilepath;
+		}
+	}
 	
 	@Override
 	public String toString() {
-		return "History [profileId=" + profileId + ", timestamp=" + timestamp + ", savepath=" + savepath + ", profile="
-				+ profile + ", inspectXmlLogMap=" + inspectXmlLogMap + ", inspectPcapLogMap=" + inspectPcapLogMap + "]";
+		return "History [profileId=" + profileId + ", runTimer=" + runTimer + ", timestamp=" + timestamp + ", savepath="
+				+ savepath + ", profile=" + profile + ", inspectXmlLogList=" + inspectXmlLogList
+				+ ", inspectPcapLogList=" + inspectPcapLogList + "]";
 	}
 
 	public static void del(String profileId) {
@@ -77,18 +98,19 @@ public class History {
 		}
 	}
 	
-	public static void add(String profileId, String timestamp) {
+	public static void add(String profileId, String timestamp, String runTimer) {
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		
 		try {
-			String sql = "insert into inspect_history (profile_id, timestamp, savepath) values (?,?,?)";
+			String sql = "insert into inspect_history (profile_id, timestamp, savepath, run_timer) values (?,?,?,?)";
 			conn = SQLite3Connection.getConnection(DBFILE.getDBFILE("profiles"));
 			conn.setAutoCommit(false);
 			pstmt = conn.prepareStatement(sql);
 			pstmt.setString(1, profileId);
 			pstmt.setString(2, timestamp);
 			pstmt.setString(3, InspectHistory.path(profileId+"/"+timestamp));
+			pstmt.setString(4, runTimer);
 			pstmt.executeUpdate();
 			
 			// create history directory
@@ -122,30 +144,13 @@ public class History {
 				history = new History();
 				history.profileId = profileId;
 				history.timestamp = timestamp;
-				history.savepath = rs.getString("savepath");				
+				history.savepath = rs.getString("savepath");
+				history.runTimer = rs.getString("run_timer");
 				history.profile = Profile.getById(profileId, true);
 				
 				if (loadLog) {
-					// load aircapture result xml
-					String [] xmls = FileUtil.scanFile(history.savepath, "^C_.*.xml$");
-					if (xmls != null) {
-						history.inspectXmlLogMap = new HashMap<>();
-						for (String xml : xmls) {
-							history.inspectXmlLogMap.put(
-									xml.substring(0, xml.length()-4), 
-									FileUtil.getContent(history.savepath+"/"+xml));
-						}
-					}
-					// load aircapture result pcap filename
-					String [] pcaps = FileUtil.scanFile(history.savepath, "^C_.*.pcap$");
-					if (pcaps != null) {
-						history.inspectPcapLogMap = new HashMap<>();
-						for (String pcap : pcaps) {
-							history.inspectPcapLogMap.put(
-									pcap.substring(0, pcap.length()-5),
-									history.savepath+"/"+pcap);
-						}
-					}
+					history.inspectXmlLogList = getInspectXmlLogList(history.savepath);
+					history.inspectPcapLogList = getInspectPcapLogList(history.savepath);
 				}
 			}
 		} catch (Exception e) {
@@ -172,30 +177,13 @@ public class History {
 				History history = new History();
 				history.profileId = profileId;
 				history.timestamp = rs.getString("timestamp");
-				history.savepath = rs.getString("savepath");				
+				history.savepath = rs.getString("savepath");
+				history.runTimer = rs.getString("run_timer");
 				history.profile = Profile.getById(profileId, true);
 				
 				if (loadLog) {
-					// load aircapture result xml
-					String [] xmls = FileUtil.scanFile(history.savepath, "^C_.*.xml$");
-					if (xmls != null) {
-						history.inspectXmlLogMap = new HashMap<>();
-						for (String xml : xmls) {
-							history.inspectXmlLogMap.put(
-									xml.substring(0, xml.length()-4), 
-									FileUtil.getContent(history.savepath+"/"+xml));
-						}
-					}
-					// load aircapture result pcap filename
-					String [] pcaps = FileUtil.scanFile(history.savepath, "^C_.*.pcap$");
-					if (pcaps != null) {
-						history.inspectPcapLogMap = new HashMap<>();
-						for (String pcap : pcaps) {
-							history.inspectPcapLogMap.put(
-									pcap.substring(0, pcap.length()-5),
-									history.savepath+"/"+pcap);
-						}
-					}
+					history.inspectXmlLogList = getInspectXmlLogList(history.savepath);
+					history.inspectPcapLogList = getInspectPcapLogList(history.savepath);
 				}
 				
 				list.add(history);
@@ -223,30 +211,13 @@ public class History {
 				History history = new History();
 				history.profileId = rs.getString("profile_id");
 				history.timestamp = rs.getString("timestamp");
-				history.savepath = rs.getString("savepath");				
+				history.savepath = rs.getString("savepath");
+				history.runTimer = rs.getString("run_timer");
 				history.profile = Profile.getById(history.profileId, true);
 				
 				if (loadLog) {
-					// load aircapture result xml
-					String [] xmls = FileUtil.scanFile(history.savepath, "^C_.*.xml$");
-					if (xmls != null) {
-						history.inspectXmlLogMap = new HashMap<>();
-						for (String xml : xmls) {
-							history.inspectXmlLogMap.put(
-									xml.substring(0, xml.length()-4), 
-									FileUtil.getContent(history.savepath+"/"+xml));
-						}
-					}
-					// load aircapture result pcap filename
-					String [] pcaps = FileUtil.scanFile(history.savepath, "^C_.*.pcap$");
-					if (pcaps != null) {
-						history.inspectPcapLogMap = new HashMap<>();
-						for (String pcap : pcaps) {
-							history.inspectPcapLogMap.put(
-									pcap.substring(0, pcap.length()-5),
-									history.savepath+"/"+pcap);
-						}
-					}
+					history.inspectXmlLogList = getInspectXmlLogList(history.savepath);
+					history.inspectPcapLogList = getInspectPcapLogList(history.savepath);
 				}
 				
 				list.add(history);
@@ -255,6 +226,42 @@ public class History {
 			e.printStackTrace();
 		} finally {
 			SQLite3Connection.sqlClose(conn, pstmt);
+		}
+		return list;
+	}
+	
+	public static List<InspectXmlLog> getInspectXmlLogList(String path) {
+		List<InspectXmlLog> list = new ArrayList<>();
+		String [] xmls = FileUtil.scanFile(path, "^C_.*.xml$");
+		if (xmls != null) {
+			for (String xml : xmls) {
+				String configId = xml.substring(0, xml.length()-4);
+				Config config = Config.getById(configId, true);
+				if (config != null) {
+					try {
+						list.add(new InspectXmlLog(
+								config, 
+								XML.toJSONObject(FileUtil.getContent(path+"/"+xml)).toString()));
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+		return list;
+	}
+	
+	public static List<InspectPcapLog> getInspectPcapLogList(String path) {
+		List<InspectPcapLog> list = new ArrayList<>();
+		String [] pcaps = FileUtil.scanFile(path, "^C_.*.pcap$");
+		if (pcaps != null) {
+			for (String pcap : pcaps) {
+				String configId = pcap.substring(0, pcap.length()-5);
+				Config config = Config.getById(configId, true);
+				if (config != null) {
+					list.add(new InspectPcapLog(config, path+"/"+pcap));
+				}
+			}
 		}
 		return list;
 	}

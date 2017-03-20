@@ -138,7 +138,7 @@ public class WipsInspectWebSocket extends AirResult {
 				}
 				
 				/* history */
-				History.add(p.profileId, String.valueOf(now));
+				History.add(p.profileId, String.valueOf(now), p.timer);
 				
 			} catch (Exception e) {
 				e.printStackTrace();

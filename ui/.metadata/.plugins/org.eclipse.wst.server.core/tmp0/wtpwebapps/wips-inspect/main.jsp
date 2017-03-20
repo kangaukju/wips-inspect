@@ -33,27 +33,31 @@
 		<table class="home_contain" style="width: 600px;">
 			<tr>
 				<td>
-					<img class="home_img home_link_users"        id="users"        src="/img/analytics2.png" >
+					<img class="home_img home_link_users"        id="users"        src="/img/users.png" >
 				</td>
 				<td>	
-					<img class="home_img home_link_inspect"      id="inspect"      src="/img/analytics_balls.svg">
+					<img class="home_img home_link_inspect"      id="inspect"      src="/img/inspect.png">
 				</td>
 				<td>
-					<img class="home_img home_link_profile_list" id="profile_list" src="/img/binary-tree.png">
+					<img class="home_img home_link_profile_list" id="profile_list" src="/img/profiles.png">
 				</td>
 				<td>		
-					<img class="home_img home_link_config_list"  id="config_list"  src="/img/EditDocument.svg">
+					<img class="home_img home_link_config_list"  id="config_list"  src="/img/configs.png">
 				</td>
 				<td>
-					<img class="home_img home_link_wifi_search"  id="wifi_search"  src="/img/wifi_rader.png">
+					<img class="home_img home_link_wifi_search"  id="wifi_search"  src="/img/wifi_search.png">
 				</td>
+				<td>
+					<img class="home_img home_link_setting_list" id="setting"      src="/img/setting.png">
+				</td>				
 			</tr>
 			<tr>
-				<td>aaaaa</td>
+				<td>Users</td>
 				<td>Inspect</td>
 				<td>Profile</td>
 				<td>Config</td>
 				<td>WiFi Search</td>
+				<td>Setting</td>
 			</tr>
 		</table>
 	</div>

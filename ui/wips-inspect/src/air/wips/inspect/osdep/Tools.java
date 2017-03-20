@@ -101,6 +101,13 @@ public class Tools {
 		return false;
 	}
 	
+	static public Process runWireshark(final String filepath) throws Exception {	
+		String[] params = {
+				filepath,
+		};
+		return ProcessUtil.processRun("wireshark", params);
+	}
+	
 	static public Process startWipsInspect(
 			String shooterWif, String captureWif, 
 			String profileId, String timer, String savePath) throws Exception 

@@ -11,7 +11,7 @@
 <body>
 	<fieldset class="main_fieldset">
 		<legend>
-			<img class="head_img" src="/img/list_banner.svg">
+			<img class="head_img" src="/img/profiles.png">
 			<span>Profile List</span>
 		</legend>
 		
@@ -43,8 +43,11 @@
 		</table>
 	</fieldset>
 	
-	<fieldset class="main_fieldset">
-		<legend>Config List</legend>
+	<fieldset class="main_fieldset">	
+		<legend>
+			<img class="head_img" src="/img/configs.png">
+			Config List
+		</legend>
 		<table id="config_list_table">
 			<thead>
 				<tr>
@@ -61,8 +64,8 @@
 	
 	<fieldset class="main_fieldset">
 		<legend id="inspect_results_legend">
-			<img class="head_img" src="/img/radio.svg">
-			Inspect Results
+			<img class="head_img" src="/img/inspect.png">
+			Inspect Results			
 		</legend>
 		<div id="inspect_results_div">
 		</div>
@@ -213,12 +216,16 @@ function load_config_list(profile_id) {
 				
 				/* mapping config key to config desc */
 				inspect_config_keys[v.id] = {};
-				$.each(v.captureXmlAirConfList, function(ii, vv) {
-					inspect_config_keys[v.id][vv.key] = vv.desc;
-				});
-				$.each(v.shooterXmlAirConfList, function(ii, vv) {
-					inspect_config_keys[v.id][vv.key] = vv.desc;
-				});
+				if (_defined_(v.captureXmlAirConfList)) {
+					$.each(v.captureXmlAirConfList, function(ii, vv) {
+						inspect_config_keys[v.id][vv.key] = vv.desc;
+					});
+				}
+				if (_defined_(v.shooterXmlAirConfList)) {
+					$.each(v.shooterXmlAirConfList, function(ii, vv) {
+						inspect_config_keys[v.id][vv.key] = vv.desc;
+					});
+				}
 			});
 		},
 		error: function(e) {
@@ -387,11 +394,11 @@ $(document).ready(function() {
 						var max_sec = parseInt($("#inspect_timer").val()) + 2;
 						inspect_charts[result.conf] 
 							= inspectChart.generate(
-									"inspect_chart_"+result.conf, {
-										items: items,
-										max_sec: max_sec,
-									}
-								);
+								"inspect_chart_"+result.conf, {
+									items: items,
+									max_sec: max_sec,
+								}
+							);
 					}
 					// capture or shooter result
 					var x = result.elapsed;

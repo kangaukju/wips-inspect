@@ -253,15 +253,18 @@
 <body>
 <table style="width: 100%;">
 	<tr>
-		<td class="title" width="150px;">
-			<img class="title_img" src="/img/wifi.svg">&nbsp;&nbsp;<b>WIPS INSPECTOR</b>
+		<td class="title">
+			<div align="left">
+				<img class="title_img" src="/img/wifi.svg">&nbsp;&nbsp;<b>WIPS INSPECTOR</b>
+			</div>
 		</td>
 		<td align="right">
-			<img class="head_link_img home_link_inspect"      src="/img/analytics_balls.svg">
-			<img class="head_link_img home_link_profile_list" src="/img/binary-tree.png">
-			<img class="head_link_img home_link_config_list"  src="/img/EditDocument.svg">
-			<img class="head_link_img home_link_wifi_search"  src="/img/wifi_rader.png">
-			<img class="head_link_img home_link_setting_list" src="/img/setting2.svg">
+			<img class="head_link_img home_link_users"        src="/img/users.png">
+			<img class="head_link_img home_link_inspect"      src="/img/inspect.png">
+			<img class="head_link_img home_link_profile_list" src="/img/profiles.png">
+			<img class="head_link_img home_link_config_list"  src="/img/configs.png">
+			<img class="head_link_img home_link_wifi_search"  src="/img/wifi_search.png">
+			<img class="head_link_img home_link_setting_list" src="/img/setting.png">
 		</td>
 	</tr>
 </table>
@@ -290,7 +293,7 @@
 	}
 %>
 
-<% boolean debug = HttpGet.sessionBoolean(request, "debug", false); %>
+<% boolean debug = HttpGet.sessionBoolean(request, "debug", true); %>
 <script type="text/javascript">
 var debug = <%= debug %>;
 function CtrlAlt() {
@@ -345,7 +348,7 @@ $("body").loading({
 		loading.overlay.fadeIn(10);
 	},
 	onStop: function(loading) {
-		loading.overlay.fadeOut(1000);
+		loading.overlay.fadeOut(200);
 	}
 });
 

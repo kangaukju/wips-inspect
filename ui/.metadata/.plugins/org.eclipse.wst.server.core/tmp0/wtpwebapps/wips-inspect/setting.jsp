@@ -11,13 +11,13 @@
 <body>
 	<fieldset class="main_fieldset">
 		<legend id="config_fieldset">
-			<img class="head_img" src="/img/connection_bar.svg">
+			<img class="head_img" src="/img/setting.png">
 			<span>Wifi Driver</span>
 		</legend>
 		<table id="wifi_dev_table" class="tablesorter">
 			<thead>
 				<tr>
-					<th>phy</th>
+					<th>phy</th>					
 					<th>interface</th>
 					<th>driver</th>
 					<th>chipset</th>

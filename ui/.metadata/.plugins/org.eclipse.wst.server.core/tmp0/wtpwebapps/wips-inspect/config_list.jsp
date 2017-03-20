@@ -11,7 +11,7 @@
 <body>
 	<fieldset class="main_fieldset">
 		<legend>
-			<img class="head_img" src="/img/list_banner.svg">
+			<img class="head_img" src="/img/configs.png">
 			<span>Config List</span>
 		</legend>
 		<div align="right">
@@ -80,6 +80,7 @@ function load_config_list() {
 				$(this).toggleClass('selected');
 				$(".config_check_img").addClass('hidden');
 				$("#img_"+$(this).attr("id")).toggleClass('hidden');
+				$("#modify_config").trigger("click");
 			});
 			
 			$("#config_list_table > tbody > tr").dblclick(function(e) {

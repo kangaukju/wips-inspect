@@ -9,7 +9,7 @@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"
 	String name = HttpGet.get(request, "name");
 	String id = HttpGet.get(request, "id");
 	boolean detail = HttpGet.getBoolean(request, "detail", false);
-	
+		
 	try {
 		if (id != null) {
 			response.getWriter().print(new Gson().toJson(Profile.getById(id, detail)));

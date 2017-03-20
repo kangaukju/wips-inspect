@@ -11,7 +11,7 @@
 <body>
 	<fieldset class="main_fieldset_r">
 		<legend>
-			<img class="head_img" src="/img/list_banner.svg">
+			<img class="head_img" src="/img/profiles.png">
 			<span>Profile List</span>
 		</legend>
 		<div align="right">
@@ -77,6 +77,7 @@ function load_profile_list() {
 				$(this).toggleClass('selected');
 				$(".profile_check_img").addClass('hidden');
 				$("#img_"+$(this).attr("id")).toggleClass('hidden');
+				$("#modify_profile").trigger("click");
 			});
 			
 			$("#profile_list_table > tbody > tr").dblclick(function(e) {

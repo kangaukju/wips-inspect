@@ -451,6 +451,7 @@ int main(int argc, char *argv[])
 			clc("Error!!! write airresult xml start end </aircaptures>");
 		}
 		if (capture_g.xml_fp) {
+			fflush(capture_g.xml_fp);
 			fclose(capture_g.xml_fp);
 			capture_g.xml_fp = NULL;
 		}

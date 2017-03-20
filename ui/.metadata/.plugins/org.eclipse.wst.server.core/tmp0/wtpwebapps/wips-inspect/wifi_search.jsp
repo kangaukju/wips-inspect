@@ -15,7 +15,7 @@ table.tablesorter thead tr, table.tablesorter tbody tr {
 <body>
 	<fieldset class="main_fieldset">
 		<legend>
-			<img class="head_img" src="/img/list_banner.svg">
+			<img class="head_img" src="/img/wifi_search.png">
 			<span>Air Current</span>
 		</legend>
 		
