@@ -1,0 +1,17 @@
+package air.wips.inspect.utils;
+
+import java.text.SimpleDateFormat;
+
+public class TimeUtil {
+
+	private static final SimpleDateFormat _format_date_hour = new SimpleDateFormat("yyy-MM-DD HH:mm:ss");
+	private static final SimpleDateFormat _format_date = new SimpleDateFormat("yyy-MM-DD");
+	private static final SimpleDateFormat _format_hour = new SimpleDateFormat("HH:mm:ss");
+	public static final String getTime(long time) {
+		java.util.Date timestamp = new java.util.Date(time*1000);
+		return _format_hour.format(timestamp);
+	}
+	public static final String getTime(String time) {
+		return getTime(Long.valueOf(time));
+	}
+}

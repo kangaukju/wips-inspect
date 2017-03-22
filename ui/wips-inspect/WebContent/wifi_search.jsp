@@ -5,18 +5,20 @@
 <meta charset="UTF-8">
 <%@include file="header.jsp"%>
 <style type="text/css">
+<%--
 table.tablesorter thead tr, table.tablesorter tbody tr {
 	font-size: 6px;
 	height: 15px;
 	font-weight: normal;
 }
+--%>
 </style>
 </head>
 <body>
 	<fieldset class="main_fieldset">
 		<legend>
 			<img class="head_img" src="/img/wifi_search.png">
-			<span>Air Current</span>
+			<span>WiFi Search</span>
 		</legend>
 		
 		<div>

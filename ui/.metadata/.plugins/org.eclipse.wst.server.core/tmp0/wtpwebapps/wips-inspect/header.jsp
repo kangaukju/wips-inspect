@@ -47,9 +47,22 @@
 	<script src="/js/err.js"></script>
 	<script src="/js/wifi_protocol.js"></script>	
 	<script src="/js/inspectChart.js"></script>
+	<%--
+	<script type="text/javascript">
+		var uAgent = navigator.userAgent.toLowerCase();
+		var mobilePhones = new Array('iphone', 'ipod', 'android', 'blackberry', 'windows ce', 'nokia', 'webos', 'opera mini', 'sonyericsson', 'opera mobi', 'iemobile', 'windows phone');
+		var isMobile = false;
+		for( var i = 0 ; i < mobilePhones.length ; ++i ){
+			if( uAgent.indexOf(mobilePhones[i]) > -1) {
+				isMobile = true;
+				break;
+			}
+		}
+	</script>
+	--%>
 	<style type="text/css">
 	* {		
-		font: 13px/18px Arial, Sans-serif;
+		font: 12px Arial, Sans-serif;
 		font-weight: bold;
 	}
 	body {
@@ -69,7 +82,7 @@
 	}
 	table.tablesorter thead tr, table.tablesorter tbody tr {
 		cursor: pointer;
-		height: 25px;
+		height: 15px;
 	}
 	table.tablesorter tbody tr.selected td {
    	background: none repeat scroll 0 0 #ffa31a;
@@ -112,7 +125,7 @@
 	}
 	.index_background {
 		background-color: #407bbf;
-	}
+	}	
 	.main_fieldset {
 		background: #ddd;
 		border: 2px solid #407bbf;
@@ -125,13 +138,13 @@
 		background: #407bbf;
 		color: #fff;
 		padding: 5px 10px ;
-		font-size: 18px;
+		font-size: 14px;
 		border-radius: 5px;
 		box-shadow: 0 0 0 5px #ddd;
 		margin-left: 20px;
 	}
 	.main_fieldset > legend > span {
-		font-size: 18px;
+		font-size: 14px;
 	}
 	.sub_fieldset {
 		background: #ddd;
@@ -165,13 +178,13 @@
 		background: #ffa31a;
     color: #fff;
     padding: 5px 10px ;
-    font-size: 18px;
+    font-size: 14px;
     border-radius: 5px;
     box-shadow: 0 0 0 5px #ddd;
     margin-left: 20px;
 	}
 	.main_fieldset_r > legend > span {
-		font-size: 18px;
+		font-size: 14px;
 	}
 	.sub_fieldset_r {
 		background: #ddd;
@@ -193,7 +206,7 @@
 	.sub_fieldset_r > legend > span {
 		font-size: 15px;
 	}
-	.title {
+	.title_outer {
 		cursor: pointer;
 		vertical-align: middle;
 		text-align: center;
@@ -204,6 +217,9 @@
 	}
 	.hidden {
 		display: none;
+	}
+	.where_link_img {
+		width: 20px;
 	}
 	.head_link_img {
 		width: 25px;
@@ -216,7 +232,7 @@
 		cursor: pointer;
 	}
 	.pop_error {
-		font: 14px Arial, Sans-serif;
+		font: 12px Arial, Sans-serif;
 		font-weight: bold;
 		padding: 20px;
 		background-color: #f44336; /* Red */
@@ -224,7 +240,7 @@
 		margin-bottom: 15px;
 	}
 	.pop_success {
-		font: 14px Arial, Sans-serif;
+		font: 12px Arial, Sans-serif;
 		font-weight: bold;
 		padding: 20px;
 		background-color: #4CAF50; /* Green */
@@ -232,7 +248,7 @@
 		margin-bottom: 15px;
 	}
 	.pop_info {
-		font: 14px Arial, Sans-serif;
+		font: 12px Arial, Sans-serif;
 		font-weight: bold;
 		padding: 20px;
 		background-color: #2196F3; /* Blue */
@@ -240,7 +256,7 @@
 		margin-bottom: 15px;
 	}
 	.pop_warning {
-		font: 14px Arial, Sans-serif;
+		font: 12px Arial, Sans-serif;
 		font-weight: bold;
 		padding: 20px;
 		background-color: #ff9800; /* Yellow */
@@ -253,22 +269,25 @@
 <body>
 <table style="width: 100%;">
 	<tr>
-		<td class="title">
+		<td class="title_outer">
 			<div align="left">
-				<img class="title_img" src="/img/wifi.svg">&nbsp;&nbsp;<b>WIPS INSPECTOR</b>
+				<span class="title">
+					<img class="title_img" src="/img/wifi.svg">&nbsp;&nbsp;<b>WIPS INSPECTOR</b>
+				</span>				
+				<span id="where"></span>
 			</div>
 		</td>
 		<td align="right">
-			<img class="head_link_img home_link_users"        src="/img/users.png">
-			<img class="head_link_img home_link_inspect"      src="/img/inspect.png">
-			<img class="head_link_img home_link_profile_list" src="/img/profiles.png">
-			<img class="head_link_img home_link_config_list"  src="/img/configs.png">
-			<img class="head_link_img home_link_wifi_search"  src="/img/wifi_search.png">
-			<img class="head_link_img home_link_setting_list" src="/img/setting.png">
+			<img class="head_link_img home_link" id="users"        src="/img/users.png">
+			<img class="head_link_img home_link" id="inspect"      src="/img/inspect.png">
+			<img class="head_link_img home_link" id="profile_list" src="/img/profiles.png">
+			<img class="head_link_img home_link" id="config_list"  src="/img/configs.png">
+			<img class="head_link_img home_link" id="history_list" src="/img/database.png">
+			<img class="head_link_img home_link" id="wifi_search"  src="/img/wifi_search.png">
+			<img class="head_link_img home_link" id="setting"      src="/img/setting.png">
 		</td>
 	</tr>
 </table>
-
 
 <div id="custom-overlay" style="text-align: center; vertical-align: middle;">
 	<img src="/img/loading.svg" style="width: 70px; height: 70px;">
@@ -373,26 +392,38 @@ $(window).on('unload ',function() {
 	});
 });
 */
+<%
+String currentID 
+	= request.getServletPath().substring(
+			request.getServletPath().indexOf("/")+1, 
+			request.getServletPath().lastIndexOf(".jsp"));
+%>
 
 $(function() {
 	$(".title").click(function() {
 		gogo("main.jsp");
 	});
-	$(".home_link_inspect").click(function() {
-		gogo("inspect.jsp");
+	$(".home_link").click(function() {		
+		gogo($(this).attr("id")+".jsp");		
 	});
-	$(".home_link_profile_list").click(function() {
-		gogo("profile_list.jsp");
-	});
-	$(".home_link_config_list").click(function() {
-		gogo("config_list.jsp");
-	});
-	$(".home_link_setting_list").click(function() {
-		gogo("setting.jsp");
-	});
-	$(".home_link_wifi_search").click(function() {
-		gogo("wifi_search.jsp");
-	});
+	
+	$("#where").empty();
+	var $currentID = $("#"+"<%=currentID%>");
+	if (_defined_($currentID)) {
+		if (_defined_($currentID.attr("src"))) {
+			$("<span>")
+				.html("&nbsp;&nbsp;>&nbsp;&nbsp;")
+				.appendTo("#where");
+			$("<img>")
+				.attr("src", $currentID.attr("src"))
+				.addClass("where_link_img")				
+				.appendTo("#where");
+			var naming = $currentID.attr("id").toUpperCase().replace("_", " ");
+			$("<span>")
+				.html("&nbsp;"+naming)
+				.appendTo("#where");
+		}
+	}
 });
 
 function _defined_(v) {

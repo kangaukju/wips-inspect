@@ -55,7 +55,13 @@ function _null(val) {
 	return val;
 }
 
-//
+function _default(val, def) {
+	if (_isnull(val)) {
+		return def;
+	}
+	return val;
+}
+
 function extract_profile_id(tree_id) {
 	var profile_id = "";
 	if (tree_id.startsWith("p_")) {

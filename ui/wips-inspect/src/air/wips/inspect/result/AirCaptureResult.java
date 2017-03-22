@@ -12,6 +12,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import air.wips.inspect.protocol.AirProtocol;
 import air.wips.inspect.servlet.AirResultParse;
 import air.wips.inspect.utils.StringUtil;
 
@@ -33,6 +34,7 @@ public class AirCaptureResult {
 	private String ds;
 	private String seq;
 	private String deauthcode;
+	private String frameTypeName;
 		
 	public static final String AIR_CAPTURE_KEY = "1";
 	public static final String AIR_SHOOTER_KEY = "2";
@@ -68,13 +70,14 @@ public class AirCaptureResult {
 				rs.setAddr4  (AirResultParse.getNodeValue(attrs, "addr4", ""));
 				rs.setDs     (AirResultParse.getNodeValue(attrs, "ds", ""));
 				rs.setSeq    (AirResultParse.getNodeValue(attrs, "seq", ""));
+				rs.setFrameTypeName(AirProtocol.toFrameTypeName(rs.getType(), rs.getSubtype()));
 				
 				if (StringUtil.isNull(rs.getProfile())) {
 					throw new Exception("empty profile of aircapture result");
 				}
 				if (StringUtil.isNull(rs.getConf())) {
 					throw new Exception("empty config of aircapture result");
-				}				
+				}
 				if (StringUtil.isNull(rs.getKey())) {
 					throw new Exception("empty key of aircapture result");
 				}
@@ -210,11 +213,17 @@ public class AirCaptureResult {
 	public void setDeauthcode(String deauthcode) {
 		this.deauthcode = deauthcode;
 	}
+	public String getFrameTypeName() {
+		return frameTypeName;
+	}
+	public void setFrameTypeName(String frameTypeName) {
+		this.frameTypeName = frameTypeName;
+	}
 	@Override
 	public String toString() {
 		return "AirCaptureResult [profile=" + profile + ", conf=" + conf + ", key=" + key + ", xid=" + xid + ", sec="
 				+ sec + ", usec=" + usec + ", elapsed=" + elapsed + ", pwr=" + pwr + ", type=" + type + ", subtype="
 				+ subtype + ", addr1=" + addr1 + ", addr2=" + addr2 + ", addr3=" + addr3 + ", addr4=" + addr4 + ", ds="
-				+ ds + ", seq=" + seq + ", deauthcode=" + deauthcode + "]";
+				+ ds + ", seq=" + seq + ", deauthcode=" + deauthcode + ", frameTypeName=" + frameTypeName + "]";
 	}
 }

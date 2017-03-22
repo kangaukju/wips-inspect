@@ -11,6 +11,7 @@ import org.w3c.dom.NodeList;
 import air.wips.inspect.protocol.AirProtocol;
 import air.wips.inspect.result.AirCurrentAP;
 import air.wips.inspect.result.AirCurrentST;
+import air.wips.inspect.utils.TimeUtil;
 
 public class AirResultParse {
 	
@@ -42,11 +43,11 @@ public class AirResultParse {
 				st.setBytes(getNodeValue(attrs, "bytes", ""));			
 				String tinit = getNodeValue(attrs, "tinit", null);
 				if (tinit != null) {
-					st.setTinit(AirProtocol.getTime(tinit));
+					st.setTinit(TimeUtil.getTime("HH:mm:ss", Long.valueOf(tinit) * 1000));
 				}
 				String tlast = getNodeValue(attrs, "tlast", null);
 				if (tlast != null) {
-					st.setTlast(AirProtocol.getTime(tlast));
+					st.setTlast(TimeUtil.getTime("HH:mm:ss", Long.valueOf(tlast) * 1000));
 				}
 				stlist.add(st);
 			}
@@ -86,11 +87,11 @@ public class AirResultParse {
 				}			
 				String tinit = getNodeValue(attrs, "tinit", null);
 				if (tinit != null) {
-					ap.setTinit(AirProtocol.getTime(tinit));
+					ap.setTinit(TimeUtil.getTime("HH:mm:ss", Long.valueOf(tinit) * 1000));
 				}
 				String tlast = getNodeValue(attrs, "tlast", null);
 				if (tlast != null) {
-					ap.setTlast(AirProtocol.getTime(tlast));
+					ap.setTlast(TimeUtil.getTime("HH:mm:ss", Long.valueOf(tlast) * 1000));
 				}
 				aplist.add(ap);
 			}

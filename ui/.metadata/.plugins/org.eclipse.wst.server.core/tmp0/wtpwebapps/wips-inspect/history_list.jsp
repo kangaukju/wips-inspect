@@ -5,21 +5,25 @@
 <meta charset="UTF-8">
 <%@include file="header.jsp"%>
 <style type="text/css">
-
+.hidable {
+	width: 15px;
+	cursor: pointer;
+}
 </style>
 </head>
 <body>
 	<fieldset class="main_fieldset">
 		<legend>
-			<img class="head_img" src="/img/list_banner.svg">
-			<span id="profile_legend"></span>
-		</legend>
+			<img class="head_img" src="/img/profiles.png">
+			Profile [<span id="profile_legend"></span>]			
+		</legend>		
 		
 		<table id="history_list_table" class="tablesorter">
 			<thead>
 				<tr>
-					<th width="20px;"></th>
+					<th width="20px;"></th>					
 					<th>timestamp</th>
+					<th>id</th>
 					<th>configs</th>
 				</tr>
 			</thead>
@@ -80,27 +84,29 @@ var history_list_table_xlat = {
 		timestamp: '$\{timestamp\}',
 		class:"pointer",
 		children: [
-			{tag:"td", html:"<img class='history_check_img hidden table_img' src='/img/profile.svg' id='img_$\{timestamp\}'>"},
+			{tag:"td", html:"<img class='history_check_img hidden table_img' src='/img/profiles.png' id='img_$\{timestamp\}'>"},
+			{tag:"td", html:"$\{timestampString\}"},
 			{tag:"td", html:"$\{timestamp\}"},
 			{tag:"td", html:"$\{profile.configListNames\}"},
 		]
 };
 
-var xml_log_table_xlat = {
-		tag: "tr",
-		children: [
-			{tag:"td", html:"$\{result.xid\}"},
-			{tag:"td", html:"$\{result.elapsed\}"},
-			{tag:"td", html:"$\{result.pwr\}"},
-			{tag:"td", html:get_framesubtype_string("$\{result.type\}", "$\{result.subtype\}")},
-			{tag:"td", html:"$\{result.elapsed\}"},
-			{tag:"td", html:"$\{result.addr1\}"},
-			{tag:"td", html:"$\{result.addr2\}"},
-			{tag:"td", html:"$\{result.addr3\}"},
-			{tag:"td", html:"$\{result.addr4\}"},
-			{tag:"td", html:"$\{result.seq\}"},
-		]
-};
+function get_xml_log_table_html(data) {
+	var html = 
+	"<tr>"+
+		"<td>"+data.xid+"</td>"+
+		"<td>"+data.elapsed+"</td>"+
+		"<td>"+data.pwr+"</td>"+
+		"<td>"+get_framesubtype_string(data.type, data.subtype)+"</td>"+
+		"<td>"+get_ds_string(data.ds, (data.type == 2))+"</td>"+
+		"<td>"+data.addr1+"</td>"+
+		"<td>"+data.addr2+"</td>"+
+		"<td>"+data.addr3+"</td>"+
+		"<td>"+_default(data.addr4, "")+"</td>"+
+		"<td>"+data.seq+"</td>"+
+	"</tr>";	
+	return html;
+}
 
 function load_inspect_history_list(profile_id, timestamp) {
 	jQuery.ajax({
@@ -122,22 +128,24 @@ function load_inspect_history_list(profile_id, timestamp) {
 			}
 			
 			//console.log(result);
-			if (_defined_(result.inspectXmlLogList)) {				
+			if (_defined_(result.inspectXmlLogList)) {
 				$.each(result.inspectXmlLogList, function(i, v) {
 					var xml_log_json = jQuery.parseJSON(v.xmlLog).aircaptures.aircapture;
 					
 					var c = $("#sample_inspect_history").clone();
-					c.attr("id", "inspect_history_"+i);
-					c.find("legend").html(v.config.name);
+					var cid = "inspect_history_"+i;
+					c.attr("id", cid);
+					c.find("legend").html("Config ["+v.config.name+"] <img src='/img/cross-button.png' class='hidable' target='"+cid+"'>");
 					c.removeClass("hidden");
 					c.appendTo($("#inspect_history_div"));
 					
 					if (1) {
-						// build xml_log_table
-						c.find(".xml_log_table > tbody").html(
-								json2html.transform(xml_log_json, xml_log_table_xlat)
-						);
-						c.find(".xml_log_table").tablesorter();
+						// build xml_log_table						
+						$.each(xml_log_json, function(ii, vv) {
+							c.find(".xml_log_table > tbody:last")
+								.append(get_xml_log_table_html(vv.result));
+						});						
+						c.find(".xml_log_table").tablesorter({widgets: ["zebra"]});
 					}
 					if (1) {
 						// bind pcap file for wireshark					
@@ -192,8 +200,13 @@ function load_inspect_history_list(profile_id, timestamp) {
 							inspect_charts.refresh(vv);
 						});
 					}
-				});
+				});				
 			}
+			
+			$(".hidable").click(function(){
+				var $target = $("#"+$(this).attr("target"));
+				$target.hide("slow", function() { $target.remove(); });
+			});
 			
 			$(".wireshark_img").click(function(e) {
 				var filepath = $(this).attr("filepath");

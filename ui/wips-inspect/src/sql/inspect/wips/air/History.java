@@ -12,11 +12,13 @@ import org.json.XML;
 
 import air.wips.inspect.history.InspectHistory;
 import air.wips.inspect.utils.FileUtil;
+import air.wips.inspect.utils.TimeUtil;
 
 public class History {
 	private String profileId;
 	private String runTimer;
 	private String timestamp;
+	private String timestampString;
 	private String savepath;
 	private Profile profile;
 	private List<InspectXmlLog> inspectXmlLogList;
@@ -144,6 +146,7 @@ public class History {
 				history = new History();
 				history.profileId = profileId;
 				history.timestamp = timestamp;
+				history.timestampString = TimeUtil.getTime("yyyy-MM-dd HH:mm:ss", Long.valueOf(history.timestamp));
 				history.savepath = rs.getString("savepath");
 				history.runTimer = rs.getString("run_timer");
 				history.profile = Profile.getById(profileId, true);
@@ -177,6 +180,7 @@ public class History {
 				History history = new History();
 				history.profileId = profileId;
 				history.timestamp = rs.getString("timestamp");
+				history.timestampString = TimeUtil.getTime("yyyy-MM-dd HH:mm:ss", Long.valueOf(history.timestamp));
 				history.savepath = rs.getString("savepath");
 				history.runTimer = rs.getString("run_timer");
 				history.profile = Profile.getById(profileId, true);
@@ -211,6 +215,7 @@ public class History {
 				History history = new History();
 				history.profileId = rs.getString("profile_id");
 				history.timestamp = rs.getString("timestamp");
+				history.timestampString = TimeUtil.getTime("yyyy-MM-dd HH:mm:ss", Long.valueOf(history.timestamp));
 				history.savepath = rs.getString("savepath");
 				history.runTimer = rs.getString("run_timer");
 				history.profile = Profile.getById(history.profileId, true);
@@ -239,9 +244,9 @@ public class History {
 				Config config = Config.getById(configId, true);
 				if (config != null) {
 					try {
-						list.add(new InspectXmlLog(
-								config, 
-								XML.toJSONObject(FileUtil.getContent(path+"/"+xml)).toString()));
+						String json = XML.toJSONObject(FileUtil.getContent(path+"/"+xml)).toString();
+						System.out.println(json);
+						list.add(new InspectXmlLog(config, json));
 					} catch (JSONException e) {
 						e.printStackTrace();
 					}

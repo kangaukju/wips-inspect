@@ -36,7 +36,7 @@
 					<th>name</th>
 					<th>selected configs</th>
 					<th>updated</th>
-					<th></th>
+					<th>history</th>
 				</tr>
 			</thead>
 			<tbody></tbody>
@@ -65,7 +65,7 @@
 	<fieldset class="main_fieldset">
 		<legend id="inspect_results_legend">
 			<img class="head_img" src="/img/inspect.png">
-			Inspect Results			
+			Inspect List			
 		</legend>
 		<div id="inspect_results_div">
 		</div>
@@ -129,7 +129,7 @@ var profile_list_table_xlat = {
 			{tag:"td", html:"$\{name\}"},
 			{tag:"td", html:"$\{configListNames\}"},
 			{tag:"td", html:"$\{updated\}"},
-			{tag:"td", html:"<img class='profile_log_img table_img' src='/img/Graph-Magnifier.svg' id='$\{id\}'>"},
+			{tag:"td", html:"<img class='profile_log_img table_img' src='/img/database.png' id='$\{id\}'>"},
 		]
 };
 

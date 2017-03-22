@@ -6,20 +6,20 @@
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="Profile List" key="selection"/>
+		<item value="_default" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
 		<item value="false" key="wholeword"/>
 		<list key="findhistory">
-			<item value="profile list"/>
-			<item value="profile List"/>
-			<item value="alert"/>
-			<item value="profile_log_img"/>
-			<item value="load_config_list"/>
-			<item value="parent"/>
-			<item value="gogo"/>
-			<item value="header"/>
+			<item value="_default"/>
+			<item value="xml_log_table_xlat"/>
+			<item value="_value"/>
+			<item value="_defined_"/>
+			<item value="_def"/>
+			<item value="addr4"/>
+			<item value="xml_log_json"/>
+			<item value="get_inspect_log_table_html"/>
 		</list>
 		<list key="replacehistory">
 		</list>

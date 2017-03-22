@@ -1,7 +1,5 @@
 package air.wips.inspect.protocol;
 
-import java.text.SimpleDateFormat;
-
 public class AirProtocol {
 	
 	public static long STD_OPN  = 0x0001;
@@ -103,15 +101,60 @@ public class AirProtocol {
 		}
 		return enc;
 	}
-	
-	private static final SimpleDateFormat _format_date_hour = new SimpleDateFormat("yyy-MM-DD HH:mm:ss");
-	private static final SimpleDateFormat _format_date = new SimpleDateFormat("yyy-MM-DD");
-	private static final SimpleDateFormat _format_hour = new SimpleDateFormat("HH:mm:ss");
-	public static final String getTime(long time) {
-		java.util.Date timestamp = new java.util.Date(time*1000);
-		return _format_hour.format(timestamp);
-	}
-	public static final String getTime(String time) {
-		return getTime(Long.valueOf(time));
-	}
+		
+	public static String toFrameTypeName(String type, String subtype) {
+		int Itype = Integer.valueOf(type);
+		int ISubtype = Integer.valueOf(subtype);
+		
+		switch (Itype) {
+		case 0:
+			switch (ISubtype) {
+			case 0: return "Assoc-Req";
+			case 1: return "Assoc-Resp";
+			case 2: return "Reassoc-Req";
+			case 3: return "Reassoc-Resp";
+			case 4: return "Probe-Request";
+			case 5: return "Probe-Request";
+			case 8: return "Beacon";
+			case 9: return "ATIM";
+			case 10: return "Disassoc";
+			case 11: return "Auth";
+			case 12: return "Deauth";
+			case 13: return "Action";
+			}
+			break;
+		case 1:
+			switch (ISubtype) {
+			case 8: return "Block-Ack-Req";
+			case 9: return "Block-Ack";
+			case 10: return "PS-Poll";
+			case 11: return "RTS";
+			case 12: return "CTS";
+			case 13: return "ACK";
+			case 14: return "CF-End";
+			case 15: return "CF-End-Ack";		
+			}
+			break;
+		case 2:
+			switch (ISubtype) {
+			case 0: return "Data";
+			case 1: return "Data-Ack";
+			case 2: return "Data-Poll";
+			case 3: return "Data-Ack-Poll";
+			case 4: return "NULL";
+			case 5: return "ACK";
+			case 6: return "Poll";
+			case 7: return "Ack-Poll";
+			case 8: return "Qos-Data";
+			case 9: return "Qos-Data-Ack";
+			case 10: return "Qos-Data-Poll";
+			case 11: return "Qos-Data-Ack-Poll";
+			case 12: return "Qos-NULL";
+			case 14: return "Qos-Poll";
+			case 15: return "Qos-Ack";
+			}
+			break;
+		}
+		return "";
+	}	
 }
